@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sitepiler Content Editor</title>
+
+	<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+	<script type="text/javascript">
+let builderTimer;
+let lastEdit;
+let pageUrl = '/devcenter/test/a-page.html';
+let sourceUrl = `/localapi/sources/0${pageUrl}.md`;
+$(document).ready(() => {
+	$('#load-source').click(() => {
+		$.get(sourceUrl)
+			.then((data) => {
+				$('#source').val(data);
+				lastEdit = new Date('1900-01-01');
+			})
+			.catch((err) => console.error(err));
+	});
+
+	$('#save-source').click(() => {
+		$('#save-source').prop('disabled', true);
+		$.post(sourceUrl, $('#source').val())
+			.then(() => {
+				// window.open(pageUrl);
+				$('#save-source').prop('disabled', false);
+			})
+			.catch((err) => console.error(err));
+	});
+
+
+	$('#reload-output').click(() => {
+		lastEdit = new Date('1900-01-01');
+	});
+
+	$('#open-output').click(() => {
+		window.open(pageUrl);
+	});
+
+
+	$('#source').on('keyup', () => {
+		lastEdit = Date.now();
+	});
+
+
+	builderTimer = setInterval(() => {
+	// builderTimer = setTimeout(() => {
+		if (!lastEdit || Date.now() - lastEdit < 1000) 
+			return;
+		else
+			lastEdit = undefined;
+
+
+		$.post('/localapi/render', $('#source').val())
+			.then((data) => {
+				// let iframe = $('<iframe class="form-control content">');
+				// const iframeDoc = iframe[0].contentDocument || iframe[0].contentWindow.document;
+				// iframeDoc.open();
+				// iframeDoc.write(data);
+				// iframeDoc.close();
+				// $('#output').html(iframe);
+
+				const iframe = $('<iframe class="form-control content">');
+				$('#output').html(iframe);
+				iframe.contents().find('body').append(data);
+			})
+			.catch((err) => console.error(err));
+	}, 100);
+});
+	</script>
+
+	<style type="text/css">
+		#source {
+
+		}
+
+		.fill, body, html, .row, .row > div { 
+			/*min-height: 100%;*/
+			height: 100%;
+		}
+
+		.content {
+			height: 95% !important;
+		}
+	</style>
+</head>
+<body>
+
+<div class="container-fluid fill">	
+	<div class="row">
+		<div class="col-sm-6">
+			<button id="load-source" class="btn btn-primary">Load Source</button>
+			<button id="save-source" class="btn btn-primary">Save Source</button>
+
+			<textarea id="source" class="form-control content"></textarea>
+
+		</div>
+		<div class="col-sm-6">
+			<button id="reload-output" class="btn btn-primary">Reload Output</button>
+			<button id="open-output" class="btn btn-primary">Open</button>
+
+			<!-- <iframe id="output" class="form-control content"></iframe> -->
+			<div id="output" class="content"></div>
+
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

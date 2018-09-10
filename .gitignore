@@ -1,3 +1,14 @@
+################
+# Custom Rules #
+################
+local
+*-local.yml
+
+
+###########
+# Node.js #
+###########
+
 # Logs
 logs
 *.log
