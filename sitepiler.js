@@ -20,6 +20,8 @@ cli
 	.option('-o --buildOnly <stage>', `Build a single stage (${TARGET_REGEX_STRING})`, TARGET_REGEX)
 	.option('-l --local', 'Serve the page locally')
 	.option('-p --localPort <n>', 'Port for serving the page locally', commanderParseInt, 4567)
+	.option('-r --livereload', 'Enable livereload server when serving locally')
+	.option('-r --livereloadPort <n>', 'Custom livereload server port', commanderParseInt, 35729)
 	.option('-t --tracing <level>', `Tracing level (${LOG_LEVEL_REGEX_STRING})`, LOG_LEVEL_REGEX, 'debug')
 	.version(packageJson.version, '-v, --version')
 	.parse(process.argv);
@@ -74,6 +76,8 @@ log.debug('--build -> ', cli.build);
 log.debug('--buildOnly -> ', cli.buildOnly);
 log.debug('--local -> ', cli.local);
 log.debug('--localPort -> ', cli.localPort);
+log.debug('--livereload -> ', cli.livereload);
+log.debug('--livereloadPort -> ', cli.livereloadPort);
 log.debug('--tracing -> ', cli.tracing);
 log.debug('args:', cli.args);
 
@@ -91,7 +95,18 @@ try {
 	exit(err);
 }
 
-log.debug(ConfigHelper.config);
+// Add cli opts to config
+ConfigHelper.setDefault(ConfigHelper.config, 'cliopts', {});
+ConfigHelper.config.cliopts.build = cli.build;
+ConfigHelper.config.cliopts.buildOnly = cli.buildOnly;
+ConfigHelper.config.cliopts.local = cli.local;
+ConfigHelper.config.cliopts.localPort = cli.localPort;
+ConfigHelper.config.cliopts.livereload = cli.livereload;
+ConfigHelper.config.cliopts.livereloadPort = cli.livereloadPort;
+ConfigHelper.config.cliopts.tracing = cli.tracing;
+ConfigHelper.config.cliopts.args = cli.args;
+
+// log.debug(ConfigHelper.config);
 
 
 // Begin processing

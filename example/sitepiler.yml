@@ -1,0 +1,37 @@
+---
+envVars:
+  TEST_ENV_1: A test value
+  TEST_ENV_2: Another test value
+
+settings:
+  templateChangeRebuildQuietSeconds: 0
+  stages:
+    data:
+      scripts:
+      - type: shell
+        src: "/path/to/file.sh"
+      - type: shell
+        src: "/path/to/file.sh"
+      dataDirs:
+      - "example/src/data"
+    compile:
+      preCompileScripts: []
+      templateDirs:
+        layouts: 
+        - "example/src/templates/layouts"
+        partials: 
+        - "example/src/templates/partials"
+      contentDirs:
+      - "example/src/content"
+      - source: "example/src/othercontent"
+        dest: "othercontent/subdir"
+      styleDirs:
+      - "example/src/styles"
+      outputDirs: 
+        content: "example/build"
+        styles: "example/build/styles"
+      postCompileScripts: []
+    publish:
+      prePublishScripts: []
+      publishScripts: []
+      postPublishScripts: []

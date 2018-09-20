@@ -1,0 +1,51 @@
+@primary-orange: #FF4F1F;
+@primary-purple: #5D3E5D;
+@primary-blue: #2A60C8;
+@primary-dark-blue: #2455A3;
+@primary-mono-1: #272727;
+@primary-mono-2: #353537;
+@primary-mono-3: #6B7178;
+@primary-mono-4: #757575;
+@primary-mono-5: #959699;
+@primary-mono-6: #D3D3D4;
+@primary-mono-7: #F2F0F2;
+@primary-mono-8: #FDFDFD;
+@default-font: normal 11pt Roboto, sans-serif;
+
+body {
+	font-family: 'Roboto', sans-serif;
+	// font-size: 11pt;
+	font: @default-font;
+}
+
+h1 {
+	color: @primary-mono-3;
+}
+
+a {
+	color: @primary-orange;
+
+	&:visited {
+		color: @primary-orange;
+	}
+
+	&:hover {
+		color: @primary-purple;
+	}
+}
+
+.site-header {
+	padding: 10px;
+	background-color: @primary-mono-3;
+	border-radius: 0;
+
+	i.fa-hand-lizard {
+		color: @primary-orange;
+	}
+
+	&-title {
+		color: #ffffff;
+		font-size: 42pt;
+		margin-left: 10px;
+	}
+}

@@ -40,22 +40,25 @@ class ConfigHelper {
 
 		// Initialize config structure before proceeding
 		this.setDefault(this.config, 'envVars', {});
+		this.setDefault(this.config, 'templateChangeRebuildQuietSeconds', 30);
 		this.setDefault(this.config, 'stageSettings', {});
-		this.setDefault(this.config.stageSettings, 'data', {});
-		this.setDefault(this.config.stageSettings.data, 'scripts', []);
-		this.setDefault(this.config.stageSettings, 'compile', {});
-		this.setDefault(this.config.stageSettings.compile, 'preCompileScripts', []);
-		this.setDefault(this.config.stageSettings.compile, 'outputDir', path.resolve('./build'));
-		this.setDefault(this.config.stageSettings.compile, 'postCompileScripts', []);
-		this.setDefault(this.config.stageSettings, 'publish', {});
-		this.setDefault(this.config.stageSettings.publish, 'prePublishScripts', []);
-		this.setDefault(this.config.stageSettings.publish, 'publishScripts', []);
-		this.setDefault(this.config.stageSettings.publish, 'postPublishScripts', []);
+		this.setDefault(this.config.settings.stages, 'data', {});
+		this.setDefault(this.config.settings.stages.data, 'scripts', []);
+		this.setDefault(this.config.settings.stages, 'compile', {});
+		this.setDefault(this.config.settings.stages.compile, 'preCompileScripts', []);
+		this.setDefault(this.config.settings.stages.compile, 'outputDirs', {});
+		this.setDefault(this.config.settings.stages.compile.outputDirs, 'content', path.resolve('./build'));
+		this.setDefault(this.config.settings.stages.compile.outputDirs, 'styles', path.resolve('./build/styles'));
+		this.setDefault(this.config.settings.stages.compile, 'postCompileScripts', []);
+		this.setDefault(this.config.settings.stages, 'publish', {});
+		this.setDefault(this.config.settings.stages.publish, 'prePublishScripts', []);
+		this.setDefault(this.config.settings.stages.publish, 'publishScripts', []);
+		this.setDefault(this.config.settings.stages.publish, 'postPublishScripts', []);
 
 		// Check for required settings
-		this.checkAndThrow(this.config.stageSettings.data, 'dataDirs');
-		this.checkAndThrow(this.config.stageSettings.compile, 'templateDirs');
-		this.checkAndThrow(this.config.stageSettings.compile, 'contentDirs');
+		this.checkAndThrow(this.config.settings.stages.data, 'dataDirs');
+		this.checkAndThrow(this.config.settings.stages.compile, 'templateDirs');
+		this.checkAndThrow(this.config.settings.stages.compile, 'contentDirs');
 
 		// Apply other configs
 		for (let i = configSources.length - 1; i > 0; i--) {
@@ -69,6 +72,19 @@ class ConfigHelper {
 
 		// Resolve env vars
 		this.resolveEnvVars(this.config);
+
+		// Normalize content dirs
+		const tempContentDirs = [];
+		this.config.settings.stages.compile.contentDirs.forEach((contentDir) => {
+			// Resolve source dir to full path, leave dest relative (to output dir)
+			if (typeof(contentDir) === 'string')
+				tempContentDirs.push({ source: path.resolve(contentDir), dest: '' });
+			else
+				tempContentDirs.push({ source: path.resolve(contentDir.source), dest: contentDir.dest });
+		});
+		this.config.settings.stages.compile.contentDirs = tempContentDirs;
+		this.config.settings.stages.compile.outputDirs.content = path.resolve(this.config.settings.stages.compile.outputDirs.content);
+		this.config.settings.stages.compile.outputDirs.styles = path.resolve(this.config.settings.stages.compile.outputDirs.styles);
 
 
 		log.silly('After:', this.config);

@@ -12,8 +12,7 @@ class EditorServer {
 
 		this.app = express();
 		// this.app.use(bodyParser.json());
-		this.app.use(express.static(sitepiler.config.stageSettings.compile.outputDir));
-		log.debug(path.resolve('./modules/editor/static'));
+		this.app.use(express.static(sitepiler.config.settings.stages.compile.outputDirs.content));
 		this.app.use('/localeditor', express.static(path.resolve('./modules/editor/static')));
 
 		// Serve local editor
@@ -39,7 +38,7 @@ class EditorServer {
 			// Join content dir path and requested path (just the * portion)
 			const requestedPath = req.path.substring(19 + req.params.contentDirId.toString().length);
 			const sourcePath = path.join(
-				sitepiler.config.stageSettings.compile.contentDirs[req.params.contentDirId], 
+				sitepiler.config.settings.stages.compile.contentDirs[req.params.contentDirId], 
 				requestedPath
 			);
 
@@ -60,7 +59,7 @@ class EditorServer {
 			// Join content dir path and requested path (just the * portion)
 			const requestedPath = req.path.substring(19 + req.params.contentDirId.toString().length);
 			const sourcePath = path.join(
-				sitepiler.config.stageSettings.compile.contentDirs[req.params.contentDirId], 
+				sitepiler.config.settings.stages.compile.contentDirs[req.params.contentDirId], 
 				requestedPath
 			);
 
@@ -70,9 +69,10 @@ class EditorServer {
 			fs.writeFileSync(sourcePath, req.body);
 
 			// Render and save
+			//TODO: don't think this code is necessary due to file system watchers in sitepiler
 			const output = sitepiler.render(req.body);
 			let destPath = path.join(
-				sitepiler.config.stageSettings.compile.outputDir,
+				sitepiler.config.settings.stages.compile.outputDirs.content,
 				requestedPath
 			);
 			log.debug('destPath=',destPath);
