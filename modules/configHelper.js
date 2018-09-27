@@ -86,6 +86,11 @@ class ConfigHelper {
 		this.config.settings.stages.compile.outputDirs.content = path.resolve(this.config.settings.stages.compile.outputDirs.content);
 		this.config.settings.stages.compile.outputDirs.styles = path.resolve(this.config.settings.stages.compile.outputDirs.styles);
 
+		// Normalize data dirs
+		for (var i = 0; i < this.config.settings.stages.data.dataDirs.length; i++) {
+			this.config.settings.stages.data.dataDirs[i] = path.resolve(this.config.settings.stages.data.dataDirs[i]);
+		}
+
 
 		log.silly('After:', this.config);
 	}

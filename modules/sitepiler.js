@@ -111,12 +111,16 @@ class Sitepiler {
 		// Context for template execution
 		this.context = {
 			config: this.config,
-			data: {},
+			data: this.context ? this.context.data || {} : {},
 			templates: {
 				layouts: {},
 				partials: {}
 			},
-			content: {}
+			content: {},
+			sitemap: {
+				dirs: {},
+				pages: []
+			}
 		};
 
 		// Uncompiled CSS/LESS
@@ -140,7 +144,7 @@ class Sitepiler {
 				this.context.data[key.substring(0, key.length - path.extname(key).length)] = value;
 			});
 
-			// log.debug('Loaded data: ', this.context.data);
+			log.debug('Loaded data: ', this.context.data);
 
 			// Complete stage
 			deferred.resolve();
@@ -176,13 +180,22 @@ class Sitepiler {
 			startMs = Date.now();
 			this.config.settings.stages.compile.contentDirs.forEach((contentDir) => {
 				let contentSourceTarget = this.contentSource;
-				contentDir.dest.split('/').forEach((d) => {
-					if (!contentSourceTarget[d]) contentSourceTarget[d] = {};
-					contentSourceTarget = contentSourceTarget[d];
-				});
+				if (contentDir.dest !== '') {
+					contentDir.dest.split('/').forEach((d) => {
+						// if (d === '') return; 
+						if (!contentSourceTarget[d]) contentSourceTarget[d] = {};
+						contentSourceTarget = contentSourceTarget[d];
+					});
+				}
 				loadFlles(contentDir.source, contentSourceTarget, [ FILTER_MARKDOWN ], true);
 			});
 			log.verbose(`Content loaded in ${Date.now() - startMs}ms`);
+
+			// Process page sources
+			// Converts raw source into parsed source (extracts frontmatter and body)
+			processSources(this.contentSource, this.context.sitemap);
+			log.debug(this.contentSource);
+			printSitemap(this.context.sitemap);
 
 			// Load styles
 			startMs = Date.now();
@@ -204,9 +217,11 @@ class Sitepiler {
 			startMs = Date.now();
 			buildContent(this.contentSource, this.context.content, this.context, this.context.templates.layouts);
 			log.verbose(`Built ${contentCount} content files in ${Date.now() - startMs}ms`);
+			// log.debug(this.context.content);
 
 			// Write content pages to disk
 			startMs = Date.now();
+			log.debug(this.context.content);
 			writeContent(this.context.content, this.config.settings.stages.compile.outputDirs.content);
 			log.verbose(`Content written in ${Date.now() - startMs}ms`);
 
@@ -253,6 +268,56 @@ module.exports = Sitepiler;
 
 
 
+function printSitemap(sitemap) {
+	log.writeBox('Sitemap');
+	printSitemapImpl(sitemap);
+}
+function printSitemapImpl(sitemap) {
+	sitemap.pages.forEach((page) => log.debug(`${path.join(page.path, page.filename)} (${page.title})`));
+	// sitemap.pages.forEach((page) => log.debug(`${path.join(prefix, page.filename)} (${page.title})`));
+	_.forOwn(sitemap.dirs, (value, key) => printSitemapImpl(value));
+}
+
+function processSources(sources, sitemap, relativePath = '/') {
+	_.forOwn(sources, (value, key) => {
+		if (typeof(value) === 'object' && !PageData.isPageData(value)) {
+			sitemap.dirs[key] = { dirs: {}, pages: [] };
+			processSources(value, sitemap.dirs[key], path.join(relativePath, key));
+		} else {
+			// Replace content with PageData
+			const pageData = processSource(value, key, relativePath);
+			sources[key] = pageData;
+
+			// Add to sitemap
+			sitemap.pages.push({ 
+				title: pageData.pageSettings.title,
+				path: pageData.pageSettings.path,
+				filename: pageData.pageSettings.fileName 
+			});
+		}
+	});
+}
+
+function processSource(content, fileName, relativePath) {
+	const pd = new PageData();
+
+	// Extract frontmatter
+	const fmData = fm(content);
+	pd.pageSettings = fmData.attributes;
+	pd.body = fmData.body;
+
+	// Validate page settings
+	ConfigHelper.setDefault(pd, 'pageSettings', {});
+	ConfigHelper.setDefault(pd.pageSettings, 'layout', 'default');
+	ConfigHelper.setDefault(pd.pageSettings, 'title', 'Default Page Title');
+
+	// Add computed page settings
+	pd.pageSettings.fileName = prepareOutputFileNameImpl(fileName);
+	pd.pageSettings.path = relativePath;
+
+	return pd;
+}
+
 function processStyles(styleSource, outputDir) {
 	/*
 	 * TODO: not sure if reading every file is the best way to process LESS.
@@ -278,7 +343,7 @@ function processStyles(styleSource, outputDir) {
 				})
 				.catch((err) => log.error(err));
 		} else {
-			log.debug('Writing file to', path.join(outputDir, key));
+			log.debug('Writing file to ', path.join(outputDir, key));
 			fs.ensureDirSync(outputDir);
 			fs.writeFileSync(path.join(outputDir, key), value, 'utf-8');
 		}
@@ -316,9 +381,17 @@ function sourceWatcherEvent(evt, filePath) {
 	if (!contentDir)
 		return watcherlog.error(`Failed to find content dir for source ${filePath}`);
 
+	// let relativePath = filePath.substring(contentDir.length, filePath.length - path.basename(filePath).length);
+	// log.debug(contentDir);
+	// log.debug('contentDir.length='+ contentDir.length);
+	// log.debug('relativePath='+ relativePath);
+
 	// Generate content
 	let content = fs.readFileSync(filePath, 'utf-8');
-	content = this.render(content);
+	// content = this.render(content);
+	content = processSource(content, path.basename(filePath), contentDir.dest);
+	log.debug(content);
+	content = renderContent(content, prepareContext(this.context), this.context.templates.layouts);
 
 	// Write to file
 	const filename = prepareOutputFileNameImpl(path.basename(filePath));
@@ -330,28 +403,26 @@ function sourceWatcherEvent(evt, filePath) {
 
 function writeContent(content, dest) {
 	_.forOwn(content, (value, key) => {
-		if (typeof(value) === 'object') {
+		if (typeof(value) === 'object' && !PageData.isPageData(value)) {
 			writeContent(value, path.join(dest, key));
 			return;
 		}
 
 		log.debug('Writing file to', path.join(dest, key));
 		fs.ensureDirSync(dest);
-		fs.writeFileSync(path.join(dest, key), value, 'utf-8');
+		fs.writeFileSync(path.join(dest, key), value.body, 'utf-8');
 	});
 }
 
 let contentCount = 0;
-function buildContent(source, dest, originalContext, templates, destPath = '') {
-	const context = prepareContext(originalContext);
-
-	_.forOwn(source, (value, key) => {
-		if (typeof(value) === 'object') {
+function buildContent(sources, dest, originalContext, templates) {
+	_.forOwn(sources, (value, key) => {
+		if (typeof(value) === 'object' && !PageData.isPageData(value)) {
 			if (!dest[key]) dest[key] = {};
-			buildContent(value, dest[key], originalContext, templates, path.join(destPath, key));
+			buildContent(value, dest[key], originalContext, templates);
 		} else {
-			const fileName = prepareOutputFileNameImpl(key);
-			dest[fileName] = renderContent(value, context, templates, path.join(destPath, key));
+			dest[value.pageSettings.fileName] = renderContent(value, prepareContext(originalContext), templates);
+			log.debug(dest[value.pageSettings.fileName]);
 			contentCount++;
 		}
 	});
@@ -363,12 +434,19 @@ function prepareOutputFileNameImpl(inputFileName) {
 	return outputFileName;
 }
 
+/**
+ * This function performs a deep copy on the object and adds the helper functions to the copied
+ * object. This prevents the page compilation process from leaking anything between page renders.
+ */
 function prepareContext(originalContext) {
 	// Deep copy context
 	const context = clone(originalContext);
 
 	// Add context-sensitive helpers
 	// These cannot be lambda functions and must be explicitly bound to the context object
+	context.path = path;
+	context._ = _;
+
 	context.include = function(partial) {
 		// return this.templates.partials[partial](this);
 		const parts = partial.split('/');
@@ -389,21 +467,15 @@ function prepareContext(originalContext) {
 	return context;
 }
 
-function renderContent(content, context, templates, pageLocation = 'no file') {
-	log.debug(`Bulding page (${pageLocation})`);
+function renderContent(pageData, context, templates) {
+	const fullPath = path.join(pageData.pageSettings.path, pageData.pageSettings.fileName);
+	log.debug(`Bulding page (${fullPath})`);
+	log.debug(pageData);
 	const startMs = Date.now();
 
-	// Extract frontmatter
-	const fmData = fm(content);
-	context.pageSettings = fmData.attributes;
-
-	// Validate page settings
-	ConfigHelper.setDefault(context, 'pageSettings', {});
-	ConfigHelper.setDefault(context.pageSettings, 'layout', 'default');
-	ConfigHelper.setDefault(context.pageSettings, 'title', 'Default Page Title');
-
 	// Compile page and execute page template
-	const markdownContent = dot.template(fmData.body, undefined, context)(context);
+	context.pageSettings = pageData.pageSettings;
+	const markdownContent = dot.template(pageData.body, undefined, context)(context);
 
 	// Compile markdown
 	const parsedContent = md.render(markdownContent);
@@ -415,10 +487,14 @@ function renderContent(content, context, templates, pageLocation = 'no file') {
 	// Log completion
 	const duration = Date.now() - startMs;
 	if (duration > 1000)
-		log.warn(`Page build time of ${duration} exceeded 1000ms: ${pageLocation}`);
+		log.warn(`Page build time of ${duration} exceeded 1000ms: ${fullPath}`);
 	else
 		log.debug(`Page build completed in ${duration}ms`);
-	return output;
+
+	//TODO: write file here instead of building output content object
+	// return new PageData(context.pageSettings, output);
+	pageData.body = output;
+	return pageData;
 }
 
 function compileTemplates(source, dest, originalContext) {
@@ -466,3 +542,24 @@ function loadFlles(dir, target, filters = DEFAULT_FILTERS, recursive = false) {
 function isDirectory(source) {
 	return fs.lstatSync(source).isDirectory();
 }
+
+
+
+
+
+
+class PageData {
+	// constructor(pageSettings, body) {
+	// 	this.pageSettings = pageSettings;
+	// 	this.body = body;
+	// }
+	constructor() {
+		this.pageSettings = {};
+		this.body = '';
+	}
+
+	static isPageData(d) { return d instanceof PageData; }
+}
+
+
+
