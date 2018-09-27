@@ -19,6 +19,7 @@
 <div class="container">
   <div class="row">
     <div class="col-sm">
+{{= context.include('breadcrumb') }}
 				<h1>{{= context.pageSettings.title }}</h1>
 
 {{= context.content }}

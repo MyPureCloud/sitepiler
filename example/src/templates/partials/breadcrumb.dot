@@ -1,0 +1,3 @@
+<p>
+Home > {{~ context.pageSettings.path.split('/') :p }}{{? p !== '' }}{{= p }} > {{?}}{{~}}{{= context.pageSettings.title }}
+</p>
