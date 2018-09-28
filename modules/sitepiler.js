@@ -1,28 +1,21 @@
 const _ = require('lodash');
 const chokidar = require('chokidar');
-const clone = require('clone');
-const ConfigHelper = require('./configHelper');
-const dot = require('dot');
 const less = require('less');
 const livereload = require('livereload');
 const lognext = require('lognext');
-const fm = require('front-matter');
 const fs = require('fs-extra');
-const MarkdownIt = require('markdown-it');
 const path = require('path');
 const Q = require('q');
 const YAML = require('yaml').default;
 
+const ConfigHelper = require('./configHelper');
+const ContextExtensions = require('./contextExtensions');
+const PageData = require('./classes/pageData');
+const renderer = require('./renderer');
+
 
 const log = new lognext('Sitepiler');
 const watcherlog = new lognext('watcher');
-const md = new MarkdownIt({
-	html: true,
-	linkify: true,
-	xhtmlOut: true
-});
-// Disable Indented code - this setting breaks rendering formatted/intented HTML if it has blank lines in it 
-md.disable(['code']); 
 
 const FILTER_JSON = ['(json)$', require];
 const FILTER_DOT = ['(dot)$', (f)=>fs.readFileSync(f,'utf-8')];
@@ -33,25 +26,9 @@ const DEFAULT_FILTERS = [
 	FILTER_JSON,
 	FILTER_DOT,
 	FILTER_MARKDOWN,
+	FILTER_STYLES,
 	FILTER_YAML
 ];
-
-dot.templateSettings.varname = 'context';
-dot.templateSettings.strip = false;
-/* 
- * Original regexes: https://github.com/olado/doT/blob/master/doT.js
- * Requires node 9.11.2 or higher for lookbehind assertions
- * Added (?<!`) to escape templating that is used at the beginning of an inline code block
- * Does not escape if {{ not immediately preceded by a backtick
- */
-dot.templateSettings.evaluate =     /(?<!`)\{\{([\s\S]+?(\}?)+)\}\}/g;
-dot.templateSettings.interpolate =  /(?<!`)\{\{=([\s\S]+?)\}\}/g;
-dot.templateSettings.encode =       /(?<!`)\{\{!([\s\S]+?)\}\}/g;
-dot.templateSettings.use =          /(?<!`)\{\{#([\s\S]+?)\}\}/g;
-dot.templateSettings.define =       /(?<!`)\{\{##\s*([\w.$]+)\s*(:|=)([\s\S]+?)#\}\}/g;
-dot.templateSettings.conditional =  /(?<!`)\{\{\?(\?)?\s*([\s\S]*?)\s*\}\}/g;
-dot.templateSettings.iterate =      /(?<!`)\{\{~\s*(?:\}\}|([\s\S]+?)\s*:\s*([\w$]+)\s*(?::\s*([\w$]+))?\s*\}\})/g;
-
 
 
 class Sitepiler {
@@ -112,10 +89,6 @@ class Sitepiler {
 		this.context = {
 			config: this.config,
 			data: this.context ? this.context.data || {} : {},
-			templates: {
-				layouts: {},
-				partials: {}
-			},
 			content: {},
 			sitemap: {
 				dirs: {},
@@ -143,8 +116,6 @@ class Sitepiler {
 			_.forOwn(tempData, (value, key) => {
 				this.context.data[key.substring(0, key.length - path.extname(key).length)] = value;
 			});
-
-			log.debug('Loaded data: ', this.context.data);
 
 			// Complete stage
 			deferred.resolve();
@@ -194,8 +165,6 @@ class Sitepiler {
 			// Process page sources
 			// Converts raw source into parsed source (extracts frontmatter and body)
 			processSources(this.contentSource, this.context.sitemap);
-			log.debug(this.contentSource);
-			printSitemap(this.context.sitemap);
 
 			// Load styles
 			startMs = Date.now();
@@ -209,26 +178,23 @@ class Sitepiler {
 
 			// Compile templates so they can be used
 			startMs = Date.now();
-			compileTemplates(this.templateSource.layouts, this.context.templates.layouts, this.context);
-			compileTemplates(this.templateSource.partials, this.context.templates.partials, this.context);
+			renderer.compileTemplates(this.templateSource.layouts, renderer.templates.layouts, this.context);
+			renderer.compileTemplates(this.templateSource.partials, renderer.templates.partials, this.context);
 			log.verbose(`Templates compiled in ${Date.now() - startMs}ms`);
 
 			// Build content pages using templates
 			startMs = Date.now();
-			buildContent(this.contentSource, this.context.content, this.context, this.context.templates.layouts);
+			buildContent(this.contentSource, this.context.content, this.context, renderer.templates.layouts);
 			log.verbose(`Built ${contentCount} content files in ${Date.now() - startMs}ms`);
-			// log.debug(this.context.content);
 
 			// Write content pages to disk
 			startMs = Date.now();
-			log.debug(this.context.content);
 			writeContent(this.context.content, this.config.settings.stages.compile.outputDirs.content);
 			log.verbose(`Content written in ${Date.now() - startMs}ms`);
 
 			// Complete stage
 			log.verbose(`Compile stage completed in ${Date.now() - compileStartMs}ms`);
 
-			// log.debug(this.context);
 			deferred.resolve();
 		} catch(err) {
 			deferred.reject(err);
@@ -254,11 +220,13 @@ class Sitepiler {
 	}
 
 	render(content) {
-		return renderContent(content, prepareContext(this.context), this.context.templates.layouts);
+		//TODO: is this right? This seems leftover, should be pageData instead of string content.
+		content.body = renderer.renderContent(content, ContextExtensions.fromContext(this.context), renderer.templates.layouts);
+		return content;
 	}
 
 	prepareOutputFileName(inputFileName) {
-		return prepareOutputFileNameImpl(inputFileName);
+		return renderer.stripExtension(inputFileName, '.md', '.html');
 	}
 }
 
@@ -280,12 +248,12 @@ function printSitemapImpl(sitemap) {
 
 function processSources(sources, sitemap, relativePath = '/') {
 	_.forOwn(sources, (value, key) => {
-		if (typeof(value) === 'object' && !PageData.isPageData(value)) {
+		if (typeof(value) === 'object' && !PageData.is(value)) {
 			sitemap.dirs[key] = { dirs: {}, pages: [] };
 			processSources(value, sitemap.dirs[key], path.join(relativePath, key));
 		} else {
 			// Replace content with PageData
-			const pageData = processSource(value, key, relativePath);
+			const pageData = renderer.parseContent(value, key, relativePath);
 			sources[key] = pageData;
 
 			// Add to sitemap
@@ -296,26 +264,6 @@ function processSources(sources, sitemap, relativePath = '/') {
 			});
 		}
 	});
-}
-
-function processSource(content, fileName, relativePath) {
-	const pd = new PageData();
-
-	// Extract frontmatter
-	const fmData = fm(content);
-	pd.pageSettings = fmData.attributes;
-	pd.body = fmData.body;
-
-	// Validate page settings
-	ConfigHelper.setDefault(pd, 'pageSettings', {});
-	ConfigHelper.setDefault(pd.pageSettings, 'layout', 'default');
-	ConfigHelper.setDefault(pd.pageSettings, 'title', 'Default Page Title');
-
-	// Add computed page settings
-	pd.pageSettings.fileName = prepareOutputFileNameImpl(fileName);
-	pd.pageSettings.path = relativePath;
-
-	return pd;
 }
 
 function processStyles(styleSource, outputDir) {
@@ -337,13 +285,13 @@ function processStyles(styleSource, outputDir) {
 			less.render(value)
 				.then((output) => {
 					const outPath = path.join(outputDir, key.replace('.less', '.css'));
-					log.debug('Writing less file to', outPath);
+					log.debug('Writing less file: ', outPath);
 					fs.ensureDirSync(outputDir);
 					fs.writeFileSync(outPath, output.css, 'utf-8');
 				})
 				.catch((err) => log.error(err));
 		} else {
-			log.debug('Writing file to ', path.join(outputDir, key));
+			log.debug('Writing file: ', path.join(outputDir, key));
 			fs.ensureDirSync(outputDir);
 			fs.writeFileSync(path.join(outputDir, key), value, 'utf-8');
 		}
@@ -381,20 +329,13 @@ function sourceWatcherEvent(evt, filePath) {
 	if (!contentDir)
 		return watcherlog.error(`Failed to find content dir for source ${filePath}`);
 
-	// let relativePath = filePath.substring(contentDir.length, filePath.length - path.basename(filePath).length);
-	// log.debug(contentDir);
-	// log.debug('contentDir.length='+ contentDir.length);
-	// log.debug('relativePath='+ relativePath);
-
 	// Generate content
 	let content = fs.readFileSync(filePath, 'utf-8');
-	// content = this.render(content);
-	content = processSource(content, path.basename(filePath), contentDir.dest);
-	log.debug(content);
-	content = renderContent(content, prepareContext(this.context), this.context.templates.layouts);
+	content = renderer.parseContent(content, path.basename(filePath), contentDir.dest);
+	content.body = renderer.renderContent(content, ContextExtensions.fromContext(this.context));
 
 	// Write to file
-	const filename = prepareOutputFileNameImpl(path.basename(filePath));
+	const filename = renderer.stripExtension(path.basename(filePath), '.md', '.html');
 	const destPath = path.join(this.config.settings.stages.compile.outputDirs.content, contentDir.dest);
 	const contentObject = {};
 	contentObject[filename] = content;
@@ -403,12 +344,12 @@ function sourceWatcherEvent(evt, filePath) {
 
 function writeContent(content, dest) {
 	_.forOwn(content, (value, key) => {
-		if (typeof(value) === 'object' && !PageData.isPageData(value)) {
+		if (typeof(value) === 'object' && !PageData.is(value)) {
 			writeContent(value, path.join(dest, key));
 			return;
 		}
 
-		log.debug('Writing file to', path.join(dest, key));
+		log.debug('Writing file: ', path.join(dest, key));
 		fs.ensureDirSync(dest);
 		fs.writeFileSync(path.join(dest, key), value.body, 'utf-8');
 	});
@@ -417,97 +358,13 @@ function writeContent(content, dest) {
 let contentCount = 0;
 function buildContent(sources, dest, originalContext, templates) {
 	_.forOwn(sources, (value, key) => {
-		if (typeof(value) === 'object' && !PageData.isPageData(value)) {
+		if (typeof(value) === 'object' && !PageData.is(value)) {
 			if (!dest[key]) dest[key] = {};
 			buildContent(value, dest[key], originalContext, templates);
 		} else {
-			dest[value.pageSettings.fileName] = renderContent(value, prepareContext(originalContext), templates);
-			log.debug(dest[value.pageSettings.fileName]);
+			value.body = renderer.renderContent(value, ContextExtensions.fromContext(originalContext));
+			dest[value.pageSettings.fileName] = value;
 			contentCount++;
-		}
-	});
-}
-
-function prepareOutputFileNameImpl(inputFileName) {
-	let outputFileName = inputFileName.substring(0, inputFileName.length - 3);
-	if (!outputFileName.includes('.')) outputFileName += '.html';
-	return outputFileName;
-}
-
-/**
- * This function performs a deep copy on the object and adds the helper functions to the copied
- * object. This prevents the page compilation process from leaking anything between page renders.
- */
-function prepareContext(originalContext) {
-	// Deep copy context
-	const context = clone(originalContext);
-
-	// Add context-sensitive helpers
-	// These cannot be lambda functions and must be explicitly bound to the context object
-	context.path = path;
-	context._ = _;
-
-	context.include = function(partial) {
-		// return this.templates.partials[partial](this);
-		const parts = partial.split('/');
-		let target = this.templates.partials;
-		parts.forEach((part) => target = target[part]);
-		const r = target(this);
-		return r;
-	};
-	context.include.bind(context);
-
-	context.livereload = function() {
-		if (!this.config.cliopts.livereload) return '';
-		return `<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':${this.config.cliopts.livereloadPort}/livereload.js?snipver=1"></' + 'script>');</script>`;
-		// return `<script src="http://' + (location.host || 'localhost').split(':')[0] + ':${this.config.cliopts.livereloadPort}/livereload.js?snipver=1"></script>`;
-	};
-	context.livereload.bind(context);
-
-	return context;
-}
-
-function renderContent(pageData, context, templates) {
-	const fullPath = path.join(pageData.pageSettings.path, pageData.pageSettings.fileName);
-	log.debug(`Bulding page (${fullPath})`);
-	log.debug(pageData);
-	const startMs = Date.now();
-
-	// Compile page and execute page template
-	context.pageSettings = pageData.pageSettings;
-	const markdownContent = dot.template(pageData.body, undefined, context)(context);
-
-	// Compile markdown
-	const parsedContent = md.render(markdownContent);
-	context.content = parsedContent;
-
-	// Execute layout template
-	const output = templates[context.pageSettings.layout](context);
-
-	// Log completion
-	const duration = Date.now() - startMs;
-	if (duration > 1000)
-		log.warn(`Page build time of ${duration} exceeded 1000ms: ${fullPath}`);
-	else
-		log.debug(`Page build completed in ${duration}ms`);
-
-	//TODO: write file here instead of building output content object
-	// return new PageData(context.pageSettings, output);
-	pageData.body = output;
-	return pageData;
-}
-
-function compileTemplates(source, dest, originalContext) {
-	// Deep copy context
-	const context = clone(originalContext);
-
-	_.forOwn(source, (value, key) => {
-		if (typeof(value) === 'object') {
-			if (!dest[key]) dest[key] = {};
-			compileTemplates(value, dest[key], originalContext);
-		} else {
-			log.debug(`Compiling template ${key}`);
-			dest[key.substring(0, key.length - 4)] = dot.template(value, undefined, context);
 		}
 	});
 }
@@ -542,24 +399,3 @@ function loadFlles(dir, target, filters = DEFAULT_FILTERS, recursive = false) {
 function isDirectory(source) {
 	return fs.lstatSync(source).isDirectory();
 }
-
-
-
-
-
-
-class PageData {
-	// constructor(pageSettings, body) {
-	// 	this.pageSettings = pageSettings;
-	// 	this.body = body;
-	// }
-	constructor() {
-		this.pageSettings = {};
-		this.body = '';
-	}
-
-	static isPageData(d) { return d instanceof PageData; }
-}
-
-
-
