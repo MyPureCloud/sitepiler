@@ -49,6 +49,7 @@ class ConfigHelper {
 		this.setDefault(this.config.settings.stages.compile, 'outputDirs', {});
 		this.setDefault(this.config.settings.stages.compile.outputDirs, 'content', path.resolve('./build'));
 		this.setDefault(this.config.settings.stages.compile.outputDirs, 'styles', path.resolve('./build/styles'));
+		this.setDefault(this.config.settings.stages.compile.outputDirs, 'static', path.resolve('./build'));
 		this.setDefault(this.config.settings.stages.compile, 'postCompileScripts', []);
 		this.setDefault(this.config.settings.stages, 'publish', {});
 		this.setDefault(this.config.settings.stages.publish, 'prePublishScripts', []);
@@ -74,25 +75,19 @@ class ConfigHelper {
 		this.resolveEnvVars(this.config);
 
 		// Normalize content dirs
-		const tempContentDirs = [];
-		this.config.settings.stages.compile.contentDirs.forEach((contentDir) => {
-			// Resolve source dir to full path, leave dest relative (to output dir)
-			if (typeof(contentDir) === 'string')
-				tempContentDirs.push({ source: path.resolve(contentDir), dest: '' });
-			else
-				tempContentDirs.push({ source: path.resolve(contentDir.source), dest: contentDir.dest });
-		});
-		this.config.settings.stages.compile.contentDirs = tempContentDirs;
+		this.config.settings.stages.compile.contentDirs = normalizeContentDirs(this.config.settings.stages.compile.contentDirs);
+		this.config.settings.stages.compile.styleDirs = normalizeContentDirs(this.config.settings.stages.compile.styleDirs);
+		this.config.settings.stages.compile.staticDirs = normalizeContentDirs(this.config.settings.stages.compile.staticDirs);
+
+		// Resolve output dirs
 		this.config.settings.stages.compile.outputDirs.content = path.resolve(this.config.settings.stages.compile.outputDirs.content);
 		this.config.settings.stages.compile.outputDirs.styles = path.resolve(this.config.settings.stages.compile.outputDirs.styles);
+		this.config.settings.stages.compile.outputDirs.static = path.resolve(this.config.settings.stages.compile.outputDirs.static);
 
 		// Normalize data dirs
 		for (var i = 0; i < this.config.settings.stages.data.dataDirs.length; i++) {
 			this.config.settings.stages.data.dataDirs[i] = path.resolve(this.config.settings.stages.data.dataDirs[i]);
 		}
-
-
-		log.silly('After:', this.config);
 	}
 
 	setDefault(haystack, needle, defaultValue, warning) {
@@ -186,3 +181,19 @@ class ConfigHelper {
 
 
 module.exports = new ConfigHelper();
+
+
+
+function normalizeContentDirs(dirs) {
+	const tempDirs = [];
+	dirs.forEach((d) => {
+		// Resolve source dir to full path, leave dest relative (to output dir)
+		if (typeof(d) === 'string')
+			tempDirs.push({ source: path.resolve(d), dest: '' });
+		else
+			tempDirs.push({ source: path.resolve(d.source), dest: d.dest });
+	});
+	return tempDirs;
+}
+
+

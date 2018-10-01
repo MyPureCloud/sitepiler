@@ -6,10 +6,10 @@ const lognext = require('lognext');
 const fs = require('fs-extra');
 const path = require('path');
 const Q = require('q');
-const YAML = require('yaml').default;
 
 const ConfigHelper = require('./configHelper');
 const ContextExtensions = require('./contextExtensions');
+const fileLoader = require('./fileLoader');
 const PageData = require('./classes/pageData');
 const renderer = require('./renderer');
 
@@ -17,18 +17,6 @@ const renderer = require('./renderer');
 const log = new lognext('Sitepiler');
 const watcherlog = new lognext('watcher');
 
-const FILTER_JSON = ['(json)$', require];
-const FILTER_DOT = ['(dot)$', (f)=>fs.readFileSync(f,'utf-8')];
-const FILTER_MARKDOWN = ['(md)$', (f)=>fs.readFileSync(f,'utf-8')];
-const FILTER_STYLES = ['(css|less)$', (f)=>fs.readFileSync(f,'utf-8')];
-const FILTER_YAML = ['(yml|yaml)$', (f)=>YAML.parse(fs.readFileSync(f,'utf-8'))];
-const DEFAULT_FILTERS = [
-	FILTER_JSON,
-	FILTER_DOT,
-	FILTER_MARKDOWN,
-	FILTER_STYLES,
-	FILTER_YAML
-];
 
 
 class Sitepiler {
@@ -64,7 +52,7 @@ class Sitepiler {
 			watchPaths = [];
 			this.config.settings.stages.compile.templateDirs.layouts.forEach((templateDir) => watchPaths.push(templateDir));
 			this.config.settings.stages.compile.templateDirs.partials.forEach((templateDir) => watchPaths.push(templateDir));
-			this.config.settings.stages.compile.styleDirs.forEach((styleDir) => watchPaths.push(styleDir));
+			this.config.settings.stages.compile.styleDirs.forEach((styleDir) => watchPaths.push(styleDir.source));
 			this.templateWatcher = chokidar.watch(watchPaths, {
 				awaitWriteFinish: true,
 				ignoreInitial: true
@@ -109,7 +97,7 @@ class Sitepiler {
 			// Load data files
 			const tempData = {};
 			this.config.settings.stages.data.dataDirs.forEach((dataDir) => {
-				loadFlles(dataDir, tempData, [ FILTER_JSON, FILTER_YAML ]);
+				fileLoader.loadFiles(dataDir, tempData, [ fileLoader.filters.JSON, fileLoader.filters.YAML ]);
 			});
 
 			// Copy data to context, strip extension from filename key
@@ -140,25 +128,24 @@ class Sitepiler {
 			// Load templates
 			let startMs = Date.now();
 			this.config.settings.stages.compile.templateDirs.layouts.forEach((dataDir) => {
-				loadFlles(dataDir, this.templateSource.layouts, [ FILTER_DOT ], true);
+				fileLoader.loadFiles(dataDir, this.templateSource.layouts, [ fileLoader.filters.DOT ], true);
 			});
 			this.config.settings.stages.compile.templateDirs.partials.forEach((dataDir) => {
-				loadFlles(dataDir, this.templateSource.partials, [ FILTER_DOT ], true);
+				fileLoader.loadFiles(dataDir, this.templateSource.partials, [ fileLoader.filters.DOT ], true);
 			});
 			log.verbose(`Templates loaded in ${Date.now() - startMs}ms`);
 
 			// Load content
 			startMs = Date.now();
-			this.config.settings.stages.compile.contentDirs.forEach((contentDir) => {
-				let contentSourceTarget = this.contentSource;
-				if (contentDir.dest !== '') {
-					contentDir.dest.split('/').forEach((d) => {
-						// if (d === '') return; 
-						if (!contentSourceTarget[d]) contentSourceTarget[d] = {};
-						contentSourceTarget = contentSourceTarget[d];
+			this.config.settings.stages.compile.contentDirs.forEach((sourceDir) => {
+				let targetDir = this.contentSource;
+				if (sourceDir.dest !== '') {
+					sourceDir.dest.split('/').forEach((d) => {
+						if (!targetDir[d]) targetDir[d] = {};
+						targetDir = targetDir[d];
 					});
 				}
-				loadFlles(contentDir.source, contentSourceTarget, [ FILTER_MARKDOWN ], true);
+				fileLoader.loadFiles(sourceDir.source, targetDir, [ fileLoader.filters.MARKDOWN ], true);
 			});
 			log.verbose(`Content loaded in ${Date.now() - startMs}ms`);
 
@@ -168,13 +155,30 @@ class Sitepiler {
 
 			// Load styles
 			startMs = Date.now();
-			this.config.settings.stages.compile.styleDirs.forEach((styleDir) => {
-				loadFlles(styleDir, this.styleSource, [ FILTER_STYLES ], true);
+			this.config.settings.stages.compile.styleDirs.forEach((sourceDir) => {
+				let targetDir = this.styleSource;
+				if (sourceDir.dest !== '') {
+					sourceDir.dest.split('/').forEach((d) => {
+						if (!targetDir[d]) targetDir[d] = {};
+						targetDir = targetDir[d];
+					});
+				}
+				fileLoader.loadFiles(sourceDir.source, targetDir, [ fileLoader.filters.STYLES ], true);
 			});
 			log.verbose(`Styles loaded in ${Date.now() - startMs}ms`);
 
 			// Process styles
 			processStyles(this.styleSource, this.config.settings.stages.compile.outputDirs.styles);
+
+			// Process static content
+			startMs = Date.now();
+			this.config.settings.stages.compile.staticDirs.forEach((sourceDir) => {
+				const targetDir = path.join(this.config.settings.stages.compile.outputDirs.static, sourceDir.dest);
+				log.debug(`Copying static files from ${sourceDir.source} to ${targetDir}`);
+				fs.copySync(sourceDir.source, targetDir);
+			});
+			log.verbose(`Static files copied in ${Date.now() - startMs}ms`);
+
 
 			// Compile templates so they can be used
 			startMs = Date.now();
@@ -367,35 +371,4 @@ function buildContent(sources, dest, originalContext, templates) {
 			contentCount++;
 		}
 	});
-}
-
-function loadFlles(dir, target, filters = DEFAULT_FILTERS, recursive = false) {
-	const files = fs.readdirSync(dir);
-
-	// Load files in dir
-	files.forEach((file) => {
-		const fullPath = path.join(dir, file);
-		if (isDirectory(fullPath)) {
-			if (recursive) {
-				if (!target[file]) target[file] = {};
-				loadFlles(fullPath, target[file], filters, recursive);
-			}
-			return;
-		}
-
-		// Apply filter
-		filters.some((filter) => {
-			// .exec() returns null if no match
-			if ((new RegExp(filter[0])).exec(file)) {
-				log.debug(`Loading file: ${fullPath}`);
-				// Loads the file by invoking the second parameter with the full path of the file
-				target[file] = filter[1](fullPath);
-				return true;
-			}
-		});
-	});
-}
-
-function isDirectory(source) {
-	return fs.lstatSync(source).isDirectory();
 }

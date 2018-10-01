@@ -27,9 +27,13 @@ settings:
         dest: "othercontent/subdir"
       styleDirs:
       - "example/src/styles"
+      staticDirs:
+      - source: "example/src/static/img"
+        dest: "img"
       outputDirs: 
         content: "example/build"
         styles: "example/build/styles"
+        static: "example/build"
       postCompileScripts: []
     publish:
       prePublishScripts: []
