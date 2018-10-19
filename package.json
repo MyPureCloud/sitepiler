@@ -21,14 +21,8 @@
     "lodash": "^4.17.10",
     "lognext": "0.0.4",
     "markdown-it": "^8.4.2",
-    "nodemon": "^1.18.3",
     "q": "^1.5.1",
     "yaml": "^1.0.0-rc.8"
-  },
-  "nodemonConfig": {
-    "ignore": [],
-    "delay": "500",
-    "ext": "js,json,yml"
   },
   "devDependencies": {
     "body-parser": "^1.18.3",

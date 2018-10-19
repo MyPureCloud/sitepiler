@@ -20,6 +20,7 @@ const md = new MarkdownIt({
 // Disable Indented code - this setting breaks rendering formatted/intented HTML if it has blank lines in it 
 md.disable(['code']); 
 
+md.block.ruler.before('table', 'mytable', require('./markdown-it-extensions/table'), { alt: ['paragraph', 'reference'] });
 // Set doT settings
 dot.templateSettings.varname = 'context';
 dot.templateSettings.strip = false;

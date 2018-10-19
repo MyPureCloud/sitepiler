@@ -31,7 +31,7 @@ class ContextExtensions {
 		};
 		newContext.include.bind(newContext);
 
-		// Inject livereload script inot page
+		// Inject livereload script into page
 		newContext.livereload = function() {
 			// Expects context to include config!
 			if (!this.config.cliopts.livereload) return '';
