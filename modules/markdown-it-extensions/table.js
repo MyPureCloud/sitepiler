@@ -151,7 +151,6 @@ module.exports = function table(state, startLine, endLine, silent) {
 	tableToken.attrs = [ 
 		tableClass
 	];
-	/////
 
 	token     = state.push('thead_open', 'thead', 1);
 	token.map = [ startLine, startLine + 1 ];
@@ -180,6 +179,9 @@ module.exports = function table(state, startLine, endLine, silent) {
 	token     = state.push('tbody_open', 'tbody', 1);
 	token.map = tbodyLines = [ startLine + 2, 0 ];
 
+	// Process lines
+	let cellContent = new Array(columnCount);
+	let isMultiline = false;
 	for (nextLine = startLine + 2; nextLine < endLine; nextLine++) {
 		if (state.sCount[nextLine] < state.blkIndent) { break; }
 
@@ -187,40 +189,67 @@ module.exports = function table(state, startLine, endLine, silent) {
 		if (lineText.indexOf('|') === -1) { break; }
 		if (state.sCount[nextLine] - state.blkIndent >= 4) { break; }
 		columns = escapedSplit(lineText.replace(/^\||\|$/g, ''));
-		console.log('columns');
-		console.log(columns);
 
-		token = state.push('tr_open', 'tr', 1);
-		let tdToken, contentToken;
+		// Create new row and clear content var
+		if (!isMultiline) {
+			token = state.push('tr_open', 'tr', 1);
+			cellContent = new Array(columnCount);
+		}
+
+		// Process columns
 		let colspan = 0;
 		for (i = 0; i < columnCount; i++) {
-			if (colspan === 0) {
-				tdToken          = state.push('td_open', 'td', 1);
-				if (!tdToken.attrs) tdToken.attrs = [];
+			// Create <td> when not spanning
+			if (colspan === 0 && !isMultiline) {
+				token = state.push('td_open', 'td', 1);
+				token.attrs = [];
 			}
 
+			// Apply alignment style
 			if (aligns[i] && colspan === 0) {
-				tdToken.attrs.push([ 'style', 'text-align:' + aligns[i] ]);
+				token.attrs.push([ 'style', 'text-align:' + aligns[i] ]);
 			}
 
-			contentToken          = state.push('inline', '', 0);
-			contentToken.content  = columns[i] ? columns[i].trim() : '';
-			contentToken.children = [];
+			// Set/append content
+			if (!isMultiline) {
+				// Create new element
+				cellContent[i]          = state.push('inline', '', 0);
+				cellContent[i].content  = '';
+				cellContent[i].children = [];
+			} 
+			// Append content to previous element
+			let cellText = columns[i];
+			if (cellText) {
+				cellText = cellText.trim();
+				if (cellText.endsWith('\\'))
+					cellText = cellText.substring(0, cellText.length - 1);
+			}
+			cellContent[i].content += cellText ? cellText + '<br />' : '';
 
+			// Close <td> or span again
 			if (i + 1 < columnCount && columns[i+1] === '') {
 				colspan++;
-				console.log(`IS COLSPAN -> ${colspan}`);
 			}	else {
 				if (colspan > 0) {
-					console.log(`Setting colspan=${colspan} on content=${contentToken.content}`);
-					tdToken.attrs.push([ 'colspan', colspan + 1 ]);
+					token.attrs.push([ 'colspan', colspan + 1 ]);
 				}
 				colspan = 0;
-				token          = state.push('td_close', 'td', -1);
+
+				// Suppress </td> when processing multi-line. Content will be added to previous <td>
+				if (!isMultiline)
+					token = state.push('td_close', 'td', -1);
 			}
 		}
-		token = state.push('tr_close', 'tr', -1);
+
+		// End row or not
+		if (columns[columnCount - 1].trim().endsWith('\\')) {
+			isMultiline = true;
+		} else {
+			isMultiline = false;
+			token = state.push('tr_close', 'tr', -1);
+		}
 	}
+
 	token = state.push('tbody_close', 'tbody', -1);
 	token = state.push('table_close', 'table', -1);
 

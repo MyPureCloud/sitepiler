@@ -16,7 +16,7 @@ Basic table with header and column alignment.
 
 # Colspan Tests
 
-Empty columns will be included in colspan.
+Empty columns will be included in colspan. Must be `||` without spaces. Using `| |` will create an empty cell.
 
 | Column 1 | Column 2 | Column 3 | Column 4 | Column 5 |
 |----------|:--------:|----------|----------|----------|
@@ -31,26 +31,27 @@ Empty columns will be included in colspan.
 
 # Inline rendering
 
-| Feature | Test |
-|---------|------|
-| Inline code | `var x = 2` |
-| Link | [Genesys](https://genesys.com) |
-| Italic | _Do you know who I am?_ |
-| Bold | **I AM THE JUGGERNAUT!**
+| Feature | Syntax | Display |
+|---------|------|---|
+| Inline code | `` `var x = 2` `` | `var x = 2` |
+| Link | `[Genesys](https://genesys.com)` | [Genesys](https://genesys.com) |
+| Italic | `_Do you know who I am?_` | _Do you know who I am?_ |
+| Bold | `**I AM THE JUGGERNAUT!**` | **I AM THE JUGGERNAUT!** |
 
 
 # Multi-line table content
 
-TODO: see if this can work.
+End a table line with `\` instead of `|` to make the next line append to the previous row's cells instead of creating a new row. Only inline markdown is supported (e.g. bold, italics, inline code). Block elements, such as lists, are not supported.
 
-| Column 1 | Column 2 | Column 3 |
-|----------|----------|----------|
-| R1-C1 | R1-C2 | R1-C3 |
-| R2-C1 | R2-C2 | R3-C3 \
-| more R1 | more R2 | more R3 \
-| | more R2-2 | |
-| List in C2 | * LI 1 | \
-| | * LI 2 | 3rd column content | 
+| Column 1 | Column 2 | Column 3 | Column 4 |
+|----------|----------|----------|----------|
+| R1-C1 | R1-C2 | R1-C3 | R1-C4 |
+| R2-C1 | R2-C2 | R3-C3 | R2-C4 \
+| more R2-C1 | more R2-C2 | more R2-C3 | More R2-C4 \
+| | more R2-C2 again | | more R2-C4 again |
+| R3-C1 | R3-C2 || \
+| more R3-C1 | More R3-C2 | First R3-C3 | R3-C4 \
+| MORE R3-C1 | MORE R3-C2 | MORE R3-C3 | MORE R3-C4 \
 {: class="table table-striped"}
 
 
@@ -63,7 +64,7 @@ Status of desired features.
 | ✅ | Zebra striping | `{: class="table table-striped"}` TODO: parse that for classes instead of a string literal |
 | ✅ | Colspan | Use double pipes, must add colspans to the right of content |
 | ✅ | inline markdown rendering in table | See table above |
-| ❓ | | |
+| ✅ | Multi-line support | End line with `\` |
 {: class="table table-striped"}
 
 Some more text
