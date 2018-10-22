@@ -190,6 +190,11 @@ module.exports = function table(state, startLine, endLine, silent) {
 		if (state.sCount[nextLine] - state.blkIndent >= 4) { break; }
 		columns = escapedSplit(lineText.replace(/^\||\|$/g, ''));
 
+		// Add empty cells to ensure this row has the same number of columns as the header
+		for (let i = columns.length; i < columnCount; i++) {
+			columns[i] = ' ';
+		}
+
 		// Create new row and clear content var
 		if (!isMultiline) {
 			token = state.push('tr_open', 'tr', 1);
@@ -253,10 +258,11 @@ module.exports = function table(state, startLine, endLine, silent) {
 	token = state.push('tbody_close', 'tbody', -1);
 	token = state.push('table_close', 'table', -1);
 
-	// This code adds striping to the table if the next line after the table is {: class="table table-striped"}
+	// Apply classes to table
 	lineText = getLine(state, nextLine).trim();
-	if (lineText === '{: class="table table-striped"}') {
-		tableClass[1] += ' table-striped';
+	const tableClassMatch = lineText.match(/\{:\s*class=["'](.+)["']\s*\}/);
+	if (tableClassMatch && tableClassMatch.length >= 2) {
+		tableClass[1] += ' ' + tableClassMatch[1];
 		token = state.push('inline', '', 0);
 		token.content = '';
 		token.children = [];
