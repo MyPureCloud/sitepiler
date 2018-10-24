@@ -3,12 +3,56 @@
 <head>
 	{{= context.include('page-title') }}
 
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css" integrity="sha384-mzrmE5qonljUremFsqc01SB46JvROS7bZs3IO2EmfFsd15uHvIt+Y8vEf7N7fWAU" crossorigin="anonymous">
 	
 	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 	<link rel="stylesheet" href="/styles/moreis.css">
 
 	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<style type="text/css">
+		.fence pre,
+		.fence code {
+			margin: 0;
+			padding: 0;
+		}
+
+		.fence-body {
+			padding: 0;
+			overflow-y: auto;
+		}
+
+		.fence-body pre {
+			max-height: 450pt;
+			overflow-x: auto;
+			overflow-y: none;
+		}
+
+		.fence-body code {
+			padding: 3pt;
+		}
+	</style>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
 
 	{{= context.livereload() }}
 </head>
