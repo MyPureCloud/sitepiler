@@ -340,7 +340,8 @@ function sourceWatcherEvent(evt, filePath) {
 
 	// Write to file
 	const filename = renderer.stripExtension(path.basename(filePath), '.md', '.html');
-	const destPath = path.join(this.config.settings.stages.compile.outputDirs.content, contentDir.dest);
+	const subdir = filePath.substring(contentDir.source.length + 1, filePath.length - path.basename(filePath).length);
+	const destPath = path.join(this.config.settings.stages.compile.outputDirs.content, contentDir.dest, subdir);
 	const contentObject = {};
 	contentObject[filename] = content;
 	writeContent(contentObject, destPath);
