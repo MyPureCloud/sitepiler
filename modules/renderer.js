@@ -66,7 +66,7 @@ class Renderer {
 	/**
 	 * Parses raw page content and returns a PageData object
 	 */
-	parseContent(content, inputFileName, relativePath) {
+	parseContent(content, inputFilename, relativePath) {
 		const pd = new PageData();
 
 		// Extract frontmatter
@@ -80,7 +80,7 @@ class Renderer {
 		ConfigHelper.setDefault(pd.pageSettings, 'title', 'Default Page Title');
 
 		// Add computed page settings
-		pd.pageSettings.fileName = this.stripExtension(inputFileName, '.md', '.html');
+		pd.pageSettings.filename = this.stripExtension(inputFilename, '.md', '.html');
 		pd.pageSettings.path = relativePath;
 
 		return pd;
@@ -90,9 +90,30 @@ class Renderer {
 	 * Returns the rendered content from the PageData
 	 */
 	renderContent(pageData, context) {
-		const fullPath = path.join(pageData.pageSettings.path, pageData.pageSettings.fileName);
+		const fullPath = path.join(pageData.pageSettings.path, pageData.pageSettings.filename);
 		log.debug(`Bulding page (${fullPath})`);
 		const startMs = Date.now();
+
+		// Build breadcrumb
+		context.breadcrumb = [];
+		let sitemap = context.sitemap;
+		let webPath = '/';
+		let paths = pageData.pageSettings.path.split('/');
+		paths = paths.filter((p) => p != '');
+		paths.forEach((dirname) => {
+			sitemap = sitemap.dirs[dirname];
+			log.debug('found: ', sitemap);
+			webPath = path.join(webPath, dirname);
+			context.breadcrumb.push({ 
+				title: sitemap.title,
+				path: webPath
+			});
+		});
+
+		// Remove last crumb if index page
+		log.debug(pageData.pageSettings);
+		if (pageData.pageSettings.filename.startsWith('index.')) context.breadcrumb.pop();
+		log.debug('breadcrumb: ', context.breadcrumb);
 
 		// Compile page and execute page template
 		context.pageSettings = pageData.pageSettings;
@@ -103,7 +124,14 @@ class Renderer {
 		context.content = parsedContent;
 
 		// Execute layout template
-		const output = this.templates.layouts[context.pageSettings.layout](context);
+		let template;
+		if (this.templates.layouts[context.pageSettings.layout]) {
+			template = this.templates.layouts[context.pageSettings.layout];
+		} else {
+			log.warn(`Unknown template "${context.pageSettings.layout}", using default`);
+			template = this.templates.layouts.default;
+		}
+		const output = template(context);
 
 		// Log completion
 		const duration = Date.now() - startMs;
@@ -115,12 +143,12 @@ class Renderer {
 		return output;
 	}
 
-	stripExtension(inputFileName, extension, newExtension) {
+	stripExtension(inputFilename, extension, newExtension) {
 		// Include periods
 		if (!extension.startsWith('.')) extension = '.' + extension;
 		if (newExtension && !newExtension.startsWith('.')) newExtension = '.' + newExtension;
 		// Remove
-		let outputFileName = inputFileName.substring(0, inputFileName.length - extension.length);
+		let outputFileName = inputFilename.substring(0, inputFilename.length - extension.length);
 		// Add
 		if (!outputFileName.endsWith(newExtension)) outputFileName += newExtension;
 		// Return

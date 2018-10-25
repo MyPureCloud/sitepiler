@@ -152,6 +152,7 @@ class Sitepiler {
 			// Process page sources
 			// Converts raw source into parsed source (extracts frontmatter and body)
 			processSources(this.contentSource, this.context.sitemap);
+			postprocessSitemap(this.context.sitemap, 'Home');
 
 			// Load styles
 			startMs = Date.now();
@@ -229,8 +230,8 @@ class Sitepiler {
 		return content;
 	}
 
-	prepareOutputFileName(inputFileName) {
-		return renderer.stripExtension(inputFileName, '.md', '.html');
+	prepareOutputFileName(inputFilename) {
+		return renderer.stripExtension(inputFilename, '.md', '.html');
 	}
 }
 
@@ -240,10 +241,26 @@ module.exports = Sitepiler;
 
 
 
+function postprocessSitemap(sitemap, defaultDirName) {
+	// Find index page
+	sitemap.pages.some((page) => {
+		if (!page.filename.toLowerCase().startsWith('index.')) return false;
+
+		sitemap.title = page.title;
+		return true;
+	});
+
+	if (!sitemap.title) sitemap.title = defaultDirName;
+
+	// Process subdirs
+	_.forOwn(sitemap.dirs, (dir, defaultDirName) => postprocessSitemap(dir, defaultDirName));
+}
+
 function printSitemap(sitemap) {
 	log.writeBox('Sitemap');
 	printSitemapImpl(sitemap);
 }
+
 function printSitemapImpl(sitemap) {
 	sitemap.pages.forEach((page) => log.debug(`${path.join(page.path, page.filename)} (${page.title})`));
 	// sitemap.pages.forEach((page) => log.debug(`${path.join(prefix, page.filename)} (${page.title})`));
@@ -264,7 +281,7 @@ function processSources(sources, sitemap, relativePath = '/') {
 			sitemap.pages.push({ 
 				title: pageData.pageSettings.title,
 				path: pageData.pageSettings.path,
-				filename: pageData.pageSettings.fileName 
+				filename: pageData.pageSettings.filename 
 			});
 		}
 	});
@@ -333,15 +350,18 @@ function sourceWatcherEvent(evt, filePath) {
 	if (!contentDir)
 		return watcherlog.error(`Failed to find content dir for source ${filePath}`);
 
+	// Determine paths
+	const subdir = filePath.substring(contentDir.source.length + 1, filePath.length - path.basename(filePath).length);
+	const relativePath = path.join(contentDir.dest, subdir);
+	const destPath = path.join(this.config.settings.stages.compile.outputDirs.content, relativePath);
+	const filename = renderer.stripExtension(path.basename(filePath), '.md', '.html');
+
 	// Generate content
 	let content = fs.readFileSync(filePath, 'utf-8');
-	content = renderer.parseContent(content, path.basename(filePath), contentDir.dest);
+	content = renderer.parseContent(content, path.basename(filePath), relativePath);
 	content.body = renderer.renderContent(content, ContextExtensions.fromContext(this.context));
 
 	// Write to file
-	const filename = renderer.stripExtension(path.basename(filePath), '.md', '.html');
-	const subdir = filePath.substring(contentDir.source.length + 1, filePath.length - path.basename(filePath).length);
-	const destPath = path.join(this.config.settings.stages.compile.outputDirs.content, contentDir.dest, subdir);
 	const contentObject = {};
 	contentObject[filename] = content;
 	writeContent(contentObject, destPath);
@@ -368,7 +388,7 @@ function buildContent(sources, dest, originalContext, templates) {
 			buildContent(value, dest[key], originalContext, templates);
 		} else {
 			value.body = renderer.renderContent(value, ContextExtensions.fromContext(originalContext));
-			dest[value.pageSettings.fileName] = value;
+			dest[value.pageSettings.filename] = value;
 			contentCount++;
 		}
 	});
