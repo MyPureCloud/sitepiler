@@ -1,6 +1,7 @@
 'use strict';
 
-const CONTROL_CHARS = '```';
+const CONTROL_CHAR_REGEX = /^`{3}|~{3}/;
+let controlChars = '```';
 
 function getLine(state, line) {
 	var pos = state.bMarks[line] + state.blkIndent,
@@ -13,27 +14,45 @@ module.exports = function(md, name, options) {
 	function fence(state, startLine, endLine/*, silent*/) {
 		var nextLine, token, lineText;
 
-		// should have at least two lines
+		// Starts with control chars?
+		lineText = getLine(state, startLine);
+		const controlCharsMatch = lineText.match(CONTROL_CHAR_REGEX);
+		if (!controlCharsMatch) return false;
+
+		// Store which control chars were used
+		controlChars = controlCharsMatch[0];
+
+		// Self-closing line, e.g.: ``` this is a code block ```
+		if (lineText.trim().endsWith(controlChars)) {
+			// Add code block
+			token = state.push('fence', 'code', 0);
+			token.attrs = parseAttrs('');
+			token.content = lineText.trim().substr(3, lineText.trim().length - 6);
+
+			state.line = startLine + 1;
+
+			return true;
+		}
+
+		// Should have at least two lines
 		if (startLine + 2 > endLine) { return false; }
 
-		// Starts with opener?
-		lineText = getLine(state, startLine);
-		if (!lineText.startsWith(CONTROL_CHARS)) return false;
-
+		// Parse control char attributes
 		const attrs = parseAttrs(lineText);
 
 		// Move past the opener line
 		nextLine = startLine + 1;
 		lineText = getLine(state, nextLine);
 
+		// Add code block
 		token = state.push('fence', 'code', 0);
 		token.attrs = attrs;
 		token.content = '';
 
 		// Add content until end marker is reached
-		while(!lineText.startsWith(CONTROL_CHARS) && nextLine <= endLine) {
+		while(!lineText.startsWith(controlChars) && nextLine <= endLine) {
 			// Trim escaped control chars
-			if (lineText.startsWith(`\\${CONTROL_CHARS}`))
+			if (lineText.startsWith(`\\${controlChars}`))
 				lineText = lineText.substr(1);
 
 			token.content += lineText + '\n';
@@ -42,7 +61,7 @@ module.exports = function(md, name, options) {
 			lineText = getLine(state, nextLine);
 		}
 
-		// Set the next line to after the fence close line
+		// Set next line in the state
 		state.line = nextLine + 1;
 
 		return true;
