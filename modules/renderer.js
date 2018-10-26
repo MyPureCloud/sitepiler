@@ -1,12 +1,9 @@
 const _ = require('lodash');
 const dot = require('dot');
-const fm = require('front-matter');
 const MarkdownIt = require('markdown-it');
 const path = require('path');
 
-const ConfigHelper = require('./configHelper');
 const ContextExtensions = require('./contextExtensions');
-const PageData = require('./classes/pageData');
 
 
 const log = new (require('lognext'))('Renderer');
@@ -17,11 +14,14 @@ const md = new MarkdownIt({
 	linkify: true,
 	xhtmlOut: true
 });
+
 // Disable Indented code - this setting breaks rendering formatted/intented HTML if it has blank lines in it 
 md.disable(['code']); 
 
+// Add extensions
 md.block.ruler.before('table', 'mytable', require('./markdown-it-extensions/table'), { alt: ['paragraph', 'reference'] });
 md.use(require('./markdown-it-extensions/code-fence'));
+
 // Set doT settings
 dot.templateSettings.varname = 'context';
 dot.templateSettings.strip = false;
@@ -38,6 +38,7 @@ dot.templateSettings.use =          /(?<!`)\{\{#([\s\S]+?)\}\}/g;
 dot.templateSettings.define =       /(?<!`)\{\{##\s*([\w.$]+)\s*(:|=)([\s\S]+?)#\}\}/g;
 dot.templateSettings.conditional =  /(?<!`)\{\{\?(\?)?\s*([\s\S]*?)\s*\}\}/g;
 dot.templateSettings.iterate =      /(?<!`)\{\{~\s*(?:\}\}|([\s\S]+?)\s*:\s*([\w$]+)\s*(?::\s*([\w$]+))?\s*\}\})/g;
+
 
 
 class Renderer {
@@ -64,68 +65,44 @@ class Renderer {
 	}
 
 	/**
-	 * Parses raw page content and returns a PageData object
-	 */
-	parseContent(content, inputFilename, relativePath) {
-		const pd = new PageData();
-
-		// Extract frontmatter
-		const fmData = fm(content);
-		pd.pageSettings = fmData.attributes;
-		pd.body = fmData.body;
-
-		// Validate page settings
-		ConfigHelper.setDefault(pd, 'pageSettings', {});
-		ConfigHelper.setDefault(pd.pageSettings, 'layout', 'default');
-		ConfigHelper.setDefault(pd.pageSettings, 'title', 'Default Page Title');
-
-		// Add computed page settings
-		pd.pageSettings.filename = this.stripExtension(inputFilename, '.md', '.html');
-		pd.pageSettings.path = relativePath;
-
-		return pd;
-	}
-
-	/**
 	 * Returns the rendered content from the PageData
 	 */
-	renderContent(pageData, context) {
-		const fullPath = path.join(pageData.pageSettings.path, pageData.pageSettings.filename);
-		log.verbose(`Bulding page (${fullPath})`);
+	renderContent(page, originalContext) {
+		// Deep copy context
+		const context = ContextExtensions.fromContext(originalContext);
+
+		log.verbose(`Bulding page (${page.link})`);
 		const startMs = Date.now();
 
 		// Build breadcrumb
 		context.breadcrumb = [];
 		let sitemap = context.sitemap;
-		let webPath = '/';
-		let paths = pageData.pageSettings.path.split('/');
+		let paths = page.path.split('/');
 		paths = paths.filter((p) => p != '');
 		paths.forEach((dirname) => {
 			sitemap = sitemap.dirs[dirname];
-			webPath = path.join(webPath, dirname);
 			context.breadcrumb.push({ 
 				title: sitemap.title,
-				path: webPath
+				path: sitemap.path
 			});
 		});
 
 		// Remove last crumb if index page
-		if (pageData.pageSettings.filename.startsWith('index.')) context.breadcrumb.pop();
+		if (page.filename.startsWith('index.')) context.breadcrumb.pop();
 
 		// Build siblings
 		context.siblings = [];
-		sitemap.pages.forEach((page) => {
+		_.forOwn(sitemap.pages, (siblingPage) => {
 			// Exclude index page
-			if (page.filename.startsWith('index.')) return;
+			if (siblingPage.filename.startsWith('index.')) return;
 
-			page.isCurrentPage = page.filename === pageData.pageSettings.filename;
-			page.link = path.join(page.path, page.filename);
-			context.siblings.push(page);
+			siblingPage.isCurrentPage = siblingPage.filename === page.filename;
+			context.siblings.push(siblingPage);
 		});
 		_.forOwn(sitemap.dirs, (dir, dirname) => {
 			context.siblings.push({
 				title: dir.title,
-				link: path.join(webPath, dirname),
+				link: dir.path,
 				isCurrentPage: false
 			});
 		});
@@ -134,8 +111,8 @@ class Renderer {
 		context.siblings = _.sortBy(context.siblings, [ 'order', 'title']);
 
 		// Compile page and execute page template
-		context.pageSettings = pageData.pageSettings;
-		const markdownContent = dot.template(pageData.body, undefined, context)(context);
+		context.page = page;
+		const markdownContent = dot.template(page.bodyRaw, undefined, context)(context);
 
 		// Compile markdown
 		const parsedContent = md.render(markdownContent);
@@ -143,10 +120,10 @@ class Renderer {
 
 		// Execute layout template
 		let template;
-		if (this.templates.layouts[context.pageSettings.layout]) {
-			template = this.templates.layouts[context.pageSettings.layout];
+		if (this.templates.layouts[page.layout]) {
+			template = this.templates.layouts[page.layout];
 		} else {
-			log.warn(`Unknown template "${context.pageSettings.layout}", using default`);
+			log.warn(`Unknown template "${page.layout}", using default`);
 			template = this.templates.layouts.default;
 		}
 		const output = template(context);

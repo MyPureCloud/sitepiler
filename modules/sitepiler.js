@@ -9,7 +9,9 @@ const Q = require('q');
 
 const ConfigHelper = require('./configHelper');
 const ContextExtensions = require('./contextExtensions');
+const Directory = require('./classes/directory');
 const fileLoader = require('./fileLoader');
+const Page = require('./classes/page');
 const PageData = require('./classes/pageData');
 const renderer = require('./renderer');
 
@@ -33,7 +35,7 @@ class Sitepiler {
 			this.livereloadServer = livereload.createServer({
 				port: this.config.cliopts.livereloadPort	
 			}, 
-			() => log.debug(`Livereload accepting connections on port ${this.config.cliopts.livereloadPort}`));
+			() => log.info(`Livereload accepting connections on port ${this.config.cliopts.livereloadPort}`));
 
 			let watchPaths = [];
 			watchPaths.push(path.resolve(this.config.settings.stages.compile.outputDirs.content));
@@ -69,9 +71,6 @@ class Sitepiler {
 			layouts: {},
 			partials: {}
 		};
-
-		// Uncompiled content
-		this.contentSource = {};
 
 		// Context for template execution
 		this.context = {
@@ -137,8 +136,9 @@ class Sitepiler {
 
 			// Load content
 			startMs = Date.now();
+			let tempSources = {};
 			this.config.settings.stages.compile.contentDirs.forEach((sourceDir) => {
-				let targetDir = this.contentSource;
+				let targetDir = tempSources;
 				if (sourceDir.dest !== '') {
 					sourceDir.dest.split('/').forEach((d) => {
 						if (!targetDir[d]) targetDir[d] = {};
@@ -150,9 +150,8 @@ class Sitepiler {
 			log.verbose(`Content loaded in ${Date.now() - startMs}ms`);
 
 			// Process page sources
-			// Converts raw source into parsed source (extracts frontmatter and body)
-			processSources(this.contentSource, this.context.sitemap);
-			postprocessSitemap(this.context.sitemap, 'Home');
+			this.context.sitemap = processSources(tempSources);
+			this.context.sitemap.analyze();
 
 			// Load styles
 			startMs = Date.now();
@@ -175,7 +174,7 @@ class Sitepiler {
 			startMs = Date.now();
 			this.config.settings.stages.compile.staticDirs.forEach((sourceDir) => {
 				const targetDir = path.join(this.config.settings.stages.compile.outputDirs.static, sourceDir.dest);
-				log.debug(`Copying static files from ${sourceDir.source} to ${targetDir}`);
+				log.info(`Copying static files from ${sourceDir.source} to ${targetDir}`);
 				fs.copySync(sourceDir.source, targetDir);
 			});
 			log.verbose(`Static files copied in ${Date.now() - startMs}ms`);
@@ -189,12 +188,12 @@ class Sitepiler {
 
 			// Build content pages using templates
 			startMs = Date.now();
-			buildContent(this.contentSource, this.context.content, this.context, renderer.templates.layouts);
-			log.verbose(`Built ${contentCount} content files in ${Date.now() - startMs}ms`);
+			this.context.sitemap.renderPages(this.context);
+			log.verbose(`Built content files in ${Date.now() - startMs}ms`);
 
 			// Write content pages to disk
 			startMs = Date.now();
-			writeContent(this.context.content, this.config.settings.stages.compile.outputDirs.content);
+			writeContent(this.context.sitemap, this.config.settings.stages.compile.outputDirs.content);
 			log.verbose(`Content written in ${Date.now() - startMs}ms`);
 
 			// Complete stage
@@ -241,46 +240,18 @@ module.exports = Sitepiler;
 
 
 
-function postprocessSitemap(sitemap, defaultDirName) {
-	// Find index page
-	sitemap.pages.some((page) => {
-		if (!page.filename.toLowerCase().startsWith('index.')) return false;
-
-		sitemap.title = page.title;
-		return true;
-	});
-
-	if (!sitemap.title) sitemap.title = defaultDirName;
-
-	// Process subdirs
-	_.forOwn(sitemap.dirs, (dir, defaultDirName) => postprocessSitemap(dir, defaultDirName));
-}
-
-function printSitemap(sitemap) {
-	log.writeBox('Sitemap');
-	printSitemapImpl(sitemap);
-}
-
-function printSitemapImpl(sitemap) {
-	sitemap.pages.forEach((page) => log.debug(`${path.join(page.path, page.filename)} (${page.title})`));
-	// sitemap.pages.forEach((page) => log.debug(`${path.join(prefix, page.filename)} (${page.title})`));
-	_.forOwn(sitemap.dirs, (value, key) => printSitemapImpl(value));
-}
-
-function processSources(sources, sitemap, relativePath = '/') {
+function processSources(sources, directory = Directory.fromPath('/')) {
 	_.forOwn(sources, (value, key) => {
-		if (typeof(value) === 'object' && !PageData.is(value)) {
-			sitemap.dirs[key] = { dirs: {}, pages: [] };
-			processSources(value, sitemap.dirs[key], path.join(relativePath, key));
+		if (typeof(value) === 'object') {
+			directory.dirs[key] = Directory.fromPath(path.join(directory.path, key));
+			processSources(value, directory.dirs[key], directory.path);
 		} else {
-			// Replace content with PageData
-			const pageData = renderer.parseContent(value, key, relativePath);
-			sources[key] = pageData;
-
-			// Add to sitemap
-			sitemap.pages.push(pageData.pageSettings);
+			const wasAdded = directory.addPage(Page.create(value, path.join(directory.path, key)));
+			if (!wasAdded)
+				log.warn('Failed to add page to directory structure! Page path: ' + path.join(directory.path, key));
 		}
 	});
+	return directory;
 }
 
 function processStyles(styleSource, outputDir) {
@@ -302,7 +273,7 @@ function processStyles(styleSource, outputDir) {
 			less.render(value)
 				.then((output) => {
 					const outPath = path.join(outputDir, key.replace('.less', '.css'));
-					log.debug('Writing less file: ', outPath);
+					log.verbose('Writing less file: ', outPath);
 					fs.ensureDirSync(outputDir);
 					fs.writeFileSync(outPath, output.css, 'utf-8');
 				})
@@ -350,42 +321,28 @@ function sourceWatcherEvent(evt, filePath) {
 	const subdir = filePath.substring(contentDir.source.length + 1, filePath.length - path.basename(filePath).length);
 	const relativePath = path.join(contentDir.dest, subdir);
 	const destPath = path.join(this.config.settings.stages.compile.outputDirs.content, relativePath);
-	const filename = renderer.stripExtension(path.basename(filePath), '.md', '.html');
 
 	// Generate content
 	let content = fs.readFileSync(filePath, 'utf-8');
-	content = renderer.parseContent(content, path.basename(filePath), relativePath);
-	content.body = renderer.renderContent(content, ContextExtensions.fromContext(this.context));
+	const page = Page.create(content, path.join(relativePath, path.basename(filePath)));
+	this.context.sitemap.addPage(page);
+	page.render(this.context);
 
 	// Write to file
-	const contentObject = {};
-	contentObject[filename] = content;
+	const contentObject = { pages: { }};
+	contentObject.pages[page.filename] = page;
 	writeContent(contentObject, destPath);
 }
 
-function writeContent(content, dest) {
-	_.forOwn(content, (value, key) => {
-		if (typeof(value) === 'object' && !PageData.is(value)) {
-			writeContent(value, path.join(dest, key));
-			return;
-		}
-
-		log.verbose('Writing file: ', path.join(dest, key));
-		fs.ensureDirSync(dest);
-		fs.writeFileSync(path.join(dest, key), value.body, 'utf-8');
+function writeContent(sitemap, outputDir) {
+	_.forOwn(sitemap.pages, (page) => {
+		log.verbose('Writing file: ', path.join(outputDir, page.filename));
+		fs.ensureDirSync(outputDir);
+		fs.writeFileSync(path.join(outputDir, page.filename), page.body, 'utf-8');
 	});
-}
 
-let contentCount = 0;
-function buildContent(sources, dest, originalContext, templates) {
-	_.forOwn(sources, (value, key) => {
-		if (typeof(value) === 'object' && !PageData.is(value)) {
-			if (!dest[key]) dest[key] = {};
-			buildContent(value, dest[key], originalContext, templates);
-		} else {
-			value.body = renderer.renderContent(value, ContextExtensions.fromContext(originalContext));
-			dest[value.pageSettings.filename] = value;
-			contentCount++;
-		}
+	// Recurse dirs
+	_.forOwn(sitemap.dirs, (dir, dirName) => {
+		writeContent(dir, path.join(outputDir, dirName));
 	});
 }
