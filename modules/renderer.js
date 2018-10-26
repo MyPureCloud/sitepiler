@@ -91,7 +91,7 @@ class Renderer {
 	 */
 	renderContent(pageData, context) {
 		const fullPath = path.join(pageData.pageSettings.path, pageData.pageSettings.filename);
-		log.debug(`Bulding page (${fullPath})`);
+		log.verbose(`Bulding page (${fullPath})`);
 		const startMs = Date.now();
 
 		// Build breadcrumb
@@ -102,7 +102,6 @@ class Renderer {
 		paths = paths.filter((p) => p != '');
 		paths.forEach((dirname) => {
 			sitemap = sitemap.dirs[dirname];
-			log.debug('found: ', sitemap);
 			webPath = path.join(webPath, dirname);
 			context.breadcrumb.push({ 
 				title: sitemap.title,
@@ -111,9 +110,28 @@ class Renderer {
 		});
 
 		// Remove last crumb if index page
-		log.debug(pageData.pageSettings);
 		if (pageData.pageSettings.filename.startsWith('index.')) context.breadcrumb.pop();
-		log.debug('breadcrumb: ', context.breadcrumb);
+
+		// Build siblings
+		context.siblings = [];
+		sitemap.pages.forEach((page) => {
+			// Exclude index page
+			if (page.filename.startsWith('index.')) return;
+
+			page.isCurrentPage = page.filename === pageData.pageSettings.filename;
+			page.link = path.join(page.path, page.filename);
+			context.siblings.push(page);
+		});
+		_.forOwn(sitemap.dirs, (dir, dirname) => {
+			context.siblings.push({
+				title: dir.title,
+				link: path.join(webPath, dirname),
+				isCurrentPage: false
+			});
+		});
+
+		// Sort siblings
+		context.siblings = _.sortBy(context.siblings, [ 'order', 'title']);
 
 		// Compile page and execute page template
 		context.pageSettings = pageData.pageSettings;
@@ -138,7 +156,7 @@ class Renderer {
 		if (duration > 1000)
 			log.warn(`Page build time of ${duration} exceeded 1000ms: ${fullPath}`);
 		else
-			log.debug(`Page build completed in ${duration}ms`);
+			log.verbose(`Page build completed in ${duration}ms`);
 
 		return output;
 	}

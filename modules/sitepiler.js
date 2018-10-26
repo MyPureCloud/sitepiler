@@ -278,11 +278,7 @@ function processSources(sources, sitemap, relativePath = '/') {
 			sources[key] = pageData;
 
 			// Add to sitemap
-			sitemap.pages.push({ 
-				title: pageData.pageSettings.title,
-				path: pageData.pageSettings.path,
-				filename: pageData.pageSettings.filename 
-			});
+			sitemap.pages.push(pageData.pageSettings);
 		}
 	});
 }
@@ -312,7 +308,7 @@ function processStyles(styleSource, outputDir) {
 				})
 				.catch((err) => log.error(err));
 		} else {
-			log.debug('Writing file: ', path.join(outputDir, key));
+			log.verbose('Writing file: ', path.join(outputDir, key));
 			fs.ensureDirSync(outputDir);
 			fs.writeFileSync(path.join(outputDir, key), value, 'utf-8');
 		}
@@ -374,7 +370,7 @@ function writeContent(content, dest) {
 			return;
 		}
 
-		log.debug('Writing file: ', path.join(dest, key));
+		log.verbose('Writing file: ', path.join(dest, key));
 		fs.ensureDirSync(dest);
 		fs.writeFileSync(path.join(dest, key), value.body, 'utf-8');
 	});
