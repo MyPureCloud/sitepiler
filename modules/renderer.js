@@ -115,8 +115,10 @@ class Renderer {
 		const markdownContent = dot.template(page.bodyRaw, undefined, context)(context);
 
 		// Compile markdown
-		const parsedContent = md.render(markdownContent);
-		context.content = parsedContent;
+		if (page.renderMarkdown !== false)
+			context.content = md.render(markdownContent);
+		else
+			context.content = markdownContent;
 
 		// Execute layout template
 		let template;
@@ -145,7 +147,7 @@ class Renderer {
 		// Remove
 		let outputFileName = inputFilename.substring(0, inputFilename.length - extension.length);
 		// Add
-		if (!outputFileName.endsWith(newExtension)) outputFileName += newExtension;
+		if (newExtension && !outputFileName.endsWith(newExtension)) outputFileName += newExtension;
 		// Return
 		return outputFileName;
 	}

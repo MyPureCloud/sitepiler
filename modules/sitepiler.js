@@ -230,7 +230,7 @@ class Sitepiler {
 	}
 
 	prepareOutputFileName(inputFilename) {
-		return renderer.stripExtension(inputFilename, '.md', '.html');
+		return renderer.stripExtension(inputFilename, '.md');
 	}
 }
 

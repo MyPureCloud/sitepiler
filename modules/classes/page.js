@@ -33,7 +33,7 @@ class Page {
 		page.bodyRaw = fmData.body;
 
 		// Add computed page settings
-		page.filename = renderer.stripExtension(path.basename(webPath), '.md', '.html');
+		page.filename = renderer.stripExtension(path.basename(webPath), '.md');
 		page.path = webPath.substr(0, webPath.length - path.basename(webPath).length);
 		page.link = path.join(page.path, page.filename);
 
