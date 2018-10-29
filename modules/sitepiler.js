@@ -196,23 +196,24 @@ class Sitepiler {
 			writeContent(this.context.sitemap, this.config.settings.stages.compile.outputDirs.content);
 			log.verbose(`Content written in ${Date.now() - startMs}ms`);
 
-			// Build manifest
-			log.verbose('Building manifest...');
-			this.manifest = {
-				name: this.context.data.build.projectName,
-				version: this.context.data.build.buildNumber,
-				buildNumber: this.context.data.build.buildNumber,
-				indexFiles: []
-			};
-			buildManifest(this.manifest.indexFiles, this.config.settings.stages.compile.outputDirs.content, '/');
-			fs.writeFileSync(
-				path.join(this.config.settings.stages.compile.outputDirs.content, 'manifest.json'), 
-				JSON.stringify(this.manifest, null, 2), 
-				'utf-8'
-			);
-
+			// Wait for styles to complete
 			stylesPromise
 				.then(() => {
+					// Build manifest
+					log.verbose('Building manifest...');
+					this.manifest = {
+						name: this.context.data.build.projectName,
+						version: this.context.data.build.buildNumber,
+						buildNumber: this.context.data.build.buildNumber,
+						indexFiles: []
+					};
+					buildManifest(this.manifest.indexFiles, this.config.settings.stages.compile.outputDirs.content, '/');
+					fs.writeFileSync(
+						path.join(this.config.settings.stages.compile.outputDirs.content, 'manifest.json'), 
+						JSON.stringify(this.manifest, null, 2), 
+						'utf-8'
+					);
+					
 					// Complete stage
 					log.verbose(`Compile stage completed in ${Date.now() - compileStartMs}ms`);
 					deferred.resolve();
