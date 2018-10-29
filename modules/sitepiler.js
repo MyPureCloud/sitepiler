@@ -203,7 +203,7 @@ class Sitepiler {
 				version: this.context.data.build.buildNumber,
 				buildNumber: this.context.data.build.buildNumber,
 				indexFiles: []
-			}
+			};
 			buildManifest(this.manifest.indexFiles, this.config.settings.stages.compile.outputDirs.content, '/');
 			fs.writeFileSync(
 				path.join(this.config.settings.stages.compile.outputDirs.content, 'manifest.json'), 
@@ -264,7 +264,7 @@ function buildManifest(manifest, sourcePath, relativePath) {
 		if (fs.lstatSync(newSourcePath).isDirectory())
 			dirs.push(file);
 		else 
-			manifest.push(newRelativePath);
+			manifest.push({ file: newRelativePath });
 	});
 
 	dirs.forEach((dir) => buildManifest(manifest, path.join(sourcePath, dir), path.join(relativePath, dir)));
