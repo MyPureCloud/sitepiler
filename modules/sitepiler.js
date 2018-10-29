@@ -196,6 +196,21 @@ class Sitepiler {
 			writeContent(this.context.sitemap, this.config.settings.stages.compile.outputDirs.content);
 			log.verbose(`Content written in ${Date.now() - startMs}ms`);
 
+			// Build manifest
+			log.verbose('Building manifest...');
+			this.manifest = {
+				name: this.context.data.build.projectName,
+				version: this.context.data.build.buildNumber,
+				buildNumber: this.context.data.build.buildNumber,
+				indexFiles: []
+			}
+			buildManifest(this.manifest.indexFiles, this.config.settings.stages.compile.outputDirs.content, '/');
+			fs.writeFileSync(
+				path.join(this.config.settings.stages.compile.outputDirs.content, 'manifest.json'), 
+				JSON.stringify(this.manifest, null, 2), 
+				'utf-8'
+			);
+
 			// Complete stage
 			log.verbose(`Compile stage completed in ${Date.now() - compileStartMs}ms`);
 
@@ -239,6 +254,21 @@ class Sitepiler {
 module.exports = Sitepiler;
 
 
+
+function buildManifest(manifest, sourcePath, relativePath) {
+	const files = fs.readdirSync(sourcePath);
+	const dirs = [];
+	files.forEach((file) => {
+		const newSourcePath = path.join(sourcePath, file);
+		const newRelativePath = path.join(relativePath, file);
+		if (fs.lstatSync(newSourcePath).isDirectory())
+			dirs.push(file);
+		else 
+			manifest.push(newRelativePath);
+	});
+
+	dirs.forEach((dir) => buildManifest(manifest, path.join(sourcePath, dir), path.join(relativePath, dir)));
+}
 
 function processSources(sources, directory = Directory.fromPath('/')) {
 	_.forOwn(sources, (value, key) => {
