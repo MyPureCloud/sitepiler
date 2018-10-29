@@ -131,7 +131,7 @@ class Renderer {
 		// Log completion
 		const duration = Date.now() - startMs;
 		if (duration > 1000)
-			log.warn(`Page build time of ${duration} exceeded 1000ms: ${fullPath}`);
+			log.warn(`Page build time of ${duration} exceeded 1000ms: ${page.link}`);
 		else
 			log.verbose(`Page build completed in ${duration}ms`);
 

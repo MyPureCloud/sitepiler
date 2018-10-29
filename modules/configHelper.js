@@ -40,8 +40,10 @@ class ConfigHelper {
 
 		// Initialize config structure before proceeding
 		this.setDefault(this.config, 'envVars', {});
-		this.setDefault(this.config, 'templateChangeRebuildQuietSeconds', 30);
-		this.setDefault(this.config, 'stageSettings', {});
+		this.setDefault(this.config, 'settings', {});
+		this.setDefault(this.config.settings, 'rootDir', process.cwd());
+		this.setDefault(this.config.settings, 'templateChangeRebuildQuietSeconds', 30);
+		this.setDefault(this.config.settings, 'stages', {});
 		this.setDefault(this.config.settings.stages, 'data', {});
 		this.setDefault(this.config.settings.stages.data, 'scripts', []);
 		this.setDefault(this.config.settings.stages, 'compile', {});
@@ -74,15 +76,18 @@ class ConfigHelper {
 		// Resolve env vars
 		this.resolveEnvVars(this.config);
 
-		// Normalize content dirs
-		this.config.settings.stages.compile.contentDirs = normalizeContentDirs(this.config.settings.stages.compile.contentDirs);
-		this.config.settings.stages.compile.styleDirs = normalizeContentDirs(this.config.settings.stages.compile.styleDirs);
-		this.config.settings.stages.compile.staticDirs = normalizeContentDirs(this.config.settings.stages.compile.staticDirs);
+		// Normalize dirs
+		this.config.settings.stages.data.dataDirs = normalizeDirs(this.config.settings.stages.data.dataDirs, this.config.settings.rootDir);
+		this.config.settings.stages.compile.templateDirs.layouts = normalizeDirs(this.config.settings.stages.compile.templateDirs.layouts, this.config.settings.rootDir);
+		this.config.settings.stages.compile.templateDirs.partials = normalizeDirs(this.config.settings.stages.compile.templateDirs.partials, this.config.settings.rootDir);
+		this.config.settings.stages.compile.contentDirs = normalizeDirObjects(this.config.settings.stages.compile.contentDirs, this.config.settings.rootDir);
+		this.config.settings.stages.compile.styleDirs = normalizeDirObjects(this.config.settings.stages.compile.styleDirs, this.config.settings.rootDir);
+		this.config.settings.stages.compile.staticDirs = normalizeDirObjects(this.config.settings.stages.compile.staticDirs, this.config.settings.rootDir);
 
 		// Resolve output dirs
-		this.config.settings.stages.compile.outputDirs.content = path.resolve(this.config.settings.stages.compile.outputDirs.content);
-		this.config.settings.stages.compile.outputDirs.styles = path.resolve(this.config.settings.stages.compile.outputDirs.styles);
-		this.config.settings.stages.compile.outputDirs.static = path.resolve(this.config.settings.stages.compile.outputDirs.static);
+		this.config.settings.stages.compile.outputDirs.content = normalizeDir(this.config.settings.stages.compile.outputDirs.content, this.config.settings.rootDir);
+		this.config.settings.stages.compile.outputDirs.styles = normalizeDir(this.config.settings.stages.compile.outputDirs.styles, this.config.settings.rootDir);
+		this.config.settings.stages.compile.outputDirs.static = normalizeDir(this.config.settings.stages.compile.outputDirs.static, this.config.settings.rootDir);
 
 		// Normalize data dirs
 		for (var i = 0; i < this.config.settings.stages.data.dataDirs.length; i++) {
@@ -184,16 +189,43 @@ module.exports = new ConfigHelper();
 
 
 
-function normalizeContentDirs(dirs) {
+function normalizeDirs(dirs, cwd) {
 	const tempDirs = [];
 	dirs.forEach((d) => {
-		// Resolve source dir to full path, leave dest relative (to output dir)
-		if (typeof(d) === 'string')
-			tempDirs.push({ source: path.resolve(d), dest: '' });
-		else
-			tempDirs.push({ source: path.resolve(d.source), dest: d.dest });
+		tempDirs.push(normalizeDir(d, cwd));
 	});
 	return tempDirs;
+}
+
+function normalizeDirObjects(dirs, cwd) {
+	const tempDirs = [];
+	dirs.forEach((d) => {
+		let newDir = {};
+
+		if (typeof(d) === 'string') {
+			newDir.source = d;
+			newDir.dest = '';
+		} else {
+			newDir = d;
+		}
+
+		newDir.source = normalizeDir(newDir.source, cwd);
+
+		tempDirs.push(newDir);
+	});
+	return tempDirs;
+}
+
+function normalizeDir(dir, cwd) {
+	const paths = [];
+
+	if (!path.isAbsolute(dir))
+		paths.push(cwd);
+
+	paths.push(dir);
+
+	const newPath = path.resolve.apply(this, paths);
+	return newPath;
 }
 
 
