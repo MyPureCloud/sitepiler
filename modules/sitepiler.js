@@ -168,7 +168,7 @@ class Sitepiler {
 			log.verbose(`Styles loaded in ${Date.now() - startMs}ms`);
 
 			// Process styles
-			processStyles(this.styleSource, this.config.settings.stages.compile.outputDirs.styles);
+			const stylesPromise = processStyles(this.styleSource, this.config.settings.stages.compile.outputDirs.styles);
 
 			// Process static content
 			startMs = Date.now();
@@ -211,10 +211,12 @@ class Sitepiler {
 				'utf-8'
 			);
 
-			// Complete stage
-			log.verbose(`Compile stage completed in ${Date.now() - compileStartMs}ms`);
-
-			deferred.resolve();
+			stylesPromise
+				.then(() => {
+					// Complete stage
+					log.verbose(`Compile stage completed in ${Date.now() - compileStartMs}ms`);
+					deferred.resolve();
+				});
 		} catch(err) {
 			deferred.reject(err);
 		}
@@ -285,6 +287,8 @@ function processSources(sources, directory = Directory.fromPath('/')) {
 }
 
 function processStyles(styleSource, outputDir) {
+	const deferred = Q.defer();
+
 	/*
 	 * TODO: not sure if reading every file is the best way to process LESS.
 	 * There is some indication that the LESS render function can resolve 
@@ -292,6 +296,7 @@ function processStyles(styleSource, outputDir) {
 	 * http://lesscss.org/usage/#programmatic-usage
 	 */
 
+	const promises = [];
 	_.forOwn(styleSource, (value, key) => {
 		if (typeof(value) === 'object') {
 			processStyles(value, path.join(outputDir, key));
@@ -300,14 +305,14 @@ function processStyles(styleSource, outputDir) {
 
 		if (key.toLowerCase().endsWith('less')) {
 			log.verbose(`Rendering LESS file ${key}`);
-			less.render(value)
+			promises.push(less.render(value)
 				.then((output) => {
 					const outPath = path.join(outputDir, key.replace('.less', '.css'));
 					log.verbose('Writing less file: ', outPath);
 					fs.ensureDirSync(outputDir);
 					fs.writeFileSync(outPath, output.css, 'utf-8');
-				})
-				.catch((err) => log.error(err));
+				}));
+			// .catch((err) => log.error(err));
 		} else {
 			log.verbose('Writing file: ', path.join(outputDir, key));
 			fs.ensureDirSync(outputDir);
@@ -315,6 +320,13 @@ function processStyles(styleSource, outputDir) {
 		}
 
 	});
+
+	// Wait for processing
+	Promise.all(promises)
+		.then(deferred.resolve)
+		.catch(deferred.reject);
+
+	return deferred.promise;
 }
 
 // Expects to have context bound to a sitepiler instance
