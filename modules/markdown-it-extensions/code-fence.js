@@ -23,7 +23,7 @@ module.exports = function(md, name, options) {
 		controlChars = controlCharsMatch[0];
 
 		// Self-closing line, e.g.: ``` this is a code block ```
-		if (lineText.trim().endsWith(controlChars)) {
+		if (lineText.trim().endsWith(controlChars) && lineText.trim().length > 6) {
 			// Add code block
 			token = state.push('fence', 'code', 0);
 			token.attrs = parseAttrs('');
