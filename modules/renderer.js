@@ -21,6 +21,7 @@ md.disable(['code']);
 // Add extensions
 md.block.ruler.before('table', 'mytable', require('./markdown-it-extensions/table'), { alt: ['paragraph', 'reference'] });
 md.use(require('./markdown-it-extensions/code-fence'));
+md.use(require('./markdown-it-extensions/heading-renderer'));
 
 // Set doT settings
 dot.templateSettings.varname = 'context';
