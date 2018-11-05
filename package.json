@@ -21,6 +21,8 @@
     "lodash": "^4.17.10",
     "lognext": "0.0.4",
     "markdown-it": "^8.4.2",
+    "moment": "^2.22.2",
+    "moment-timezone": "^0.5.23",
     "q": "^1.5.1",
     "yaml": "^1.0.0-rc.8"
   },

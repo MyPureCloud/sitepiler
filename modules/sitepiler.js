@@ -14,6 +14,7 @@ const fileLoader = require('./fileLoader');
 const Page = require('./classes/page');
 const PageData = require('./classes/pageData');
 const renderer = require('./renderer');
+const Timer = require('./timer');
 
 
 const log = new lognext('Sitepiler');
@@ -118,24 +119,24 @@ class Sitepiler {
 
 		try {
 			log.writeBox('Stage: compile');
-			let compileStartMs = Date.now();
+			let compileStartMs = Timer.start();
 
 			// Clear old data
 			this.initCompileProps();
 
 			// TODO: separate the template loading/compiling so that this module can be used without running a full compile
 			// Load templates
-			let startMs = Date.now();
+			let startMs = Timer.start();
 			this.config.settings.stages.compile.templateDirs.layouts.forEach((dataDir) => {
 				fileLoader.loadFiles(dataDir, this.templateSource.layouts, [ fileLoader.filters.DOT ], true);
 			});
 			this.config.settings.stages.compile.templateDirs.partials.forEach((dataDir) => {
 				fileLoader.loadFiles(dataDir, this.templateSource.partials, [ fileLoader.filters.DOT ], true);
 			});
-			log.verbose(`Templates loaded in ${Date.now() - startMs}ms`);
+			log.verbose(`Templates loaded in ${startMs.getMs()}ms`);
 
 			// Load content
-			startMs = Date.now();
+			startMs = Timer.start();
 			let tempSources = {};
 			this.config.settings.stages.compile.contentDirs.forEach((sourceDir) => {
 				let targetDir = tempSources;
@@ -147,14 +148,14 @@ class Sitepiler {
 				}
 				fileLoader.loadFiles(sourceDir.source, targetDir, [ fileLoader.filters.MARKDOWN ], true);
 			});
-			log.verbose(`Content loaded in ${Date.now() - startMs}ms`);
+			log.verbose(`Content loaded in ${startMs.getMs()}ms`);
 
 			// Process page sources
 			this.context.sitemap = processSources(tempSources);
 			this.context.sitemap.analyze();
 
 			// Load styles
-			startMs = Date.now();
+			startMs = Timer.start();
 			this.config.settings.stages.compile.styleDirs.forEach((sourceDir) => {
 				let targetDir = this.styleSource;
 				if (sourceDir.dest !== '') {
@@ -165,36 +166,36 @@ class Sitepiler {
 				}
 				fileLoader.loadFiles(sourceDir.source, targetDir, [ fileLoader.filters.STYLES ], true);
 			});
-			log.verbose(`Styles loaded in ${Date.now() - startMs}ms`);
+			log.verbose(`Styles loaded in ${startMs.getMs()}ms`);
 
 			// Process styles
 			const stylesPromise = processStyles(this.styleSource, this.config.settings.stages.compile.outputDirs.styles);
 
 			// Process static content
-			startMs = Date.now();
+			startMs = Timer.start();
 			this.config.settings.stages.compile.staticDirs.forEach((sourceDir) => {
 				const targetDir = path.join(this.config.settings.stages.compile.outputDirs.static, sourceDir.dest);
 				log.info(`Copying static files from ${sourceDir.source} to ${targetDir}`);
 				fs.copySync(sourceDir.source, targetDir);
 			});
-			log.verbose(`Static files copied in ${Date.now() - startMs}ms`);
+			log.verbose(`Static files copied in ${startMs.getMs()}ms`);
 
 
 			// Compile templates so they can be used
-			startMs = Date.now();
+			startMs = Timer.start();
 			renderer.compileTemplates(this.templateSource.layouts, renderer.templates.layouts, this.context);
 			renderer.compileTemplates(this.templateSource.partials, renderer.templates.partials, this.context);
-			log.verbose(`Templates compiled in ${Date.now() - startMs}ms`);
+			log.verbose(`Templates compiled in ${startMs.getMs()}ms`);
 
 			// Build content pages using templates
-			startMs = Date.now();
+			startMs = Timer.start();
 			this.context.sitemap.renderPages(this.context);
-			log.verbose(`Built content files in ${Date.now() - startMs}ms`);
+			log.verbose(`Built content files in ${startMs.getMs()}ms`);
 
 			// Write content pages to disk
-			startMs = Date.now();
+			startMs = Timer.start();
 			writeContent(this.context.sitemap, this.config.settings.stages.compile.outputDirs.content);
-			log.verbose(`Content written in ${Date.now() - startMs}ms`);
+			log.verbose(`Content written in ${startMs.getMs()}ms`);
 
 			// Wait for styles to complete
 			stylesPromise
@@ -215,7 +216,7 @@ class Sitepiler {
 					);
 					
 					// Complete stage
-					log.verbose(`Compile stage completed in ${Date.now() - compileStartMs}ms`);
+					log.verbose(`Compile stage completed in ${compileStartMs.getMs() }ms`);
 					deferred.resolve();
 				});
 		} catch(err) {
