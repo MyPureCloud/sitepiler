@@ -14,6 +14,7 @@ const fileLoader = require('./fileLoader');
 const Page = require('./classes/page');
 const PageData = require('./classes/pageData');
 const renderer = require('./renderer');
+const scriptRunner = require('./scriptRunner');
 const Timer = require('./timer');
 
 
@@ -94,6 +95,9 @@ class Sitepiler {
 		try {
 			log.writeBox('Stage: gather data');
 
+			// Run scripts
+			scriptRunner.run(this.config.settings.stages.data.scripts);
+
 			// Load data files
 			const tempData = {};
 			this.config.settings.stages.data.dataDirs.forEach((dataDir) => {
@@ -123,6 +127,9 @@ class Sitepiler {
 
 			// Clear old data
 			this.initCompileProps();
+
+			// Run scripts
+			scriptRunner.run(this.config.settings.stages.compile.preCompileScripts);
 
 			// TODO: separate the template loading/compiling so that this module can be used without running a full compile
 			// Load templates
@@ -219,6 +226,9 @@ class Sitepiler {
 					log.verbose(`Compile stage completed in ${compileStartMs.getMs() }ms`);
 					deferred.resolve();
 				});
+
+			// Run scripts
+			scriptRunner.run(this.config.settings.stages.compile.postCompileScripts);
 		} catch(err) {
 			deferred.reject(err);
 		}
@@ -232,7 +242,8 @@ class Sitepiler {
 		try {
 			log.writeBox('Stage: publish');
 
-			// TODO
+			// Run scripts
+			scriptRunner.run(this.config.settings.stages.publish.publishScripts);
 
 			deferred.resolve();
 		} catch(err) {

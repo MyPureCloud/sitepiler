@@ -9,9 +9,22 @@ settings:
     data:
       scripts:
       - type: shell
-        src: "/path/to/file.sh"
-      - type: shell
-        src: "/path/to/file.sh"
+        src: "scripts/test.sh"
+        args:
+        - "arg1"
+        - "arg2"
+        failOnError: true
+      - type: node
+        src: "scripts/test.js"
+        args:
+        - "arg1"
+        - "arg2"
+        failOnError: true
+      - type: command
+        command: ls
+        args:
+        - "/"
+        failOnError: true
       dataDirs:
       - "example/src/data"
     compile:
@@ -36,6 +49,4 @@ settings:
         static: "example/build"
       postCompileScripts: []
     publish:
-      prePublishScripts: []
       publishScripts: []
-      postPublishScripts: []

@@ -89,6 +89,15 @@ class ConfigHelper {
 		this.config.settings.stages.compile.outputDirs.styles = normalizeDir(this.config.settings.stages.compile.outputDirs.styles, this.config.settings.rootDir);
 		this.config.settings.stages.compile.outputDirs.static = normalizeDir(this.config.settings.stages.compile.outputDirs.static, this.config.settings.rootDir);
 
+		// Resolve script sources
+		this.config.settings.stages.data.scripts.forEach((scriptConfig) => {
+			if (scriptConfig.src) scriptConfig.src = normalizeDir(scriptConfig.src, this.config.settings.rootDir);
+			if (scriptConfig.cwd)
+				scriptConfig.cwd = normalizeDir(scriptConfig.cwd, this.config.settings.rootDir);
+			else
+				scriptConfig.cwd = this.config.settings.rootDir;
+		});
+
 		// Normalize data dirs
 		for (var i = 0; i < this.config.settings.stages.data.dataDirs.length; i++) {
 			this.config.settings.stages.data.dataDirs[i] = path.resolve(this.config.settings.stages.data.dataDirs[i]);
