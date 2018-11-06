@@ -127,6 +127,14 @@ class Sitepiler {
 
 			// Clear old data
 			this.initCompileProps();
+			if (this.config.settings.stages.compile.outputDirs.clearOnBuild) {
+				fs.removeSync(this.config.settings.stages.compile.outputDirs.content);
+				fs.removeSync(this.config.settings.stages.compile.outputDirs.styles);
+				fs.removeSync(this.config.settings.stages.compile.outputDirs.static);
+			}
+			fs.ensureDirSync(this.config.settings.stages.compile.outputDirs.content);
+			fs.ensureDirSync(this.config.settings.stages.compile.outputDirs.styles);
+			fs.ensureDirSync(this.config.settings.stages.compile.outputDirs.static);
 
 			// Run scripts
 			scriptRunner.run(this.config.settings.stages.compile.preCompileScripts);

@@ -49,6 +49,7 @@ class ConfigHelper {
 		this.setDefault(this.config.settings.stages, 'compile', {});
 		this.setDefault(this.config.settings.stages.compile, 'preCompileScripts', []);
 		this.setDefault(this.config.settings.stages.compile, 'outputDirs', {});
+		this.setDefault(this.config.settings.stages.compile.outputDirs, 'clearOnBuild', false);
 		this.setDefault(this.config.settings.stages.compile.outputDirs, 'content', path.resolve('./build'));
 		this.setDefault(this.config.settings.stages.compile.outputDirs, 'styles', path.resolve('./build/styles'));
 		this.setDefault(this.config.settings.stages.compile.outputDirs, 'static', path.resolve('./build'));
