@@ -153,7 +153,7 @@ class Sitepiler {
 						targetDir = targetDir[d];
 					});
 				}
-				fileLoader.loadFiles(sourceDir.source, targetDir, [ fileLoader.filters.MARKDOWN ], true);
+				fileLoader.loadFiles(sourceDir.source, targetDir, [ fileLoader.filters.MARKDOWN ], sourceDir.recursive);
 			});
 			log.verbose(`Content loaded in ${startMs.getMs()}ms`);
 
@@ -161,22 +161,16 @@ class Sitepiler {
 			this.context.sitemap = processSources(tempSources);
 			this.context.sitemap.analyze();
 
-			// Load styles
-			startMs = Timer.start();
-			this.config.settings.stages.compile.styleDirs.forEach((sourceDir) => {
-				let targetDir = this.styleSource;
-				if (sourceDir.dest !== '') {
-					sourceDir.dest.split('/').forEach((d) => {
-						if (!targetDir[d]) targetDir[d] = {};
-						targetDir = targetDir[d];
-					});
-				}
-				fileLoader.loadFiles(sourceDir.source, targetDir, [ fileLoader.filters.STYLES ], true);
-			});
-			log.verbose(`Styles loaded in ${startMs.getMs()}ms`);
-
 			// Process styles
-			const stylesPromise = processStyles(this.styleSource, this.config.settings.stages.compile.outputDirs.styles);
+			const styleStartMs = Timer.start();
+			const stylePromises = [];
+			this.config.settings.stages.compile.styleDirs.forEach((styleConfig) => {
+				stylePromises.push(processStyleConfig(
+					styleConfig.source, 
+					path.join(this.config.settings.stages.compile.outputDirs.styles, styleConfig.dest), 
+					styleConfig.recursive
+				));
+			});
 
 			// Process static content
 			startMs = Timer.start();
@@ -205,8 +199,10 @@ class Sitepiler {
 			log.verbose(`Content written in ${startMs.getMs()}ms`);
 
 			// Wait for styles to complete
-			stylesPromise
+			Promise.all(stylePromises)
 				.then(() => {
+					log.verbose(`Styles loaded in ${styleStartMs.getMs()}ms`);
+
 					// Build manifest
 					log.verbose('Building manifest...');
 					this.manifest = {
@@ -225,7 +221,8 @@ class Sitepiler {
 					// Complete stage
 					log.verbose(`Compile stage completed in ${compileStartMs.getMs() }ms`);
 					deferred.resolve();
-				});
+				})
+				.catch(deferred.reject);
 
 			// Run scripts
 			scriptRunner.run(this.config.settings.stages.compile.postCompileScripts);
@@ -299,33 +296,37 @@ function processSources(sources, directory = Directory.fromPath('/')) {
 	return directory;
 }
 
-function processStyles(styleSource, outputDir) {
+function processStyleConfig(sourceDir, outputDir, recursive) {
 	const deferred = Q.defer();
 
-	/*
-	 * TODO: not sure if reading every file is the best way to process LESS.
-	 * There is some indication that the LESS render function can resolve 
-	 * external files automatically. Need to determine best approach.
-	 * http://lesscss.org/usage/#programmatic-usage
-	 */
+	let styleSource = {};
+	fileLoader.loadFiles(sourceDir, styleSource, [ fileLoader.filters.STYLES ], false);
 
 	const promises = [];
 	_.forOwn(styleSource, (value, key) => {
-		if (typeof(value) === 'object') {
-			processStyles(value, path.join(outputDir, key));
-			return;
-		}
-
 		if (key.toLowerCase().endsWith('less')) {
 			log.verbose(`Rendering LESS file ${key}`);
-			promises.push(less.render(value)
+			promises.push(less.render(value, { paths: [ sourceDir ] })
 				.then((output) => {
 					const outPath = path.join(outputDir, key.replace('.less', '.css'));
 					log.verbose('Writing less file: ', outPath);
 					fs.ensureDirSync(outputDir);
 					fs.writeFileSync(outPath, output.css, 'utf-8');
-				}));
-			// .catch((err) => log.error(err));
+				})
+				.catch((err) => {
+					if (err.constructor.name === 'LessError') {
+						// The LESS renderer throws a custom object that is not a standard JS error
+						log.error(`[render error] ${key} >> line: ${err.line}, column: ${err.column}, index: ${err.index}`);
+						err = Error(err.message);
+					} else if (!err) {
+						// This 
+						const msg = `Unspecified error rendering ${key}`;
+						log.warn(msg);
+						err = Error(msg);
+					}
+					throw err;
+				})
+			);
 		} else {
 			log.verbose('Writing file: ', path.join(outputDir, key));
 			fs.ensureDirSync(outputDir);
@@ -333,6 +334,13 @@ function processStyles(styleSource, outputDir) {
 		}
 
 	});
+
+	// Recurse?
+	if (recursive) {
+		fileLoader.getDirNames(sourceDir).forEach((dir) => {
+			promises.push(processStyleConfig(path.join(sourceDir, dir), path.join(outputDir, dir), recursive));
+		});
+	}
 
 	// Wait for processing
 	Promise.all(promises)

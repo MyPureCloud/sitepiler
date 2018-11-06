@@ -74,6 +74,17 @@ class FileLoader {
 			});
 		});
 	}
+
+	getDirNames(dir) {
+		const files = fs.readdirSync(dir);
+		const dirs = [];
+		files.forEach((file) => {
+			const fullPath = path.join(dir, file);
+			if (fs.lstatSync(fullPath).isDirectory())
+				dirs.push(file);
+		});
+		return dirs;
+	}
 }
 
 

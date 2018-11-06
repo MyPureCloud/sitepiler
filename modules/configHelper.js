@@ -77,23 +77,23 @@ class ConfigHelper {
 		this.resolveEnvVars(this.config);
 
 		// Normalize dirs
-		this.config.settings.stages.data.dataDirs = normalizeDirs(this.config.settings.stages.data.dataDirs, this.config.settings.rootDir);
-		this.config.settings.stages.compile.templateDirs.layouts = normalizeDirs(this.config.settings.stages.compile.templateDirs.layouts, this.config.settings.rootDir);
-		this.config.settings.stages.compile.templateDirs.partials = normalizeDirs(this.config.settings.stages.compile.templateDirs.partials, this.config.settings.rootDir);
-		this.config.settings.stages.compile.contentDirs = normalizeDirObjects(this.config.settings.stages.compile.contentDirs, this.config.settings.rootDir);
-		this.config.settings.stages.compile.styleDirs = normalizeDirObjects(this.config.settings.stages.compile.styleDirs, this.config.settings.rootDir);
-		this.config.settings.stages.compile.staticDirs = normalizeDirObjects(this.config.settings.stages.compile.staticDirs, this.config.settings.rootDir);
+		this.config.settings.stages.data.dataDirs = this.normalizeDirs(this.config.settings.stages.data.dataDirs, this.config.settings.rootDir);
+		this.config.settings.stages.compile.templateDirs.layouts = this.normalizeDirs(this.config.settings.stages.compile.templateDirs.layouts, this.config.settings.rootDir);
+		this.config.settings.stages.compile.templateDirs.partials = this.normalizeDirs(this.config.settings.stages.compile.templateDirs.partials, this.config.settings.rootDir);
+		this.config.settings.stages.compile.contentDirs = this.normalizeDirObjects(this.config.settings.stages.compile.contentDirs, this.config.settings.rootDir);
+		this.config.settings.stages.compile.styleDirs = this.normalizeDirObjects(this.config.settings.stages.compile.styleDirs, this.config.settings.rootDir);
+		this.config.settings.stages.compile.staticDirs = this.normalizeDirObjects(this.config.settings.stages.compile.staticDirs, this.config.settings.rootDir);
 
 		// Resolve output dirs
-		this.config.settings.stages.compile.outputDirs.content = normalizeDir(this.config.settings.stages.compile.outputDirs.content, this.config.settings.rootDir);
-		this.config.settings.stages.compile.outputDirs.styles = normalizeDir(this.config.settings.stages.compile.outputDirs.styles, this.config.settings.rootDir);
-		this.config.settings.stages.compile.outputDirs.static = normalizeDir(this.config.settings.stages.compile.outputDirs.static, this.config.settings.rootDir);
+		this.config.settings.stages.compile.outputDirs.content = this.normalizeDir(this.config.settings.stages.compile.outputDirs.content, this.config.settings.rootDir);
+		this.config.settings.stages.compile.outputDirs.styles = this.normalizeDir(this.config.settings.stages.compile.outputDirs.styles, this.config.settings.rootDir);
+		this.config.settings.stages.compile.outputDirs.static = this.normalizeDir(this.config.settings.stages.compile.outputDirs.static, this.config.settings.rootDir);
 
 		// Resolve script sources
 		this.config.settings.stages.data.scripts.forEach((scriptConfig) => {
-			if (scriptConfig.src) scriptConfig.src = normalizeDir(scriptConfig.src, this.config.settings.rootDir);
+			if (scriptConfig.src) scriptConfig.src = this.normalizeDir(scriptConfig.src, this.config.settings.rootDir);
 			if (scriptConfig.cwd)
-				scriptConfig.cwd = normalizeDir(scriptConfig.cwd, this.config.settings.rootDir);
+				scriptConfig.cwd = this.normalizeDir(scriptConfig.cwd, this.config.settings.rootDir);
 			else
 				scriptConfig.cwd = this.config.settings.rootDir;
 		});
@@ -109,7 +109,7 @@ class ConfigHelper {
 			log.warn('Haystack was undefined!');
 			return;
 		}
-		if (!haystack[needle]) {
+		if (!haystack[needle] && haystack[needle] !== false) {
 			if (warning) 
 				log.warn(warning);
 
@@ -190,51 +190,48 @@ class ConfigHelper {
 	dereference(config) {
 		return deref(config);
 	}
+
+	normalizeDirs(dirs, cwd) {
+		const tempDirs = [];
+		dirs.forEach((d) => {
+			tempDirs.push(this.normalizeDir(d, cwd));
+		});
+		return tempDirs;
+	}
+
+	normalizeDirObjects(dirs, cwd) {
+		const tempDirs = [];
+		dirs.forEach((d) => {
+			let newDir = {};
+
+			if (typeof(d) === 'string') {
+				newDir.source = d;
+			} else {
+				newDir = d;
+			}
+
+			newDir.source = this.normalizeDir(newDir.source, cwd);
+			this.setDefault(newDir, 'dest', '');
+			this.setDefault(newDir, 'recursive', true);
+
+			tempDirs.push(newDir);
+		});
+		return tempDirs;
+	}
+
+	normalizeDir(dir, cwd) {
+		const paths = [];
+
+		if (!path.isAbsolute(dir))
+			paths.push(cwd);
+
+		paths.push(dir);
+
+		const newPath = path.resolve.apply(this, paths);
+		return newPath;
+	}
 }
 
 
 
 module.exports = new ConfigHelper();
-
-
-
-function normalizeDirs(dirs, cwd) {
-	const tempDirs = [];
-	dirs.forEach((d) => {
-		tempDirs.push(normalizeDir(d, cwd));
-	});
-	return tempDirs;
-}
-
-function normalizeDirObjects(dirs, cwd) {
-	const tempDirs = [];
-	dirs.forEach((d) => {
-		let newDir = {};
-
-		if (typeof(d) === 'string') {
-			newDir.source = d;
-			newDir.dest = '';
-		} else {
-			newDir = d;
-		}
-
-		newDir.source = normalizeDir(newDir.source, cwd);
-
-		tempDirs.push(newDir);
-	});
-	return tempDirs;
-}
-
-function normalizeDir(dir, cwd) {
-	const paths = [];
-
-	if (!path.isAbsolute(dir))
-		paths.push(cwd);
-
-	paths.push(dir);
-
-	const newPath = path.resolve.apply(this, paths);
-	return newPath;
-}
-
-
