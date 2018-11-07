@@ -23,6 +23,7 @@ md.block.ruler.before('table', 'mytable', require('./markdown-it-extensions/tabl
 md.use(require('./markdown-it-extensions/code-fence'));
 md.use(require('./markdown-it-extensions/toc'));
 md.use(require('./markdown-it-extensions/heading-renderer'));
+md.use(require('./markdown-it-extensions/linkRenderer'), 'link renderer');
 
 // Set doT settings
 dot.templateSettings.varname = 'context';
@@ -49,6 +50,11 @@ class Renderer {
 			layouts: {},
 			partials: {}
 		};
+	}
+
+	setInternalLinkRegex(internalLinkRegex) {
+		log.info(`Using internal link regex: ${internalLinkRegex}`);
+		md.use(require('./markdown-it-extensions/linkRenderer'), 'link renderer', internalLinkRegex);
 	}
 
 	compileTemplates(source, dest, originalContext) {

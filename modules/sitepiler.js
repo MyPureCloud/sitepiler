@@ -32,6 +32,10 @@ class Sitepiler {
 
 		this.initCompileProps();
 
+		// Set internal link regex
+		if (this.config.settings.internalLinkRegex)
+			renderer.setInternalLinkRegex(new RegExp(this.config.settings.internalLinkRegex, 'i'));
+
 		// Livereload
 		if (this.config.cliopts.livereload && this.config.cliopts.local) {
 			this.livereloadServer = livereload.createServer({
@@ -324,7 +328,7 @@ function processStyleConfig(sourceDir, outputDir, recursive) {
 				.catch((err) => {
 					if (err.constructor.name === 'LessError') {
 						// The LESS renderer throws a custom object that is not a standard JS error
-						log.error(`[render error] ${key} >> line: ${err.line}, column: ${err.column}, index: ${err.index}`);
+						log.error(`${err.message} [${path.basename(err.filename)} (via ${key}) >> line: ${err.line}, column: ${err.column}, index: ${err.index}]`);
 						err = Error(err.message);
 					} else if (!err) {
 						// This 
