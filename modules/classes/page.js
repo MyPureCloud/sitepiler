@@ -35,6 +35,7 @@ class Page {
 		// Add computed page settings
 		page.filename = renderer.stripExtension(path.basename(webPath), '.md');
 		page.path = webPath.substr(0, webPath.length - path.basename(webPath).length);
+		if (!page.path.startsWith('/')) page.path = '/' + page.path;
 		page.link = path.join(page.path, page.filename);
 
 		// Validate page settings

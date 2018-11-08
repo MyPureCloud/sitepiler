@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const path = require('path');
 
 const log = new (require('lognext'))('Directory');
 
@@ -18,11 +19,20 @@ class Directory {
 				return true;
 			} else {
 				// Try adding to subdir
-				return _.some(this.dirs, (dir) => {
+				let pageAdded = _.some(this.dirs, (dir) => {
 					if (page.path.startsWith(dir.path)) {
 						return dir.addPage(page);
 					}
 				});
+
+				if (!pageAdded) {
+					let nextDirName = page.path.substr(this.path.length).split('/')[0];
+					let nextDir = path.join(page.path.substr(0, this.path.length), nextDirName);
+					this.dirs[nextDirName] = Directory.fromPath(nextDir);
+					return this.dirs[nextDirName].addPage(page);
+				}
+
+				return pageAdded;
 			}
 		} else {
 			// Not in this path!
@@ -32,11 +42,13 @@ class Directory {
 
 	analyze(recursive = true) {
 		// Find index page and get title
-		_.some(this.pages, (page) => {
+		_.forOwn(this.pages, (page) => {
 			if (page.filename.startsWith('index.')) {
 				this.title = page.title;
-				return true;
 			}
+
+			// Analyze page
+			page.analyze();
 		});
 
 		// Default title
@@ -61,7 +73,9 @@ class Directory {
 
 		directory.path = webPath;
 
-		// Add trailing slash
+		// Add slashes
+		if (!directory.path.startsWith('/')) 
+			directory.path = '/' + directory.path;
 		if (!directory.path.endsWith('/')) 
 			directory.path = directory.path + '/';
 

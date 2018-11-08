@@ -21,6 +21,8 @@ const Timer = require('./timer');
 const log = new lognext('Sitepiler');
 const watcherlog = new lognext('watcher');
 
+const BLOCKED_WATCHER_EVENTS = ['addDir','unlink','unlinkDir'];
+
 
 
 class Sitepiler {
@@ -297,6 +299,7 @@ function buildManifest(manifest, sourcePath, relativePath) {
 function processSources(sources, directory = Directory.fromPath('/')) {
 	_.forOwn(sources, (value, key) => {
 		if (typeof(value) === 'object') {
+			//TODO: don't create the directory manually. addPage will lazy-create subdirs
 			directory.dirs[key] = Directory.fromPath(path.join(directory.path, key));
 			processSources(value, directory.dirs[key], directory.path);
 		} else {
@@ -365,6 +368,7 @@ function processStyleConfig(sourceDir, outputDir, recursive) {
 // Expects to have context bound to a sitepiler instance
 function templateWatcherEvent(evt, filePath) {
 	watcherlog.verbose(`(template) ${evt} >> ${filePath}`);
+	if (BLOCKED_WATCHER_EVENTS.includes(evt)) return;
 
 	// Skip if disabled
 	if (this.config.settings.templateChangeRebuildQuietSeconds < 0) return;
@@ -380,6 +384,7 @@ function templateWatcherEvent(evt, filePath) {
 // Expects to have context bound to a sitepiler instance
 function sourceWatcherEvent(evt, filePath) {
 	watcherlog.verbose(`(source) ${evt} >> ${filePath}`);
+	if (BLOCKED_WATCHER_EVENTS.includes(evt)) return;
 
 	// Find content dir
 	let contentDir;
