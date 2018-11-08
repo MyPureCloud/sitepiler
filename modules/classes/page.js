@@ -18,7 +18,13 @@ class Page {
 		// Mutate self
 		this.body = renderer.renderContent(this, context);
 
+		this.analyze();
+
 		return this;
+	}
+
+	analyze() {
+		
 	}
 
 	static create(content, webPath) {
