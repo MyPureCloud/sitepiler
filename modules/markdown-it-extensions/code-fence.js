@@ -86,7 +86,7 @@ module.exports = function(md, name, options) {
 
 		let content = token.content;
 		let title = token.attrs.title ? `<h5 class="card-header fence-header">${token.attrs.title}</h5>` : '';
-		let language = token.attrs.language ? ` class="lang-${token.attrs.language}"` : '';
+		let language = ` class="lang-${token.attrs.language ? token.attrs.language : 'nohighlight'}"`;
 		let maxHeight = token.attrs.maxHeight ? ` style="max-height: ${token.attrs.maxHeight} !important"` : '';
 		let autoCollapse = token.attrs.autoCollapse === true ? ' style="display: none"' : '';
 
