@@ -157,7 +157,6 @@ if (cli.build) {
 /*** Functions ***/
 
 function runLocalServer() {
-	log.debug('cli.local=', cli.local);
 	if (cli.local) {
 		// Run local server
 		const EditorServer = require('./modules/editor/server');

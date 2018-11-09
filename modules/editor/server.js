@@ -85,6 +85,15 @@ class EditorServer {
 			// TODO: render contents and write output
 			res.sendStatus(204);
 		});
+
+		// Error page
+		this.app.use('*', (req, res) => {
+			let errorPage = path.join(sitepiler.config.settings.stages.compile.outputDirs.content, 'error.html');
+			if (fs.existsSync(errorPage))
+				res.sendFile(errorPage);
+
+			// Do nothing if the site doesn't have the page. Use default.
+		});
 	}
 
 	start() {
