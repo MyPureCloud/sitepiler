@@ -13,7 +13,7 @@ class EditorServer {
 		this.app = express();
 		// this.app.use(bodyParser.json());
 		this.app.use(express.static(sitepiler.config.settings.stages.compile.outputDirs.content));
-		this.app.use('/localeditor', express.static(path.resolve('./modules/editor/static')));
+		this.app.use('/localeditor', express.static(path.join(__dirname, './static')));
 
 		// Serve local editor
 		// this.app.get('/localeditor', (req, res) => {
