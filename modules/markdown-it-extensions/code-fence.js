@@ -1,4 +1,4 @@
-'use strict';
+const _ = require('lodash');
 
 const CONTROL_CHAR_REGEX = /^`{3}|~{3}/;
 let controlChars = '```';
@@ -102,7 +102,7 @@ module.exports = function(md, name, options) {
 	<div class="card fence">
   	${title}
 	  <div class="card-body fence-body"${autoCollapse}>
-	    <pre${maxHeight}><code${language}>${content}</code></pre>
+	    <pre${maxHeight}><code${language}>${_.escape(content)}</code></pre>
 	  </div>
 	</div>
 </p>`;
