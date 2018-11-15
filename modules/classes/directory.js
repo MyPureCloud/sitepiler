@@ -45,6 +45,7 @@ class Directory {
 		_.forOwn(this.pages, (page) => {
 			if (page.filename.startsWith('index.')) {
 				this.title = page.title;
+				this.indexPage = page;
 			}
 
 			// Analyze page

@@ -66,7 +66,7 @@ class Renderer {
 				if (!dest[key]) dest[key] = {};
 				this.compileTemplates(value, dest[key], originalContext);
 			} else {
-				log.debug(`Compiling template ${key}`);
+				log.verbose(`Compiling template ${key}`);
 				dest[key.substring(0, key.length - 4)] = dot.template(value, undefined, context);
 			}
 		});
@@ -111,7 +111,8 @@ class Renderer {
 			context.siblings.push({
 				title: dir.title,
 				link: dir.path,
-				isCurrentPage: false
+				isCurrentPage: false,
+				order: dir.indexPage ? dir.indexPage.order : undefined
 			});
 		});
 
