@@ -66,7 +66,6 @@ class FileLoader {
 			filters.some((filter) => {
 				// .exec() returns null if no match
 				if ((new RegExp(filter[0])).exec(file)) {
-					log.debug(`Loading file: ${fullPath}`);
 					// Loads the file by invoking the second parameter with the full path of the file
 					target[file] = filter[1](fullPath);
 					return true;
@@ -75,15 +74,40 @@ class FileLoader {
 		});
 	}
 
-	getDirNames(dir) {
-		const files = fs.readdirSync(dir);
-		const dirs = [];
-		files.forEach((file) => {
-			const fullPath = path.join(dir, file);
-			if (fs.lstatSync(fullPath).isDirectory())
-				dirs.push(file);
+	testFilters(filters, fileName) {
+		let filterMatch;
+		filters.some((filter) => {
+			// .exec() returns null if no match
+			if ((new RegExp(filter[0])).exec(fileName)) {
+				filterMatch = filter;
+				return true;
+			}
 		});
-		return dirs;
+		return filterMatch;
+	}
+
+	getDirNames(dir) {
+		return this.getContentNames(dir).dirs;
+	}
+
+	getContentNames(dir, fileFilters) {
+		const dirContents = fs.readdirSync(dir);
+		const dirs = [];
+		const files = [];
+
+		dirContents.forEach((file) => {
+			const fullPath = path.join(dir, file);
+			if (fs.lstatSync(fullPath).isDirectory()) {
+				dirs.push(file);
+			} else {
+				if (!fileFilters || this.testFilters(fileFilters, file))
+					files.push(file);
+			}
+		});
+		return {
+			dirs: dirs,
+			files: files
+		};
 	}
 }
 

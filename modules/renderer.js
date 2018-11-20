@@ -1,7 +1,6 @@
 const _ = require('lodash');
 const dot = require('dot');
 const MarkdownIt = require('markdown-it');
-const path = require('path');
 
 const ContextExtensions = require('./contextExtensions');
 
@@ -79,7 +78,7 @@ class Renderer {
 		// Deep copy context
 		const context = ContextExtensions.fromContext(originalContext);
 
-		log.verbose(`Bulding page (${page.link})`);
+		log.verbose(`Bulding page: ${page.link}`);
 		const startMs = Date.now();
 
 		// Build breadcrumb
@@ -98,7 +97,7 @@ class Renderer {
 		// Remove last crumb if index page
 		if (page.filename.startsWith('index.')) context.breadcrumb.pop();
 
-		// Build siblings
+		// Build siblings list
 		context.siblings = [];
 		_.forOwn(sitemap.pages, (siblingPage) => {
 			// Exclude index page
@@ -121,7 +120,7 @@ class Renderer {
 
 		// Compile page and execute page template
 		context.page = page;
-		const markdownContent = dot.template(page.bodyRaw, undefined, context)(context);
+		const markdownContent = dot.template(page.getBody(), undefined, context)(context);
 
 		// Compile markdown
 		if (page.renderMarkdown !== false)
