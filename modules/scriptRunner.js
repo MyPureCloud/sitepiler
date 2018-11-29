@@ -42,6 +42,7 @@ class ScriptRunner {
 				}
 				case 'shell': {
 					args.unshift(scriptConfig.src);
+					args.unshift('-e');
 					log.info(`Executing shell script: ${args.join(' ')}`);
 					exitCode = childProcess.execFileSync('sh', args, options);
 					break;

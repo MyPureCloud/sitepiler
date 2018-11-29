@@ -31,13 +31,28 @@ class ContextExtensions {
 		 */
 
 		// Function to include partial templates in pages
-		newContext.include = function (partial, additionalContext) {
+		newContext.include = function (partial) {
+			// console.log(Array.prototype.slice.call(arguments, 1));
+			// Drill down into directories to find template
 			const parts = partial.split('/');
 			let target = this.renderer.templates.partials;
-			// Drill down into directories to find template
 			parts.forEach((part) => target = target[part]);
-			this.additionalContext = additionalContext;
-			return target(this);
+
+			// Preserve previous context and set new additional context
+			const origContext = this.additionalContext;
+			if (arguments.length > 1)
+				this.additionalContext = Array.prototype.slice.call(arguments, 1);
+			else
+				this.additionalContext = [];
+
+			// Execute template
+			const retval = target(this);
+
+			// Reset additional context
+			this.additionalContext = origContext;
+
+			// Return result of include
+			return retval;
 		};
 		newContext.include.bind(newContext);
 
@@ -59,6 +74,40 @@ class ContextExtensions {
 				return parts[parts.length - 1];
 		};
 		newContext.splitAndGet.bind(newContext);
+
+		/** Swagger Helpers **/
+		//TODO: Move this to the dev center project. It's project-specific.
+		// For some reason, bind isn't working to set the context of `this` in the functions. The 
+		// context is still the parent object (`swaggerHelpers`).
+		// newContext.swaggerHelpers = {};
+
+		newContext.getDefinition = function(schema, resolvedTypes = [], level = 0) {
+			// If this is a reference, return the definition
+			if (schema['$ref']) {
+				const defName = schema['$ref'].split('/').pop();
+				// Stop resolving refs at: 
+				// 	- level 3 if the type has already been resolved
+				// 	- level 6 if it's a previously unknown type
+				if ((resolvedTypes.includes(defName) && level > 3) ||
+					(!resolvedTypes.includes(defName) && level > 6)) {
+					return { 'modelRef': defName };
+				} else {
+					resolvedTypes.push(defName);
+					return newContext.getDefinition(JSON.parse(JSON.stringify(this.data.swagger.definitions[defName])), resolvedTypes, level);
+				}
+			}
+
+			// Look ahead at properties and resolve them
+			let newSchema = JSON.parse(JSON.stringify(schema));
+			_.forOwn(newSchema, (value, key) => {
+				// Value is a reference, replace it with a definition
+				if (typeof(value) === 'object') {
+					newSchema[key] = newContext.getDefinition(value, resolvedTypes, level + 1);
+				}
+			});
+			return newSchema;
+		};
+		newContext.getDefinition.bind(newContext);
 
 		return newContext;
 	}
