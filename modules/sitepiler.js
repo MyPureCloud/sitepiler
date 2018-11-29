@@ -211,7 +211,7 @@ class Sitepiler {
 					this.manifest = {
 						name: this.context.data.build.projectName,
 						version: this.context.data.build.buildNumber,
-						buildNumber: this.context.data.build.buildNumber,
+						build: this.context.data.build.buildNumber,
 						indexFiles: []
 					};
 					buildManifest(this.manifest.indexFiles, this.config.settings.stages.compile.outputDirs.content, '/');
