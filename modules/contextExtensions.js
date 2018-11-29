@@ -32,7 +32,6 @@ class ContextExtensions {
 
 		// Function to include partial templates in pages
 		newContext.include = function (partial) {
-			// console.log(Array.prototype.slice.call(arguments, 1));
 			// Drill down into directories to find template
 			const parts = partial.split('/');
 			let target = this.renderer.templates.partials;
