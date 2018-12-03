@@ -11,7 +11,7 @@ function getLine(state, line) {
 }
 
 module.exports = function(md, name, options) {
-	function fence(state, startLine, endLine/*, silent*/) {
+	function fence(state, startLine, endLine, silent) {
 		var nextLine, token, lineText;
 
 		// Starts with control chars?
@@ -24,6 +24,8 @@ module.exports = function(md, name, options) {
 
 		// Self-closing line, e.g.: ``` this is a code block ```
 		if (lineText.trim().endsWith(controlChars) && lineText.trim().length > 6) {
+			if (silent) return true;
+
 			// Add code block
 			token = state.push('fence', 'code', 0);
 			token.attrs = parseAttrs('');
@@ -36,6 +38,7 @@ module.exports = function(md, name, options) {
 
 		// Should have at least two lines
 		if (startLine + 2 > endLine) { return false; }
+		if (silent) return true;
 
 		// Parse control char attributes
 		const attrs = parseAttrs(lineText);
@@ -63,6 +66,7 @@ module.exports = function(md, name, options) {
 
 		// Set next line in the state
 		state.line = nextLine + 1;
+		token.map = [ startLine, state.line ];
 
 		return true;
 	}
