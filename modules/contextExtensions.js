@@ -81,6 +81,8 @@ class ContextExtensions {
 		// newContext.swaggerHelpers = {};
 
 		newContext.getDefinition = function(schema, resolvedTypes = [], level = 0) {
+			if (!schema) return;
+			
 			// If this is a reference, return the definition
 			if (schema['$ref']) {
 				const defName = schema['$ref'].split('/').pop();
