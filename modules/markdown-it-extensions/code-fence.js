@@ -89,10 +89,37 @@ module.exports = function(md, name, options) {
 		const token = tokens[idx];
 
 		let content = token.content;
-		let title = token.attrs.title ? `<h5 class="card-header fence-header">${token.attrs.title}</h5>` : '';
-		let language = ` class="lang-${token.attrs.language ? token.attrs.language : 'nohighlight'}"`;
-		let maxHeight = token.attrs.maxHeight ? ` style="max-height: ${token.attrs.maxHeight} !important"` : '';
-		let autoCollapse = token.attrs.autoCollapse === true ? ' style="display: none"' : '';
+		let title = token.attrs.title || undefined;
+		let language = token.attrs.language || 'nohighlight';
+		let maxHeight = token.attrs.maxHeight;
+		let autoCollapse = token.attrs.autoCollapse;
+		let alertType = token.attrs.alert ? token.attrs.alert.toLowerCase() : undefined;
+		let alertIcon;
+
+		if (alertType) {
+			switch(alertType.toLowerCase()) {
+				case 'primary':
+				case 'secondary':
+				case 'light':
+				case 'dark':
+				case 'info': {
+					alertIcon = 'info';
+					break;
+				}
+				case 'success': {
+					alertIcon = 'check';
+					break;
+				}
+				case 'danger': {
+					alertIcon = 'x';
+					break;
+				}
+				case 'warning': {
+					alertIcon = 'warning';
+					break;
+				}
+			}
+		}
 
 		if (token.attrs.tabsToSpaces) {
 			let spaces = '';
@@ -102,11 +129,15 @@ module.exports = function(md, name, options) {
 			content = content.replace(/\t/gi, spaces);
 		}
 
+		const contentMarkup = alertType 
+			? `<div class="alert alert-${alertType}" role="alert">${_.escape(content)}</div>`
+			: `<pre${maxHeight ? ` style="max-height: ${token.attrs.maxHeight} !important"` : ''}><code class="lang-${language}">${_.escape(content)}</code></pre>` ;
+
 		return `<p>
 	<div class="card fence">
-  	${title}
-	  <div class="card-body fence-body"${autoCollapse}>
-	    <pre${maxHeight}><code${language}>${_.escape(content)}</code></pre>
+		${title ? `<h5 class="card-header fence-header${alertType ? ` alert-type-${alertType}` : ''}">${alertIcon ? `<span class="oi" data-glyph="${alertIcon}"></span> ` : '' }${title}</h5>` : ''}
+	  <div class="card-body fence-body"${autoCollapse ? ' style="display: none"' : ''}>
+	    ${contentMarkup}
 	  </div>
 	</div>
 </p>`;
