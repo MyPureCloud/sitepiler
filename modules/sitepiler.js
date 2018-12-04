@@ -397,7 +397,9 @@ function sourceWatcherEvent(evt, filePath) {
 
 	// Determine paths
 	const subdir = filePath.substring(contentDir.source.length + 1, filePath.length - path.basename(filePath).length);
-	const relativePath = path.join(contentDir.dest, subdir);
+	let relativePath = path.join(contentDir.dest, subdir);
+	// path.join returns '.' representing the current directory when both contentDir.dest and subdir and empty strings
+	if (relativePath === '.') relativePath = '/';
 	const destPath = path.join(this.config.settings.stages.compile.outputDirs.content, relativePath, path.basename(filePath));
 
 	// Generate content
