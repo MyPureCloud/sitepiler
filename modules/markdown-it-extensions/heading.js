@@ -66,7 +66,7 @@ module.exports = function(md, name, options) {
 	function headingOpenRenderer(tokens, idx, _options, env, slf) {
 		const token = tokens[idx];
 		let anchorName = tokens[idx+1].content || '';
-		anchorName = anchorName.toLowerCase().trim().replace(/\s/g, '');
+		anchorName = anchorName.toLowerCase().trim().replace(/[^a-z0-9]/gi, '_');
 		return `<a href="#${anchorName}" name="${anchorName}" class="toc-link toc-link-${token.tag}"><${token.tag}>`;
 	}
 

@@ -25,23 +25,32 @@ module.exports = function(md, name, options) {
 		token.attrs = [ [ 'class', 'toc-list' ] ];
 
 		// Add content until end marker is reached
+		let isCodeBlock = false;
 		while(nextLine <= endLine) {
 			if (lineText) {
-				// Regex match all markdown headings (e.g. ### Heading Three)
-				let headingMatch = lineText.match(/^(#+)\s*(.+)/);
-				if (headingMatch) {
+				let isCodeBlockMarkup = (lineText.startsWith('```') || lineText.startsWith('~~~'));
+				if (!isCodeBlock && isCodeBlockMarkup)
+					isCodeBlock = true;
+				else if (isCodeBlock && isCodeBlockMarkup)
+					isCodeBlock = false;
 
-					// Open list item
-					token = state.push('list_item_open', 'li', 1);
-					token.attrs = [ [ 'class', `toc-list-${headingMatch[1].length}` ] ];
+				if (!isCodeBlock) {
+					// Regex match all markdown headings (e.g. ### Heading Three)
+					let headingMatch = lineText.match(/^(#+)\s*(.+)/);
+					if (headingMatch) {
 
-					// Add content
-					token = state.push('inline', '', 0);
-					token.content = `<a href="#${headingMatch[2].toLowerCase().trim().replace(/\s/g, '')}">${headingMatch[2]}</a>`;
-					token.children = [];
+						// Open list item
+						token = state.push('list_item_open', 'li', 1);
+						token.attrs = [ [ 'class', `toc-list-${headingMatch[1].length}` ] ];
 
-					// Close list item
-					token = state.push('list_item_close', 'li', -1);
+						// Add content
+						token = state.push('inline', '', 0);
+						token.content = `<a href="#${headingMatch[2].toLowerCase().trim().replace(/[^a-z0-9]/gi, '_')}">${headingMatch[2]}</a>`;
+						token.children = [];
+
+						// Close list item
+						token = state.push('list_item_close', 'li', -1);
+					}
 				}
 			}
 
