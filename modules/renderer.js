@@ -7,6 +7,8 @@ const ContextExtensions = require('./contextExtensions');
 
 const log = new (require('lognext'))('Renderer');
 
+const ABS_PATH_REGEX = /(<\s*(?:a|img|script|link)\s+.*(?:href|src)=['"])(\/.*?['"].*?>)/igm;
+
 // Markdown renderer settings
 const md = new MarkdownIt({
 	html: true,
@@ -136,7 +138,15 @@ class Renderer {
 			log.warn(`Unknown template "${page.layout}", using default`);
 			template = this.templates.layouts.default;
 		}
-		const output = template(context);
+		let output = template(context);
+
+		// Add subdir
+		if (this.siteSubdir) {
+			output = output.replace(ABS_PATH_REGEX, (match, p1, p2, offset, string) => {
+				if (p2.startsWith('//')) return match;
+				return p1 + this.siteSubdir + p2;
+			});
+		}
 
 		// Log completion
 		const duration = Date.now() - startMs;

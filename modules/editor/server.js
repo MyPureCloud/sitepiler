@@ -11,27 +11,29 @@ class EditorServer {
 		this.port = port;
 
 		this.app = express();
+		const router = express.Router();
+
 		// this.app.use(bodyParser.json());
-		this.app.use(express.static(sitepiler.config.settings.stages.compile.outputDirs.content));
-		this.app.use('/localeditor', express.static(path.join(__dirname, './static')));
+		router.use(express.static(sitepiler.config.settings.stages.compile.outputDirs.content));
+		router.use('/localeditor', express.static(path.join(__dirname, './static')));
 
 		// Serve local editor
-		// this.app.get('/localeditor', (req, res) => {
+		// router.get('/localeditor', (req, res) => {
 		// 	res.sendFile('./static/index.html');
 		// });
 
 		// Return source file listing
-		this.app.get('/localapi/sources', (req, res) => {
+		router.get('/localapi/sources', (req, res) => {
 			res.send('sitemap');
 		});
 
 		// Render the post body and return the output
-		this.app.post('/localapi/render', textPlainBodyParser, (req, res) => {
+		router.post('/localapi/render', textPlainBodyParser, (req, res) => {
 			res.send(sitepiler.render(req.body));
 		});
 
 		// Retrieve a source file
-		this.app.get('/localapi/sources/:contentDirId/*', (req, res) => {
+		router.get('/localapi/sources/:contentDirId/*', (req, res) => {
 			if (req.originalUrl.includes('../'))
 				return res.status(400).send('No cheating in the path!');
 
@@ -52,7 +54,7 @@ class EditorServer {
 		});
 
 		// Save a source file
-		this.app.post('/localapi/sources/:contentDirId/*', textPlainBodyParser, (req, res) => {
+		router.post('/localapi/sources/:contentDirId/*', textPlainBodyParser, (req, res) => {
 			if (req.originalUrl.includes('../'))
 				return res.status(400).send('No cheating in the path!');
 
@@ -87,13 +89,27 @@ class EditorServer {
 		});
 
 		// Error page
-		this.app.use('*', (req, res) => {
+		router.use('*', (req, res) => {
 			let errorPage = path.join(sitepiler.config.settings.stages.compile.outputDirs.content, 'error.html');
 			if (fs.existsSync(errorPage))
 				res.sendFile(errorPage);
 
 			// Do nothing if the site doesn't have the page. Use default.
 		});
+
+		// Add routes
+		if (sitepiler.config.settings.siteSubdir) {
+			// Add routes to subdir
+			this.app.use(sitepiler.config.settings.siteSubdir, router);
+
+			// Redirect all requests to root to the subdir
+			this.app.all('/', (req, res) => {
+				res.redirect(sitepiler.config.settings.siteSubdir);
+			});
+		} else {
+			// Add routes to root
+			this.app.use('/', router);
+		}
 	}
 
 	start() {

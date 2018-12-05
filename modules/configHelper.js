@@ -103,6 +103,14 @@ class ConfigHelper {
 		for (var i = 0; i < this.config.settings.stages.data.dataDirs.length; i++) {
 			this.config.settings.stages.data.dataDirs[i] = path.resolve(this.config.settings.stages.data.dataDirs[i]);
 		}
+
+		// Normalize siteSubdir to "/path/to/folder"
+		if (this.config.settings.siteSubdir) {
+			if (!this.config.settings.siteSubdir.startsWith('/'))
+				this.config.settings.siteSubdir = '/' + this.config.settings.siteSubdir;
+			if (this.config.settings.siteSubdir.endsWith('/'))
+				this.config.settings.siteSubdir = this.config.settings.siteSubdir.substring(1);
+		}
 	}
 
 	setDefault(haystack, needle, defaultValue, warning) {

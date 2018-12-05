@@ -12,6 +12,10 @@ settings:
 
   # A regular expression string to identify internal links. No capture groups required.
   internalLinkRegex: "^\\/"
+
+  # Causes the local server to serve files under this subdirectory and adds the subdirectory 
+  # to all absolute img and href paths (absolute paths start with `/`)
+  siteSubdir: sitepiler
   
   # Stage configuration
   stages:

@@ -38,6 +38,9 @@ class Sitepiler {
 		if (this.config.settings.internalLinkRegex)
 			renderer.setInternalLinkRegex(new RegExp(this.config.settings.internalLinkRegex, 'i'));
 
+		// Set siteSubdir
+		renderer.siteSubdir = this.config.settings.siteSubdir;
+
 		// Livereload
 		if (this.config.cliopts.livereload && this.config.cliopts.local) {
 			this.livereloadServer = livereload.createServer({
