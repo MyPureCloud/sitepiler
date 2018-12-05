@@ -162,7 +162,8 @@ class Sitepiler {
 			this.config.settings.stages.compile.contentDirs.forEach((sourceDir) => {
 				loadSources(
 					sourceDir.source, 
-					path.join(this.config.settings.stages.compile.outputDirs.content, sourceDir.dest), 
+					this.config.settings.stages.compile.outputDirs.content, 
+					sourceDir.dest, 
 					this.context.sitemap);
 			});
 			log.verbose(`Content loaded in ${startMs.getMs()}ms`);
@@ -207,19 +208,24 @@ class Sitepiler {
 					log.verbose(`Styles loaded in ${styleStartMs.getMs()}ms`);
 
 					// Build manifest
-					log.verbose('Building manifest...');
-					this.manifest = {
-						name: this.context.data.build.projectName,
-						version: this.context.data.build.buildNumber,
-						buildNumber: this.context.data.build.buildNumber,
-						indexFiles: []
-					};
-					buildManifest(this.manifest.indexFiles, this.config.settings.stages.compile.outputDirs.content, '/');
-					fs.writeFileSync(
-						path.join(this.config.settings.stages.compile.outputDirs.content, 'manifest.json'), 
-						JSON.stringify(this.manifest, null, 2), 
-						'utf-8'
-					);
+					//TODO: move this into a custom script. Should be possible now that the sitemap exists for all pages.
+					if (this.context.data.build && this.context.data.build.projectName) {
+						log.verbose('Building manifest...');
+						this.manifest = {
+							name: this.context.data.build.projectName,
+							version: this.context.data.build.buildNumber,
+							buildNumber: this.context.data.build.buildNumber,
+							indexFiles: []
+						};
+						buildManifest(this.manifest.indexFiles, this.config.settings.stages.compile.outputDirs.content, '/');
+						fs.writeFileSync(
+							path.join(this.config.settings.stages.compile.outputDirs.content, 'manifest.json'), 
+							JSON.stringify(this.manifest, null, 2), 
+							'utf-8'
+						);
+					} else {
+						log.verbose('Skipping manifest, build data not found');
+					}
 					
 					// Complete stage
 					log.verbose(`Compile stage completed in ${compileStartMs.getMs() }ms`);
@@ -270,7 +276,9 @@ module.exports = Sitepiler;
 
 
 
-function loadSources(sourceDir, outputDir, directory) {
+function loadSources(sourceDir, outputRoot, relativePath, directory) {
+	const outputDir = path.join(outputRoot, relativePath);
+
 	// Load dir content
 	const dirContents = fileLoader.getContentNames(sourceDir, [fileLoader.filters.MARKDOWN]);
 
@@ -280,7 +288,7 @@ function loadSources(sourceDir, outputDir, directory) {
 			Page.load(
 				path.join(sourceDir, file), 
 				path.join(outputDir, file), 
-				directory.path
+				relativePath
 			)
 		);
 		if (!wasAdded)
@@ -290,7 +298,7 @@ function loadSources(sourceDir, outputDir, directory) {
 	// Recurse each subdir
 	dirContents.dirs.forEach((dir) => {
 		directory.dirs[dir] = Directory.fromPath(path.join(directory.path, dir));
-		loadSources(path.join(sourceDir, dir), path.join(outputDir, dir), directory.dirs[dir]);
+		loadSources(path.join(sourceDir, dir), outputRoot, path.join(relativePath, dir), directory.dirs[dir]);
 	});
 }
 

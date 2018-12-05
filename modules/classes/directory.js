@@ -12,15 +12,15 @@ class Directory {
 	}
 
 	addPage(page) {
-		if (page.path.startsWith(this.path)) {
+		if (page.path.startsWith(this.path) || page.path.startsWith(this.path.substr(0, this.path.length - 1))) {
 			// goes in this dir or call addPage() on subdir?
-			if (page.path === this.path) {
+			if (page.path === this.path || page.path === this.path.substr(0, this.path.length - 1)) {
 				this.pages[page.filename] = page;
 				return true;
 			} else {
 				// Try adding to subdir
 				let pageAdded = _.some(this.dirs, (dir) => {
-					if (page.path.startsWith(dir.path)) {
+					if (page.path.startsWith(dir.path) || page.path.startsWith(dir.path.substr(dir.path.length - 1))) {
 						return dir.addPage(page);
 					}
 				});
