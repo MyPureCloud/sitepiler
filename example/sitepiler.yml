@@ -13,8 +13,8 @@ settings:
   # A regular expression string to identify internal links. No capture groups required.
   internalLinkRegex: "^\\/"
 
-  # Causes the local server to serve files under this subdirectory and adds the subdirectory 
-  # to all absolute img and href paths (absolute paths start with `/`)
+  # Causes the local server to serve files under this subdirectory and prepends the subdirectory 
+  # to all absolute paths found in href and src attributes on a, img, script, and link tags
   siteSubdir: sitepiler
   
   # Stage configuration
@@ -76,6 +76,8 @@ settings:
       staticDirs:
       - source: "src/static/img"
         dest: "img"
+      - source: "src/static/rootfiles"
+        dest: ""
       outputDirs: 
         clearOnBuild: true
         content: "../docs"
