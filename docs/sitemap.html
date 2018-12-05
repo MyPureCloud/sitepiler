@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sitemap</title>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" href="/styles/sitepiler.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
+</head>
+<body>
+
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container layout-content">
+  <div class="row">
+    <div class="col-sm-3 layout-content-navigation">
+    	<h3>Navigation</h3>
+    	<ul class="page-list">
+    		<li class="pages-default"><a href="/authoring/">Authoring Content</a></li>
+    		<li class="pages-default"><a href="/examples/">Example Pages</a></li>
+    		<li class="pages-current"><a href="/sitemap.html">Sitemap</a></li>
+    	</ul>
+    </div>
+    <div class="col-sm-9 layout-content-body">
+<p class="devcenter-breadcrumb">
+	<a href="/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+	Sitemap
+</p>
+				<h1>Sitemap</h1>
+
+<ul>
+<li><a href="/index.html">/index.html</a></li>
+<li><a href="/sitemap.html">/sitemap.html</a></li>
+<li><a href="/examples/datatable.html">/examples/datatable.html</a></li>
+<li><a href="/examples/index.html">/examples/index.html</a></li>
+<li><a href="/authoring/codeFence.html">/authoring/codeFence.html</a></li>
+<li><a href="/authoring/creatingpages.html">/authoring/creatingpages.html</a></li>
+<li><a href="/authoring/index.html">/authoring/index.html</a></li>
+<li><a href="/authoring/markdown.html">/authoring/markdown.html</a></li>
+<li><a href="/authoring/styles.html">/authoring/styles.html</a></li>
+<li><a href="/authoring/table.html">/authoring/table.html</a></li>
+<li><a href="/authoring/templating.html">/authoring/templating.html</a></li>
+</ul>
+
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

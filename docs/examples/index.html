@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	{{= context.include('page-title') }}
+	<title>Example Pages</title>
 
 	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 	
@@ -28,25 +28,39 @@ $(document).ready(() => {
 	<!-- END Code fence style and collapser -->
 
 
-	{{= context.livereload() }}
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
 </head>
 <body>
 
-{{= context.include('site-header') }}
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
 
 <div class="container layout-content">
   <div class="row">
     <div class="col-sm-3 layout-content-navigation">
     	<h3>Navigation</h3>
-    	<ul class="page-list">{{~ context.siblings :page }}{{? !page.notoc }}
-    		<li class="{{? page.isCurrentPage }}pages-current{{?? true}}pages-default{{?}}"><a href="{{= page.link }}">{{= page.title }}</a></li>{{?}}{{~}}
+    	<ul class="page-list">
+    		<li class="pages-default"><a href="/examples/datatable.html">Dynamically generate a table</a></li>
     	</ul>
     </div>
     <div class="col-sm-9 layout-content-body">
-{{= context.include('breadcrumb') }}
-				<h1>{{= context.page.title }}</h1>
+<p class="devcenter-breadcrumb">
+	<a href="/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+	Example Pages
+</p>
+				<h1>Example Pages</h1>
 
-{{= context.content }}
+<p>Examples of how to do stuff.</p>
+
 
     </div>
   </div>

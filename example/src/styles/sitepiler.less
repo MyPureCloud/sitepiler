@@ -1,0 +1,66 @@
+// Include sitepiler's base styles
+@import 'partials/sitepilerBase.less';
+
+// Add in Font Awesome
+@import url('https://use.fontawesome.com/releases/v5.3.1/css/all.css');
+
+// Add in this small icon set
+// https://useiconic.com/open/
+@import url('https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic.css');
+
+
+/*** Custom CSS for styling this site ***/
+
+// Color pallete
+@primary-dark: #37392E;
+@primary-color: #19647E;
+@primary-highlight: #28AFB0;
+@secondary-dark: #DDCECD;
+@secondary-light: #EEE5E5;
+
+// Set default text and heading anchor link color
+body,
+a > h1,
+a > h2,
+a > h3,
+a > h4,
+a > h5,
+a > h6 {
+	color: @primary-dark;
+}
+
+// Default link colors
+a, a:visited {
+	color: @primary-highlight;	
+	text-decoration: none;
+}
+
+// Site header styles
+.layout-header {
+	padding: 10px;
+	background-color: @primary-dark;
+	border-radius: 0;
+
+	i.fa-hand-lizard {
+		color: @primary-highlight;
+	}
+
+	&-title {
+		color: #FFFFFF;
+		font-size: 42pt;
+		margin-left: 10px;
+	}
+}
+
+// Site content styles
+.layout-content {
+	&-navigation {
+		ul {
+			padding-left: 19px;
+		}
+	}
+
+	&-body {
+		padding-bottom: 70px;
+	}
+}

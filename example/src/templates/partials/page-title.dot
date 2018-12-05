@@ -1,1 +1,1 @@
-<title>{{= context.pageSettings.title }}</title>
+<title>{{= context.page.title }}</title>

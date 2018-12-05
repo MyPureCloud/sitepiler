@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Creating Pages</title>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" href="/styles/sitepiler.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
+</head>
+<body>
+
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container layout-content">
+  <div class="row">
+    <div class="col-sm-3 layout-content-navigation">
+    	<h3>Navigation</h3>
+    	<ul class="page-list">
+    		<li class="pages-default"><a href="/authoring/markdown.html">Basic Formatting with Markdown</a></li>
+    		<li class="pages-default"><a href="/authoring/codeFence.html">Code Fences and Alert Blocks</a></li>
+    		<li class="pages-current"><a href="/authoring/creatingpages.html">Creating Pages</a></li>
+    		<li class="pages-default"><a href="/authoring/styles.html">Styling with LESS and CSS</a></li>
+    		<li class="pages-default"><a href="/authoring/table.html">Tables</a></li>
+    		<li class="pages-default"><a href="/authoring/templating.html">Templating</a></li>
+    	</ul>
+    </div>
+    <div class="col-sm-9 layout-content-body">
+<p class="devcenter-breadcrumb">
+	<a href="/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+		<a href="/authoring/">Authoring Content</a> > 
+	
+	Creating Pages
+</p>
+				<h1>Creating Pages</h1>
+
+<a href="#frontmatter_properties" name="frontmatter_properties" class="toc-link toc-link-h2"><h2>Frontmatter Properties<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><p>Frontmatter must begin as the first line in the file and must use exactly three dashes to mark the beginning and end of the frontmatter block. Properties must be specified in the format of <code>name: value</code>, one per line. Example:</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">---
+title: A page title
+layout: layoutname
+customproperty: true
+---
+</code></pre>
+	  </div>
+	</div>
+</p><p>All properties specified in the frontmatter object will be available as part of the page's data. The page being rendered is available via <code>context.page</code>. For example, to access the page's title, use <code>context.page.title</code>.</p>
+<a href="#standard_properties" name="standard_properties" class="toc-link toc-link-h3"><h3>Standard Properties<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><table class="table">
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>title<br /></td>
+<td>the page's title<br /></td>
+</tr>
+<tr>
+<td>layout<br /></td>
+<td>the name of the layout to use when rendering the page. Defaults to <code>default</code> if not specified.<br /></td>
+</tr>
+<tr>
+<td>priority<br /></td>
+<td>Priority in siblings list. Value of 1 will be a the top of the list, higher numbers lower. If not set, will appear sorted alphabetically below all prioritized pages.<br /></td>
+</tr>
+</tbody>
+</table>
+<a href="#suggested_properties" name="suggested_properties" class="toc-link toc-link-h3"><h3>Suggested Properties<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>These properties aren't used by sitepiler directly, but are some suggested options that authors may wish to make use of in their templates.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Property</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>notoc<br /></td>
+<td><code>true</code> to exclude from navigation<br /></td>
+</tr>
+<tr>
+<td>ispreview<br /></td>
+<td><code>true</code> to include a preview banner at the top of the site<br /></td>
+</tr>
+</tbody>
+</table>
+
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

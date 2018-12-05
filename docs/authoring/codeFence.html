@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Code Fences and Alert Blocks</title>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" href="/styles/sitepiler.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
+</head>
+<body>
+
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container layout-content">
+  <div class="row">
+    <div class="col-sm-3 layout-content-navigation">
+    	<h3>Navigation</h3>
+    	<ul class="page-list">
+    		<li class="pages-default"><a href="/authoring/markdown.html">Basic Formatting with Markdown</a></li>
+    		<li class="pages-current"><a href="/authoring/codeFence.html">Code Fences and Alert Blocks</a></li>
+    		<li class="pages-default"><a href="/authoring/creatingpages.html">Creating Pages</a></li>
+    		<li class="pages-default"><a href="/authoring/styles.html">Styling with LESS and CSS</a></li>
+    		<li class="pages-default"><a href="/authoring/table.html">Tables</a></li>
+    		<li class="pages-default"><a href="/authoring/templating.html">Templating</a></li>
+    	</ul>
+    </div>
+    <div class="col-sm-9 layout-content-body">
+<p class="devcenter-breadcrumb">
+	<a href="/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+		<a href="/authoring/">Authoring Content</a> > 
+	
+	Code Fences and Alert Blocks
+</p>
+				<h1>Code Fences and Alert Blocks</h1>
+
+<p>The extended fences plugin allows for fancy syntax-highlighted code blocks.</p>
+<ul class="toc-list">
+<li class="toc-list-2"><a href="#fence_options">Fence Options</a></li>
+<li class="toc-list-2"><a href="#examples">Examples</a></li>
+<li class="toc-list-3"><a href="#vanilla_markdown">Vanilla markdown</a></li>
+<li class="toc-list-3"><a href="#title_only">Title only</a></li>
+<li class="toc-list-3"><a href="#configuration_object">Configuration Object</a></li>
+<li class="toc-list-3"><a href="#alerts">Alerts</a></li>
+<li class="toc-list-2"><a href="#more_examples">More examples</a></li>
+<li class="toc-list-3"><a href="#all_config_options_specified">All config options specified</a></li>
+<li class="toc-list-3"><a href="#plain_ol__title">Plain ol' title</a></li>
+<li class="toc-list-3"><a href="#title_and_language">Title and language</a></li>
+<li class="toc-list-3"><a href="#no_title__highlighting_turned_off">No title, highlighting turned off</a></li>
+<li class="toc-list-3"><a href="#alert_examples">Alert Examples</a></li>
+</ul>
+<a href="#fence_options" name="fence_options" class="toc-link toc-link-h2"><h2>Fence Options<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><p>Use three backticks to open and close a fence. The opening colons support either a title or a JSON configuration object on the same line directly following the colons. The following options are supported:</p>
+<table class="table table-striped">
+<thead>
+<tr>
+<th>Option</th>
+<th>Example</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>title<br /></td>
+<td>Some Code<br /></td>
+<td>Displays a header before the code block with the given title<br /></td>
+</tr>
+<tr>
+<td>maxHeight<br /></td>
+<td>100px<br /></td>
+<td>Sets the <code>max-height</code> CSS property, must include units. Create a CSS rule in the stylesheet for <code>.fence .fence-body pre { max-height: 500px; }</code> to set a global default.<br /></td>
+</tr>
+<tr>
+<td>autoCollapse<br /></td>
+<td>true<br /></td>
+<td>When <code>true</code>, the element will be displayed in its collapsed state initially. Default: <code>false</code><br /></td>
+</tr>
+<tr>
+<td>language<br /></td>
+<td>json<br /></td>
+<td>Syntax highlighting language. Default: <code>nohighlight</code>. See <a href="https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases" target="_blank">Language names and aliases</a>. Use the values in the right column.<br /></td>
+</tr>
+<tr>
+<td>tabsToSpaces<br /></td>
+<td>2<br /></td>
+<td>When specified, replaces all tab characters in the content with the specified number of spaces.<br /></td>
+</tr>
+<tr>
+<td>alert<br /></td>
+<td>primary<br /></td>
+<td>When specified, the code fence does not use code formatting and displays as a styled alert instead. Valid types: <code>primary</code>, <code>secondary</code>, <code>success</code>, <code>danger</code>, <code>warning</code>, <code>info</code>, <code>light</code>, <code>dark</code>.<br /></td>
+</tr>
+</tbody>
+</table>
+<a href="#examples" name="examples" class="toc-link toc-link-h2"><h2>Examples<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#vanilla_markdown" name="vanilla_markdown" class="toc-link toc-link-h3"><h3>Vanilla markdown<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>This is the standard markdown code fence. Code highlighting is disabled by default.</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">```
+// Code goes here
+```
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#title_only" name="title_only" class="toc-link toc-link-h3"><h3>Title only<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Provide a title for the code block.</p>
+<p>
+	<div class="card fence">
+		<h5 class="card-header fence-header">Some Title Text</h5>
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">``` Some Title Text
+// Code goes here
+```
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#configuration_object" name="configuration_object" class="toc-link toc-link-h3"><h3>Configuration Object<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Specify configuration options as a JSON object.</p>
+<p>
+	<div class="card fence">
+		<h5 class="card-header fence-header">Test Heading</h5>
+	  <div class="card-body fence-body" style="display: none">
+	    <pre style="max-height: 30px !important"><code class="lang-json">``` { &quot;title&quot;:&quot;Test Heading&quot;, &quot;maxHeight&quot;: &quot;30px&quot;, &quot;autoCollapse&quot;: true, &quot;language&quot;: &quot;json&quot;, &quot;tabsToSpaces&quot;: 2 }
+// Code goes here
+```
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#alerts" name="alerts" class="toc-link toc-link-h3"><h3>Alerts<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Alerts don't use the <code>&lt;pre&gt;</code> or <code>&lt;code&gt;</code> tags and are styled based on <a href="https://getbootstrap.com/docs/4.0/components/alerts/" target="_blank">Bootstrap Alerts</a>. See <a href="#alertexamples" target="_blank">Alert Examples</a> for all alert types.</p>
+<p>
+	<div class="card fence">
+		<h5 class="card-header fence-header alert-type-primary"><span class="oi" data-glyph="info"></span> Alert Title</h5>
+	  <div class="card-body fence-body">
+	    <div class="alert alert-primary" role="alert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
+</div>
+	  </div>
+	</div>
+</p><a href="#more_examples" name="more_examples" class="toc-link toc-link-h2"><h2>More examples<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#all_config_options_specified" name="all_config_options_specified" class="toc-link toc-link-h3"><h3>All config options specified<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header">Test Heading</h5>
+	  <div class="card-body fence-body" style="display: none">
+	    <pre style="max-height: 70px !important"><code class="lang-json">{
+  &quot;key&quot;: &quot;value&quot;,
+  &quot;array&quot;: [
+    &quot;value&quot;
+  ],
+  &quot;object&quot;: {
+    &quot;key&quot;: &quot;value&quot;
+  }
+}
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#plain_ol__title" name="plain_ol__title" class="toc-link toc-link-h3"><h3>Plain ol' title<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header">Language unspecified</h5>
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">const rp = require(&#39;request-promise&#39;);
+
+rp(&#39;http://www.google.com&#39;)
+  .then(function (htmlString) {
+    // Process html...
+  })
+  .catch(function (err) {
+    // Crawling failed...
+  });
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#title_and_language" name="title_and_language" class="toc-link toc-link-h3"><h3>Title and language<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header">JavaScript</h5>
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-javascript">const rp = require(&#39;request-promise&#39;);
+
+rp(&#39;http://www.google.com&#39;)
+  .then(function (htmlString) {
+    // Process html...
+  })
+  .catch(function (err) {
+    // Crawling failed...
+  });
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#no_title__highlighting_turned_off" name="no_title__highlighting_turned_off" class="toc-link toc-link-h3"><h3>No title, highlighting turned off<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">let thisCode = &quot;not highlighted&quot;;
+
+## Markdown just displays unrendered
+
+* No
+* Lists
+
+or `inline` code
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#alert_examples" name="alert_examples" class="toc-link toc-link-h3"><h3>Alert Examples<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header alert-type-primary"><span class="oi" data-glyph="info"></span> Primary</h5>
+	  <div class="card-body fence-body">
+	    <div class="alert alert-primary" role="alert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
+</div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header alert-type-secondary"><span class="oi" data-glyph="info"></span> Secondary</h5>
+	  <div class="card-body fence-body">
+	    <div class="alert alert-secondary" role="alert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
+</div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header alert-type-success"><span class="oi" data-glyph="check"></span> Success</h5>
+	  <div class="card-body fence-body">
+	    <div class="alert alert-success" role="alert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
+</div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header alert-type-danger"><span class="oi" data-glyph="x"></span> Danger</h5>
+	  <div class="card-body fence-body">
+	    <div class="alert alert-danger" role="alert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
+</div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header alert-type-warning"><span class="oi" data-glyph="warning"></span> Warning</h5>
+	  <div class="card-body fence-body">
+	    <div class="alert alert-warning" role="alert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
+</div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header alert-type-info"><span class="oi" data-glyph="info"></span> Info</h5>
+	  <div class="card-body fence-body">
+	    <div class="alert alert-info" role="alert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
+</div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header alert-type-light"><span class="oi" data-glyph="info"></span> Light</h5>
+	  <div class="card-body fence-body">
+	    <div class="alert alert-light" role="alert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
+</div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header alert-type-dark"><span class="oi" data-glyph="info"></span> Dark</h5>
+	  <div class="card-body fence-body">
+	    <div class="alert alert-dark" role="alert">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
+</div>
+	  </div>
+	</div>
+</p>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

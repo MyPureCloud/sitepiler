@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Styling with LESS and CSS</title>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" href="/styles/sitepiler.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
+</head>
+<body>
+
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container layout-content">
+  <div class="row">
+    <div class="col-sm-3 layout-content-navigation">
+    	<h3>Navigation</h3>
+    	<ul class="page-list">
+    		<li class="pages-default"><a href="/authoring/markdown.html">Basic Formatting with Markdown</a></li>
+    		<li class="pages-default"><a href="/authoring/codeFence.html">Code Fences and Alert Blocks</a></li>
+    		<li class="pages-default"><a href="/authoring/creatingpages.html">Creating Pages</a></li>
+    		<li class="pages-current"><a href="/authoring/styles.html">Styling with LESS and CSS</a></li>
+    		<li class="pages-default"><a href="/authoring/table.html">Tables</a></li>
+    		<li class="pages-default"><a href="/authoring/templating.html">Templating</a></li>
+    	</ul>
+    </div>
+    <div class="col-sm-9 layout-content-body">
+<p class="devcenter-breadcrumb">
+	<a href="/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+		<a href="/authoring/">Authoring Content</a> > 
+	
+	Styling with LESS and CSS
+</p>
+				<h1>Styling with LESS and CSS</h1>
+
+<p>Sitepiler supports both LESS and plain CSS.</p>
+<a href="#less_usage" name="less_usage" class="toc-link toc-link-h2"><h2>LESS usage<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><ul>
+<li>Put files in style source dir with <code>.less</code> file extension</li>
+<li>Each file gets compiled into a CSS file and placed in the appropriate output location based on the input file's location</li>
+<li>Use <code>@import url('https://site.com/path/to/style.css');</code> to import web resources</li>
+<li>Use <code>@import 'some/subdir/style.less';</code> to import local resources. Path is absolute or relative to the LESS file being processed.</li>
+</ul>
+<a href="#suggested_pattern" name="suggested_pattern" class="toc-link toc-link-h3"><h3>Suggested pattern<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Configure the style source dir with <code>recursive: false</code> and use subdirs in the source dir to house partial LESS/CSS files that will be imported into a LESS file in the root of the source dir. Given the following files with the stated imports:</p>
+<ul>
+<li>sitepiler.less
+<ul>
+<li><code>@import 'partials/sitepilerBase.less';</code></li>
+</ul>
+</li>
+<li>anotherstyle.less
+<ul>
+<li><code>@import 'partials/sitepilerBase.less';</code></li>
+</ul>
+</li>
+<li>plainstyle.css</li>
+<li>partials/sitepilerBase.less</li>
+</ul>
+<p>The following output files will be produced:</p>
+<ul>
+<li>sitepiler.css</li>
+<li>anotherstyle.css</li>
+<li>plainstyle.css</li>
+</ul>
+
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

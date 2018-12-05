@@ -1,8 +1,10 @@
 ---
-title: Code Fences
+title: Code Fences and Alert Blocks
 ---
 
 The extended fences plugin allows for fancy syntax-highlighted code blocks.
+
+:::toc:::
 
 ## Fence Options
 
@@ -11,9 +13,9 @@ Use three backticks to open and close a fence. The opening colons support either
 | Option | Example | Description |
 |--------|---------|-------------|
 | title | Some Code | Displays a header before the code block with the given title |
-| maxHeight | 100pt | Overrides the `max-height` CSS property, must include units | 
-| autoCollapse | true | When `true`, the element will be displayed in its collapsed state initially |
-| language | java | Syntax highlighting language. Use `nohighlight` to disable. See [Language names and aliases](https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases). Use the values in the right column. |
+| maxHeight | 100px | Sets the `max-height` CSS property, must include units. Create a CSS rule in the stylesheet for `.fence .fence-body pre { max-height: 500px; }` to set a global default. | 
+| autoCollapse | true | When `true`, the element will be displayed in its collapsed state initially. Default: `false` |
+| language | json | Syntax highlighting language. Default: `nohighlight`. See [Language names and aliases](https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases). Use the values in the right column. |
 | tabsToSpaces | 2 | When specified, replaces all tab characters in the content with the specified number of spaces. |
 | alert | primary | When specified, the code fence does not use code formatting and displays as a styled alert instead. Valid types: `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `light`, `dark`. |
 {: class="table-striped"}
@@ -22,7 +24,7 @@ Use three backticks to open and close a fence. The opening colons support either
 
 ### Vanilla markdown
 
-This is the standard markdown code fence. Code highlighting is automatically applied.
+This is the standard markdown code fence. Code highlighting is disabled by default.
 
 ```
 \```
@@ -34,7 +36,7 @@ This is the standard markdown code fence. Code highlighting is automatically app
 
 Provide a title for the code block.
 
-```
+``` Some Title Text
 \``` Some Title Text
 // Code goes here
 \```
@@ -44,18 +46,18 @@ Provide a title for the code block.
 
 Specify configuration options as a JSON object.
 
-```
-\``` { "title":"Test Heading", "maxHeight": "70pt", "autoCollapse": false, "language": "json", "tabsToSpaces": 2 }
+``` { "title":"Test Heading", "maxHeight": "30px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2 }
+\``` { "title":"Test Heading", "maxHeight": "30px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2 }
 // Code goes here
 \```
 ```
 
 ### Alerts
 
-Alerts don't use the `<pre>` or `<code>` tags and are styled based on [Bootstrap Alerts](https://getbootstrap.com/docs/4.0/components/alerts/). See [Alert Examples](#alertexamples) for all alert types.
+Alerts don't use the `<pre>` or `<code>` tags and are styled based on [Bootstrap Alerts](https://getbootstrap.com/docs/4.0/components/alerts/). See [Alert Examples](#alertexamples) for all alert types. 
 
 ```{"title":"Alert Title","alert":"primary"}
-Internally in the PureCloud system, this creates a chat but does not yet route it to an agent! You must connect a websocket to your new Chat's event stream in order to make the system start looking for an agent. This is done because there's no use in finding an agent if something on the browser side doesn't allow connecting to this event stream. Details on how/where to do this are below.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
 ```
 
 
@@ -64,7 +66,7 @@ Internally in the PureCloud system, this creates a chat but does not yet route i
 
 ### All config options specified
 
-``` { "title":"Test Heading", "maxHeight": "70pt", "autoCollapse": false, "language": "json", "tabsToSpaces": 2 }
+``` { "title":"Test Heading", "maxHeight": "70px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2 }
 {
   "key": "value",
 	"array": [
@@ -76,48 +78,32 @@ Internally in the PureCloud system, this creates a chat but does not yet route i
 }
 ```
 
-### Plain ol' title, language is inferred by highlight.js
+### Plain ol' title
 
-``` JavaScript
-// Create API instance
-var authorizationApi = new platformClient.AuthorizationApi();
+``` Language unspecified
+const rp = require('request-promise');
 
-// Authenticate
-client.loginImplicitGrant(clientId, redirectUri)
-  .then(function() {
-    // Make request to GET /api/v2/authorization/permissions
-    return authorizationApi.getAuthorizationPermissions();
+rp('http://www.google.com')
+  .then(function (htmlString) {
+    // Process html...
   })
-  .catch(function(response) {
-    // Handle failure response
-    console.log(`${response.status} - ${response.error.message}`);
-    console.log(response.error);
+  .catch(function (err) {
+    // Crawling failed...
   });
 ```
 
 ### Title and language
 
-``` { "title": "Java", "language": "Java"}
-// Create ApiClient instance
-ApiClient apiClient = ApiClient.Builder.standard()
-  // Set access token
-  .withAccessToken("BL4Cb3EQIQFlqIItaj-zf5eyhAiP964kucEuOI1g54dKQIgd24P99ojbFHtpgUTudRIkuUYfXMy0afEnZc5nEQ")
-  // Set environment
-  .withBasePath("https://api.mypurecloud.ie")
-  .build();
+``` { "title": "JavaScript", "language": "javascript"}
+const rp = require('request-promise');
 
-// Use the ApiClient instance
-Configuration.setDefaultApiClient(apiClient);
-
-// Instantiate API
-UsersApi usersApi = new UsersApi();
-
-// Get the logged in user
-GetUsersMeRequest request = GetUsersMeRequest.builder()
-  .withExpand(Collections.singletonList("presence"))
-  .build();
-UserMe me = usersApi.getUsersMe(request);
-System.out.println("Hello " + me.getName());
+rp('http://www.google.com')
+  .then(function (htmlString) {
+    // Process html...
+  })
+  .catch(function (err) {
+    // Crawling failed...
+  });
 ```
 
 ### No title, highlighting turned off
@@ -136,7 +122,7 @@ or `inline` code
 ### Alert Examples
 
 ```{"title":"Primary","alert":"primary"}
-Internally in the PureCloud system, this creates a chat but does not yet route it to an agent! You must connect a websocket to your new Chat's event stream in order to make the system start looking for an agent. This is done because there's no use in finding an agent if something on the browser side doesn't allow connecting to this event stream. Details on how/where to do this are below.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
 ```
 
 ```{"title":"Secondary","alert":"secondary"}

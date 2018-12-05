@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Templating</title>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" href="/styles/sitepiler.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
+</head>
+<body>
+
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container layout-content">
+  <div class="row">
+    <div class="col-sm-3 layout-content-navigation">
+    	<h3>Navigation</h3>
+    	<ul class="page-list">
+    		<li class="pages-default"><a href="/authoring/markdown.html">Basic Formatting with Markdown</a></li>
+    		<li class="pages-default"><a href="/authoring/codeFence.html">Code Fences and Alert Blocks</a></li>
+    		<li class="pages-default"><a href="/authoring/creatingpages.html">Creating Pages</a></li>
+    		<li class="pages-default"><a href="/authoring/styles.html">Styling with LESS and CSS</a></li>
+    		<li class="pages-default"><a href="/authoring/table.html">Tables</a></li>
+    		<li class="pages-current"><a href="/authoring/templating.html">Templating</a></li>
+    	</ul>
+    </div>
+    <div class="col-sm-9 layout-content-body">
+<p class="devcenter-breadcrumb">
+	<a href="/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+		<a href="/authoring/">Authoring Content</a> > 
+	
+	Templating
+</p>
+				<h1>Templating</h1>
+
+<ul class="toc-list">
+<li class="toc-list-2"><a href="#basic_syntax">Basic Syntax</a></li>
+<li class="toc-list-3"><a href="#displaying_a_value">Displaying a value</a></li>
+<li class="toc-list-3"><a href="#running_arbitrary_javascript">Running arbitrary JavaScript</a></li>
+<li class="toc-list-4"><a href="#example__advanced_looping_using_lodash">Example: advanced looping using lodash</a></li>
+<li class="toc-list-2"><a href="#built_in_template_functions">Built-in Template Functions</a></li>
+<li class="toc-list-3"><a href="#include__partialname__">include('partialname')</a></li>
+</ul>
+<a href="#basic_syntax" name="basic_syntax" class="toc-link toc-link-h2"><h2>Basic Syntax<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#displaying_a_value" name="displaying_a_value" class="toc-link toc-link-h3"><h3>Displaying a value<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Use <code>{{= context.data }}</code> to output the value of the expression.</p>
+<a href="#running_arbitrary_javascript" name="running_arbitrary_javascript" class="toc-link toc-link-h3"><h3>Running arbitrary JavaScript<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Use <code>{{ console.log('Hello World!'); }}</code> to execute arbitrary JavaScript code. Can be multi-line and must use semicolons.</p>
+<a href="#example__advanced_looping_using_lodash" name="example__advanced_looping_using_lodash" class="toc-link toc-link-h4"><h4>Example: advanced looping using lodash<span class="oi toc-link-icon" data-glyph="link-intact"></span></h4></a><p>View the source of this page to see the code that generates the following list:</p>
+<ul>
+<li>key1 -&gt; value1</li>
+<li>key2 -&gt; value2</li>
+</ul>
+<a href="#built_in_template_functions" name="built_in_template_functions" class="toc-link toc-link-h2"><h2>Built-in Template Functions<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#include__partialname__" name="include__partialname__" class="toc-link toc-link-h3"><h3>include('partialname')<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Using <code>{{= context.include('partialname') }}</code> will render the named partial. Additional parameters beyond the first are placed into an array and the array is provided to the included page as <code>context.additionalContext</code>. The included page would access the first additional parameter using <code>context.additionalContext[0]</code>.</p>
+
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

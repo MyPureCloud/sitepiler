@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Tables</title>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" href="/styles/sitepiler.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
+</head>
+<body>
+
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container layout-content">
+  <div class="row">
+    <div class="col-sm-3 layout-content-navigation">
+    	<h3>Navigation</h3>
+    	<ul class="page-list">
+    		<li class="pages-default"><a href="/authoring/markdown.html">Basic Formatting with Markdown</a></li>
+    		<li class="pages-default"><a href="/authoring/codeFence.html">Code Fences and Alert Blocks</a></li>
+    		<li class="pages-default"><a href="/authoring/creatingpages.html">Creating Pages</a></li>
+    		<li class="pages-default"><a href="/authoring/styles.html">Styling with LESS and CSS</a></li>
+    		<li class="pages-current"><a href="/authoring/table.html">Tables</a></li>
+    		<li class="pages-default"><a href="/authoring/templating.html">Templating</a></li>
+    	</ul>
+    </div>
+    <div class="col-sm-9 layout-content-body">
+<p class="devcenter-breadcrumb">
+	<a href="/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+		<a href="/authoring/">Authoring Content</a> > 
+	
+	Tables
+</p>
+				<h1>Tables</h1>
+
+<p>Markdown table documentation. View this page's source to inspect the markdown required to display each table.</p>
+<a href="#table_styling" name="table_styling" class="toc-link toc-link-h2"><h2>Table Styling<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><p>Tables have basic bootstrap styling by default. To add additional style classes to the table element, use the notation <code>{: class=&quot;table-striped table-bordered&quot;}</code> on the line directly following the last row of the table. Class names should be space-separated. For full documentation, see <a href="https://getbootstrap.com/docs/4.0/content/tables/" target="_blank">Bootstrap Tables</a>.</p>
+<a href="#supported_bootstrap_table_styles" name="supported_bootstrap_table_styles" class="toc-link toc-link-h3"><h3>Supported Bootstrap Table Styles<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><ul>
+<li><code>table-striped</code> - add zebra-striping to any table row within the <code>&lt;tbody&gt;</code></li>
+<li><code>table-dark</code> - invert the colors with light text on dark backgrounds</li>
+<li><code>table-bordered</code> - for borders on all sides of the table and cells</li>
+<li><code>table-hover</code> - to enable a hover state on table rows within a <code>&lt;tbody&gt;</code></li>
+<li><code>table-sm</code> - to make tables more compact by cutting cell padding in half</li>
+</ul>
+<a href="#basic_table" name="basic_table" class="toc-link toc-link-h2"><h2>Basic table<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><p>Basic table with header and column alignment.</p>
+<table class="table">
+<thead>
+<tr>
+<th>Left Aligned</th>
+<th style="text-align:center">Centered</th>
+<th style="text-align:right">Right Aligned</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Left 1<br /></td>
+<td style="text-align:center">Center 1<br /></td>
+<td style="text-align:right">Right 1<br /></td>
+</tr>
+<tr>
+<td>Left 2<br /></td>
+<td style="text-align:center">Center 2<br /></td>
+<td style="text-align:right">Right 2<br /></td>
+</tr>
+<tr>
+<td>Left 3<br /></td>
+<td style="text-align:center">Center 3<br /></td>
+<td style="text-align:right">Right 3<br /></td>
+</tr>
+</tbody>
+</table>
+<a href="#colspan_examples" name="colspan_examples" class="toc-link toc-link-h2"><h2>Colspan Examples<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><p>Create colspans by using empty cells to the right of the content to be spanned. Must be <code>||</code> without spaces. Using <code>| |</code> will create an empty cell. Column alignment is determined by the first/leftmost spanning column.</p>
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>Column 1</th>
+<th style="text-align:center">Column 2</th>
+<th>Column 3</th>
+<th style="text-align:right">Column 4</th>
+<th>Column 5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1-C1<br /></td>
+<td style="text-align:center">R1-C2<br /></td>
+<td>R1-C3<br /></td>
+<td style="text-align:right">R1-C4<br /></td>
+<td>R1-C5<br /></td>
+</tr>
+<tr>
+<td>R2-C1<br /></td>
+<td style="text-align:center" colspan="2">R2-C2 (colspan=2)<br /></td>
+<td style="text-align:right">R2-C4<br /></td>
+<td>R2-C5<br /></td>
+</tr>
+<tr>
+<td>R2-C1<br /></td>
+<td style="text-align:center" colspan="3">R2-C2 (colspan=3)<br /></td>
+<td>R2-C5<br /></td>
+</tr>
+<tr>
+<td>R3-C1<br /></td>
+<td style="text-align:center">R3-C2 (no colspan)<br /></td>
+<td></td>
+<td style="text-align:right">R3-C4<br /></td>
+<td>R3-C5<br /></td>
+</tr>
+<tr>
+<td>R4-C1<br /></td>
+<td style="text-align:center"></td>
+<td>R4-C3 (no colspan, C2 is a space)<br /></td>
+<td style="text-align:right">R4-C4<br /></td>
+<td>R4-C5<br /></td>
+</tr>
+<tr>
+<td colspan="2">R5-C1 (colspan)<br /></td>
+<td>R5-C3<br /></td>
+<td style="text-align:right">R5-C4<br /></td>
+<td>R5-C5<br /></td>
+</tr>
+</tbody>
+</table>
+<a href="#inline_rendering" name="inline_rendering" class="toc-link toc-link-h2"><h2>Inline rendering<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><p>Inline markdown may be rendered inside of a table. Block elements, such as lists, are not supported.</p>
+<table class="table table table-striped">
+<thead>
+<tr>
+<th>Feature</th>
+<th>Syntax</th>
+<th>Display</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inline code<br /></td>
+<td><code>`var x = 2`</code><br /></td>
+<td><code>var x = 2</code><br /></td>
+</tr>
+<tr>
+<td>Link<br /></td>
+<td><code>[Genesys](https://genesys.com)</code><br /></td>
+<td><a href="https://genesys.com" target="_blank">Genesys</a><br /></td>
+</tr>
+<tr>
+<td>Strikethrough<br /></td>
+<td><code>~~Some Text~~</code><br /></td>
+<td><s>Some Text</s><br /></td>
+</tr>
+<tr>
+<td>Italic<br /></td>
+<td><code>_Do you know who I am?_</code><br /></td>
+<td><em>Do you know who I am?</em><br /></td>
+</tr>
+<tr>
+<td>Bold<br /></td>
+<td><code>**I AM THE JUGGERNAUT!**</code><br /></td>
+<td><strong>I AM THE JUGGERNAUT!</strong><br /></td>
+</tr>
+<tr>
+<td>Image<br /></td>
+<td><code>![Genesys](/img/genesys-logo-50.png)</code><br /></td>
+<td><img src="/img/genesys-logo-50.png" alt="Genesys" /><br /></td>
+</tr>
+</tbody>
+</table>
+<a href="#multi_line_table_content" name="multi_line_table_content" class="toc-link toc-link-h2"><h2>Multi-line table content<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><p>End a table line with <code>\</code> instead of <code>|</code> to make the next line append to the previous row's cells instead of creating a new row. A <code>&lt;br /&gt;</code> element will be added after the content of each cell on each line.</p>
+<table class="table table-striped table-bordered">
+<thead>
+<tr>
+<th>Column 1</th>
+<th>Column 2</th>
+<th>Column 3</th>
+<th>Column 4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>R1-C1<br /></td>
+<td>R1-C2<br /></td>
+<td>R1-C3<br /></td>
+<td>R1-C4<br /></td>
+</tr>
+<tr>
+<td>R2-C1<br />more R2-C1<br /></td>
+<td>R2-C2<br />more R2-C2<br />more R2-C2 again<br /></td>
+<td>R3-C3<br />more R2-C3<br /></td>
+<td>R2-C4 <br />More R2-C4 <br />more R2-C4 again<br /></td>
+</tr>
+<tr>
+<td>R3-C1<br />more R3-C1<br />MORE R3-C1<br /></td>
+<td colspan="2">R3-C2<br />More R3-C2<br />MORE R3-C2<br />First R3-C3<br />MORE R3-C3<br /></td>
+<td>R3-C4 <br />MORE R3-C4<br /></td>
+</tr>
+</tbody>
+</table>
+
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

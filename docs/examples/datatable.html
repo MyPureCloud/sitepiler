@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Dynamically generate a table</title>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" href="/styles/sitepiler.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
+</head>
+<body>
+
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container layout-content">
+  <div class="row">
+    <div class="col-sm-3 layout-content-navigation">
+    	<h3>Navigation</h3>
+    	<ul class="page-list">
+    		<li class="pages-current"><a href="/examples/datatable.html">Dynamically generate a table</a></li>
+    	</ul>
+    </div>
+    <div class="col-sm-9 layout-content-body">
+<p class="devcenter-breadcrumb">
+	<a href="/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+		<a href="/examples/">Example Pages</a> > 
+	
+	Dynamically generate a table
+</p>
+				<h1>Dynamically generate a table</h1>
+
+<p>This page demonstrates looping through an array (<code>context.data.employees</code>) to add rows to a table. The <code>employees</code> array comes from loading the file <code>example/data/employees.json</code>. All data in the file is fictitious.</p>
+<table class="table">
+<thead>
+<tr>
+<th>name</th>
+<th>email</th>
+<th>phone</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Willow Mckenzies<br /></td>
+<td><a href="mailto:augue@augue.net" target="_blank">augue@augue.net</a><br /></td>
+<td>(573) 795-8504<br /></td>
+</tr>
+<tr>
+<td>Astra Roberts<br /></td>
+<td><a href="mailto:libero.lacus@aliquam.net" target="_blank">libero.lacus@aliquam.net</a><br /></td>
+<td>(221) 966-5810<br /></td>
+</tr>
+<tr>
+<td>Addison Mercado<br /></td>
+<td><a href="mailto:at.auctor.ullamcorper@loremutaliquam.edu" target="_blank">at.auctor.ullamcorper@loremutaliquam.edu</a><br /></td>
+<td>(594) 581-9302<br /></td>
+</tr>
+<tr>
+<td>Melanie Guthrie<br /></td>
+<td><a href="mailto:Phasellus.at@facilisi.edu" target="_blank">Phasellus.at@facilisi.edu</a><br /></td>
+<td>(627) 150-9203<br /></td>
+</tr>
+<tr>
+<td>Breanna Briggs<br /></td>
+<td><a href="mailto:sem.semper@egestasAliquamnec.com" target="_blank">sem.semper@egestasAliquamnec.com</a><br /></td>
+<td>(330) 334-9323<br /></td>
+</tr>
+<tr>
+<td>Adrienne Bradford<br /></td>
+<td><a href="mailto:a.enim.Suspendisse@vulputateullamcorpermagna.net" target="_blank">a.enim.Suspendisse@vulputateullamcorpermagna.net</a><br /></td>
+<td>(312) 422-3259<br /></td>
+</tr>
+<tr>
+<td>Drake Reynolds<br /></td>
+<td><a href="mailto:et@lectus.org" target="_blank">et@lectus.org</a><br /></td>
+<td>(997) 203-5632<br /></td>
+</tr>
+<tr>
+<td>Burke Britt<br /></td>
+<td><a href="mailto:in.faucibus.orci@semperpretiumneque.com" target="_blank">in.faucibus.orci@semperpretiumneque.com</a><br /></td>
+<td>(323) 299-6016<br /></td>
+</tr>
+<tr>
+<td>Allegra Brock<br /></td>
+<td><a href="mailto:ornare.lectus.ante@enimEtiam.co.uk" target="_blank">ornare.lectus.ante@enimEtiam.co.uk</a><br /></td>
+<td>(897) 944-6004<br /></td>
+</tr>
+<tr>
+<td>Philip Leblanc<br /></td>
+<td><a href="mailto:egestas.lacinia@risusvariusorci.org" target="_blank">egestas.lacinia@risusvariusorci.org</a><br /></td>
+<td>(518) 302-2947<br /></td>
+</tr>
+<tr>
+<td>Chiquita Dickerson<br /></td>
+<td><a href="mailto:Fusce.fermentum.fermentum@Intinciduntcongue.co.uk" target="_blank">Fusce.fermentum.fermentum@Intinciduntcongue.co.uk</a><br /></td>
+<td>(246) 666-4152<br /></td>
+</tr>
+<tr>
+<td>Hector Cleveland<br /></td>
+<td><a href="mailto:ligula.Donec.luctus@mauris.net" target="_blank">ligula.Donec.luctus@mauris.net</a><br /></td>
+<td>(481) 294-1024<br /></td>
+</tr>
+<tr>
+<td>Kirsten Carver<br /></td>
+<td><a href="mailto:Suspendisse.tristique.neque@justoProin.co.uk" target="_blank">Suspendisse.tristique.neque@justoProin.co.uk</a><br /></td>
+<td>(374) 638-3288<br /></td>
+</tr>
+<tr>
+<td>Nash Norman<br /></td>
+<td><a href="mailto:bibendum.ullamcorper@molestietortor.ca" target="_blank">bibendum.ullamcorper@molestietortor.ca</a><br /></td>
+<td>(768) 499-0340<br /></td>
+</tr>
+<tr>
+<td>Bruce Marshall<br /></td>
+<td><a href="mailto:sed.dolor@enim.com" target="_blank">sed.dolor@enim.com</a><br /></td>
+<td>(734) 602-5838<br /></td>
+</tr>
+<tr>
+<td>Caesar Sandoval<br /></td>
+<td><a href="mailto:faucibus@gravida.ca" target="_blank">faucibus@gravida.ca</a><br /></td>
+<td>(571) 912-7705<br /></td>
+</tr>
+<tr>
+<td>Clio Tyler<br /></td>
+<td><a href="mailto:Nam@enimEtiamimperdiet.edu" target="_blank">Nam@enimEtiamimperdiet.edu</a><br /></td>
+<td>(677) 361-8501<br /></td>
+</tr>
+<tr>
+<td>Macey Leon<br /></td>
+<td><a href="mailto:Donec@fermentummetus.co.uk" target="_blank">Donec@fermentummetus.co.uk</a><br /></td>
+<td>(171) 579-1238<br /></td>
+</tr>
+<tr>
+<td>Howard Cross<br /></td>
+<td><a href="mailto:orci@Intincidunt.edu" target="_blank">orci@Intincidunt.edu</a><br /></td>
+<td>(538) 319-9074<br /></td>
+</tr>
+<tr>
+<td>Christian Vazquez<br /></td>
+<td><a href="mailto:odio.sagittis.semper@vulputate.ca" target="_blank">odio.sagittis.semper@vulputate.ca</a><br /></td>
+<td>(792) 763-4385<br /></td>
+</tr>
+<tr>
+<td>Kendall Haley<br /></td>
+<td><a href="mailto:fringilla.est@lacus.org" target="_blank">fringilla.est@lacus.org</a><br /></td>
+<td>(580) 381-2857<br /></td>
+</tr>
+<tr>
+<td>Karleigh Clarke<br /></td>
+<td><a href="mailto:Integer.mollis@volutpatNulladignissim.ca" target="_blank">Integer.mollis@volutpatNulladignissim.ca</a><br /></td>
+<td>(288) 741-4926<br /></td>
+</tr>
+<tr>
+<td>Arsenio Barry<br /></td>
+<td><a href="mailto:a.enim@Donecluctus.ca" target="_blank">a.enim@Donecluctus.ca</a><br /></td>
+<td>(821) 175-5313<br /></td>
+</tr>
+<tr>
+<td>Preston Greene<br /></td>
+<td><a href="mailto:Sed.molestie@vitae.net" target="_blank">Sed.molestie@vitae.net</a><br /></td>
+<td>(673) 616-0297<br /></td>
+</tr>
+<tr>
+<td>Emery Sellers<br /></td>
+<td><a href="mailto:Duis.elementum@cursusvestibulum.co.uk" target="_blank">Duis.elementum@cursusvestibulum.co.uk</a><br /></td>
+<td>(541) 465-8098<br /></td>
+</tr>
+<tr>
+<td>Deacon Gillespie<br /></td>
+<td><a href="mailto:ipsum.dolor.sit@ipsumsodalespurus.co.uk" target="_blank">ipsum.dolor.sit@ipsumsodalespurus.co.uk</a><br /></td>
+<td>(990) 723-0489<br /></td>
+</tr>
+<tr>
+<td>Noah Brock<br /></td>
+<td><a href="mailto:auctor.velit@dapibus.edu" target="_blank">auctor.velit@dapibus.edu</a><br /></td>
+<td>(427) 969-3264<br /></td>
+</tr>
+<tr>
+<td>Holly Hubbard<br /></td>
+<td><a href="mailto:et@tinciduntpedeac.net" target="_blank">et@tinciduntpedeac.net</a><br /></td>
+<td>(967) 485-0037<br /></td>
+</tr>
+</tbody>
+</table>
+
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

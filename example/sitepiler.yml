@@ -4,49 +4,79 @@ envVars:
   TEST_ENV_2: Another test value
 
 settings:
-  templateChangeRebuildQuietSeconds: 0
+  # The root path for all other config paths
+  rootDir: "./example"
+  
+  # How long to wait before rebuilding the site when a template change is detected
+  templateChangeRebuildQuietSeconds: 1
+
+  # A regular expression string to identify internal links. No capture groups required.
+  internalLinkRegex: "^\\/"
+  
+  # Stage configuration
   stages:
+    # Data gathering stage
     data:
+      # Custom scripts to execute before reading data
       scripts:
-      - type: shell
-        src: "scripts/test.sh"
+        # Runs `npm i` to install packages
+      - type: command
+        command: npm
         args:
-        - "arg1"
-        - "arg2"
+        - i
+        cwd: src/scripts
         failOnError: true
+        # Writes data to the temp directory
       - type: node
-        src: "scripts/test.js"
+        src: "src/scripts/writeData.js"
+        args:
+        - "temp/data"
+        failOnError: true
+        # Example node script, serves no purpose to the project
+      - type: node
+        src: "src/scripts/test.js"
         args:
         - "arg1"
         - "arg2"
         failOnError: true
+        # Example shell script, serves no purpose to the project
+      - type: shell
+        src: "src/scripts/test.sh"
+        args:
+        - "arg1"
+        - "arg2"
+        failOnError: true
+        # Example shell command, serves no purpose to the project
       - type: command
         command: ls
         args:
-        - "/"
+        - "./"
         failOnError: true
       dataDirs:
-      - "example/src/data"
+      - "src/data"
+      - "temp/data"
     compile:
       preCompileScripts: []
       templateDirs:
         layouts: 
-        - "example/src/templates/layouts"
+        - "src/templates/layouts"
         partials: 
-        - "example/src/templates/partials"
+        - "src/templates/partials"
       contentDirs:
-      - "example/src/content"
-      - source: "example/src/othercontent"
-        dest: "othercontent/subdir"
+      - "src/content"
+      - source: "src/authoringdocs"
+        dest: "authoring"
       styleDirs:
-      - "example/src/styles"
+      - source: "src/styles"
+        recursive: false
       staticDirs:
-      - source: "example/src/static/img"
+      - source: "src/static/img"
         dest: "img"
       outputDirs: 
-        content: "example/build"
-        styles: "example/build/styles"
-        static: "example/build"
+        clearOnBuild: true
+        content: "../docs"
+        styles: "../docs/styles"
+        static: "../docs"
       postCompileScripts: []
     publish:
       publishScripts: []

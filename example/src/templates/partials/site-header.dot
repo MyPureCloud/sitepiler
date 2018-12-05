@@ -1,9 +1,9 @@
-<div class="jumbotron site-header">
+<div class="jumbotron layout-header">
 	<div class="container">
 	  <div class="row">
 	    <div class="col-sm">
 				<a href="/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
-				<span class="site-header-title">Sitepiler</span>
+				<span class="layout-header-title">Sitepiler</span>
 			</div>
 		</div>
 	</div>

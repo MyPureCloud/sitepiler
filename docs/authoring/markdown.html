@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Basic Formatting with Markdown</title>
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" href="/styles/sitepiler.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
+</head>
+<body>
+
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container layout-content">
+  <div class="row">
+    <div class="col-sm-3 layout-content-navigation">
+    	<h3>Navigation</h3>
+    	<ul class="page-list">
+    		<li class="pages-current"><a href="/authoring/markdown.html">Basic Formatting with Markdown</a></li>
+    		<li class="pages-default"><a href="/authoring/codeFence.html">Code Fences and Alert Blocks</a></li>
+    		<li class="pages-default"><a href="/authoring/creatingpages.html">Creating Pages</a></li>
+    		<li class="pages-default"><a href="/authoring/styles.html">Styling with LESS and CSS</a></li>
+    		<li class="pages-default"><a href="/authoring/table.html">Tables</a></li>
+    		<li class="pages-default"><a href="/authoring/templating.html">Templating</a></li>
+    	</ul>
+    </div>
+    <div class="col-sm-9 layout-content-body">
+<p class="devcenter-breadcrumb">
+	<a href="/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+		<a href="/authoring/">Authoring Content</a> > 
+	
+	Basic Formatting with Markdown
+</p>
+				<h1>Basic Formatting with Markdown</h1>
+
+<p>This page covers standard Markdown syntax.</p>
+<ul class="toc-list">
+<li class="toc-list-2"><a href="#advanced_syntax">Advanced Syntax</a></li>
+<li class="toc-list-2"><a href="#inline_styling">Inline Styling</a></li>
+<li class="toc-list-3"><a href="#bold">Bold</a></li>
+<li class="toc-list-3"><a href="#italics">Italics</a></li>
+<li class="toc-list-3"><a href="#links">Links</a></li>
+<li class="toc-list-2"><a href="#block_styling">Block Styling</a></li>
+<li class="toc-list-3"><a href="#line_breaks">Line Breaks</a></li>
+<li class="toc-list-3"><a href="#headers">Headers</a></li>
+<li class="toc-list-1"><a href="#h1">H1</a></li>
+<li class="toc-list-2"><a href="#h2">H2</a></li>
+<li class="toc-list-3"><a href="#h3">H3</a></li>
+<li class="toc-list-4"><a href="#h4">H4</a></li>
+<li class="toc-list-5"><a href="#h5">H5</a></li>
+<li class="toc-list-6"><a href="#h6">H6</a></li>
+<li class="toc-list-3"><a href="#lists">Lists</a></li>
+<li class="toc-list-3"><a href="#images">Images</a></li>
+<li class="toc-list-3"><a href="#blockquotes">Blockquotes</a></li>
+<li class="toc-list-3"><a href="#horizontal_rules">Horizontal Rules</a></li>
+</ul>
+<a href="#advanced_syntax" name="advanced_syntax" class="toc-link toc-link-h2"><h2>Advanced Syntax<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><p>See the advanced guides for additional features:</p>
+<ul>
+<li><a href="codeFence.html" target="_blank">Code Fences and Alert Blocks</a></li>
+<li><a href="table.html" target="_blank">Tables</a></li>
+<li><a href="templating.html" target="_blank">Templating</a></li>
+</ul>
+<a href="#inline_styling" name="inline_styling" class="toc-link toc-link-h2"><h2>Inline Styling<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#bold" name="bold" class="toc-link toc-link-h3"><h3>Bold<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Here is some <strong>bold text</strong> inline.</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">Here is some **bold text** inline.
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#italics" name="italics" class="toc-link toc-link-h3"><h3>Italics<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Here is some <em>italic text</em> inline.</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">Here is some _italic text_ inline.
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#links" name="links" class="toc-link toc-link-h3"><h3>Links<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>You can <a href="https://google.com" target="_blank">Google</a> for answers.</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">You can [Google](https://google.com) for answers.
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#block_styling" name="block_styling" class="toc-link toc-link-h2"><h2>Block Styling<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#line_breaks" name="line_breaks" class="toc-link toc-link-h3"><h3>Line Breaks<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Text on lines without a blank line
+is lumped together.</p>
+<p>One or more blank lines in between blocks of text</p>
+<p>Makes it a new paragraph.</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">Text on lines without a blank line
+is lumped together.
+
+One or more blank lines in between blocks of text
+
+Makes it a new paragraph.
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#headers" name="headers" class="toc-link toc-link-h3"><h3>Headers<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight"># H1
+## H2
+### H3
+#### H4
+##### H5
+###### H6
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#h1" name="h1" class="toc-link toc-link-h1"><h1>H1<span class="oi toc-link-icon" data-glyph="link-intact"></span></h1></a><a href="#h2" name="h2" class="toc-link toc-link-h2"><h2>H2<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#h3" name="h3" class="toc-link toc-link-h3"><h3>H3<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><a href="#h4" name="h4" class="toc-link toc-link-h4"><h4>H4<span class="oi toc-link-icon" data-glyph="link-intact"></span></h4></a><a href="#h5" name="h5" class="toc-link toc-link-h5"><h5>H5<span class="oi toc-link-icon" data-glyph="link-intact"></span></h5></a><a href="#h6" name="h6" class="toc-link toc-link-h6"><h6>H6<span class="oi toc-link-icon" data-glyph="link-intact"></span></h6></a><a href="#lists" name="lists" class="toc-link toc-link-h3"><h3>Lists<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><ul>
+<li>list</li>
+<li>items</li>
+<li>more</li>
+</ul>
+<a href="#images" name="images" class="toc-link toc-link-h3"><h3>Images<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p><img src="/img/dog-lion.png" alt="Alt text for accessibility" /></p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">![Alt text for accessibility](/img/dog-lion.png)
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#blockquotes" name="blockquotes" class="toc-link toc-link-h3"><h3>Blockquotes<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><blockquote>
+<p>Single line quoted text</p>
+</blockquote>
+<blockquote>
+<p>Linebreaks are removed in multi-line quoted text when there isn't a blank line in between.
+Any blockquotes can use <em>inline</em> <strong>styles</strong>.</p>
+</blockquote>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">&gt; Single line quoted text
+
+&gt; Linebreaks are removed in multi-line quoted text when there isn&#39;t a blank line in between.
+&gt; Any blockquotes can use _inline_ **styles**.
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#horizontal_rules" name="horizontal_rules" class="toc-link toc-link-h3"><h3>Horizontal Rules<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Horizontal rules require a blank line preceding them.</p>
+<hr />
+<p>But a blank line is not required after.</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre><code class="lang-nohighlight">Horizontal rules require a blank line preceding them.
+
+---
+But a blank line is not required after.
+</code></pre>
+	  </div>
+	</div>
+</p>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

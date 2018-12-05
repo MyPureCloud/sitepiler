@@ -1,5 +1,5 @@
 ---
-title: Table Test
+title: Tables
 ---
 
 Markdown table documentation. View this page's source to inspect the markdown required to display each table.

@@ -1,0 +1,1 @@
+echo "test.sh called with args: $1 $2"
