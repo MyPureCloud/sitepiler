@@ -80,7 +80,7 @@ class ContextExtensions {
 		// context is still the parent object (`swaggerHelpers`).
 		// newContext.swaggerHelpers = {};
 
-		newContext.getDefinition = function(schema, resolvedTypes = [], level = 0) {
+		newContext.getDefinition = function(schema, truncate = true, resolvedTypes = [], level = 0) {
 			if (!schema) return;
 			
 			// If this is a reference, return the definition
@@ -90,20 +90,24 @@ class ContextExtensions {
 				// 	- level 3 if the type has already been resolved
 				// 	- level 6 if it's a previously unknown type
 				if ((resolvedTypes.includes(defName) && level > 3) ||
-					(!resolvedTypes.includes(defName) && level > 6)) {
+					(!resolvedTypes.includes(defName) && truncate && level > 6)) {
 					return { 'modelRef': defName };
 				} else {
 					resolvedTypes.push(defName);
-					return newContext.getDefinition(JSON.parse(JSON.stringify(this.data.swagger.definitions[defName])), resolvedTypes, level);
+					return newContext.getDefinition(JSON.parse(JSON.stringify(this.data.swagger.definitions[defName])), truncate, resolvedTypes, level);
 				}
 			}
 
 			// Look ahead at properties and resolve them
 			let newSchema = JSON.parse(JSON.stringify(schema));
 			_.forOwn(newSchema, (value, key) => {
-				// Value is a reference, replace it with a definition
 				if (typeof(value) === 'object') {
-					newSchema[key] = newContext.getDefinition(value, resolvedTypes, level + 1);
+					// Value is a reference, replace it with a definition
+					newSchema[key] = newContext.getDefinition(value, truncate, resolvedTypes, value.items ? level : level + 1);
+
+					// Set model name
+					if (value['$ref'])
+						newSchema[key].____modelName = value['$ref'].split('/').pop();
 				}
 			});
 			return newSchema;
