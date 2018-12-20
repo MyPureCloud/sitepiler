@@ -80,8 +80,9 @@ class ContextExtensions {
 		// context is still the parent object (`swaggerHelpers`).
 		// newContext.swaggerHelpers = {};
 
-		newContext.getDefinition = function(schema, truncate = true, resolvedTypes = [], level = 0) {
+		newContext.getDefinition = function(schema, swaggerSource, truncate = true, resolvedTypes = [], level = 0) {
 			if (!schema) return;
+			if (!swaggerSource) swaggerSource = this.data.swagger;
 			
 			// If this is a reference, return the definition
 			if (schema['$ref']) {
@@ -94,7 +95,7 @@ class ContextExtensions {
 					return { 'modelRef': defName };
 				} else {
 					resolvedTypes.push(defName);
-					return newContext.getDefinition(JSON.parse(JSON.stringify(this.data.swagger.definitions[defName])), truncate, resolvedTypes, level);
+					return newContext.getDefinition(JSON.parse(JSON.stringify(swaggerSource.definitions[defName])), swaggerSource, truncate, resolvedTypes, level);
 				}
 			}
 
@@ -103,7 +104,7 @@ class ContextExtensions {
 			_.forOwn(newSchema, (value, key) => {
 				if (typeof(value) === 'object') {
 					// Value is a reference, replace it with a definition
-					newSchema[key] = newContext.getDefinition(value, truncate, resolvedTypes, value.items ? level : level + 1);
+					newSchema[key] = newContext.getDefinition(value, swaggerSource, truncate, resolvedTypes, value.items ? level : level + 1);
 
 					// Set model name
 					if (value['$ref'])

@@ -376,49 +376,57 @@ function processStyleConfig(sourceDir, outputDir, recursive) {
 
 // Expects to have context bound to a sitepiler instance
 function templateWatcherEvent(evt, filePath) {
-	watcherlog.verbose(`(template) ${evt} >> ${filePath}`);
-	if (BLOCKED_WATCHER_EVENTS.includes(evt)) return;
+	try {
+		watcherlog.verbose(`(template) ${evt} >> ${filePath}`);
+		if (BLOCKED_WATCHER_EVENTS.includes(evt)) return;
 
-	// Skip if disabled
-	if (this.config.settings.templateChangeRebuildQuietSeconds < 0) return;
+		// Skip if disabled
+		if (this.config.settings.templateChangeRebuildQuietSeconds < 0) return;
 
-	// Clear pending timer
-	if (this.templateWatcherRebuiltTimeout) clearTimeout(this.templateWatcherRebuiltTimeout);
+		// Clear pending timer
+		if (this.templateWatcherRebuiltTimeout) clearTimeout(this.templateWatcherRebuiltTimeout);
 
-	// Set new timer
-	watcherlog.info(`Triggering recompile in ${this.config.settings.templateChangeRebuildQuietSeconds} seconds...`);
-	this.templateWatcherRebuiltTimeout = setTimeout(this.compile.bind(this), this.config.settings.templateChangeRebuildQuietSeconds * 1000);
+		// Set new timer
+		watcherlog.info(`Triggering recompile in ${this.config.settings.templateChangeRebuildQuietSeconds} seconds...`);
+		this.templateWatcherRebuiltTimeout = setTimeout(this.compile.bind(this), this.config.settings.templateChangeRebuildQuietSeconds * 1000);
+	} catch(ex) {
+		log.error(ex);
+	}
 }
 
 // Expects to have context bound to a sitepiler instance
 function sourceWatcherEvent(evt, filePath) {
-	watcherlog.verbose(`(source) ${evt} >> ${filePath}`);
-	if (BLOCKED_WATCHER_EVENTS.includes(evt)) return;
+	try {
+		watcherlog.verbose(`(source) ${evt} >> ${filePath}`);
+		if (BLOCKED_WATCHER_EVENTS.includes(evt)) return;
 
-	// Find content dir
-	let contentDir;
-	this.config.settings.stages.compile.contentDirs.some((c) => {
-		if (filePath.startsWith(c.source)) {
-			contentDir = c;
-			return true;
-		}
-	});
-	if (!contentDir)
-		return watcherlog.error(`Failed to find content dir for source ${filePath}`);
+		// Find content dir
+		let contentDir;
+		this.config.settings.stages.compile.contentDirs.some((c) => {
+			if (filePath.startsWith(c.source)) {
+				contentDir = c;
+				return true;
+			}
+		});
+		if (!contentDir)
+			return watcherlog.error(`Failed to find content dir for source ${filePath}`);
 
-	// Determine paths
-	const subdir = filePath.substring(contentDir.source.length + 1, filePath.length - path.basename(filePath).length);
-	let relativePath = path.join(contentDir.dest, subdir);
-	// path.join returns '.' representing the current directory when both contentDir.dest and subdir and empty strings
-	if (relativePath === '.') relativePath = '/';
-	const destPath = path.join(this.config.settings.stages.compile.outputDirs.content, relativePath, path.basename(filePath));
+		// Determine paths
+		const subdir = filePath.substring(contentDir.source.length + 1, filePath.length - path.basename(filePath).length);
+		let relativePath = path.join(contentDir.dest, subdir);
+		// path.join returns '.' representing the current directory when both contentDir.dest and subdir and empty strings
+		if (relativePath === '.') relativePath = '/';
+		const destPath = path.join(this.config.settings.stages.compile.outputDirs.content, relativePath, path.basename(filePath));
 
-	// Generate content
-	const page = Page.load(
-		filePath, 
-		destPath, 
-		relativePath
-	);
-	this.context.sitemap.addPage(page);
-	page.render(this.context);
+		// Generate content
+		const page = Page.load(
+			filePath, 
+			destPath, 
+			relativePath
+		);
+		this.context.sitemap.addPage(page);
+		page.render(this.context);
+	} catch(ex) {
+		log.error(ex);
+	}
 }
