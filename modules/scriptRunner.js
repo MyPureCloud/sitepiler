@@ -10,7 +10,12 @@ const log = new (require('lognext'))('ScriptRunner');
 
 class ScriptRunner {
 	constructor() {
+		this.isLocal = false;
+	}
 
+	setIsLocal(local) {
+		this.isLocal = local;
+		log.info(`Running locally: ${this.isLocal}`);
 	}
 
 	run(scriptConfig) {
@@ -25,6 +30,27 @@ class ScriptRunner {
 			return 0;
 		}
 
+		if (this.isLocal && scriptConfig.runLocally === false) {
+			log.warn(`Building locally, skipping ${scriptConfig.type} script: ${scriptConfig.src || scriptConfig.command} ${scriptConfig.args ? scriptConfig.args.join(' ') : ''}`);
+			return 0;
+		} else {
+			exitCode = this._runImpl(scriptConfig);
+		}
+
+		var completedMessage = `Script completed with return code ${exitCode} in ${startTime.getMs()}ms`;
+		if (exitCode !== 0) {
+			log.error(completedMessage);
+			if (scriptConfig.failOnError) {
+				throw new Error(`Script failed! Aborting. Script config: ${JSON.stringify(scriptConfig, null, 2)}`);
+			}
+		} else {
+			log.verbose(completedMessage);
+			return exitCode;
+		}
+	}
+
+	_runImpl(scriptConfig) {
+		let exitCode = -100;
 		try {
 			const args = scriptConfig.args ? scriptConfig.args.slice() : [];
 			const options = {stdio:'inherit'};
@@ -71,16 +97,7 @@ class ScriptRunner {
 				exitCode = err.status;
 		}
 
-		var completedMessage = `Script completed with return code ${exitCode} in ${startTime.getMs()}ms`;
-		if (exitCode !== 0) {
-			log.error(completedMessage);
-			if (scriptConfig.failOnError) {
-				throw new Error(`Script failed! Aborting. Script config: ${JSON.stringify(scriptConfig, null, 2)}`);
-			}
-		} else {
-			log.verbose(completedMessage);
-			return exitCode;
-		}
+		return exitCode;
 	}
 }
 

@@ -71,8 +71,10 @@ class Sitepiler {
 				ignoreInitial: true
 			});
 			this.templateWatcher.on('all', templateWatcherEvent.bind(this));
-
 		}
+
+		// Configure script runner
+		scriptRunner.setIsLocal(this.config.cliopts.local);
 	}
 
 	// These props should be cleared when a full recompile is triggered
