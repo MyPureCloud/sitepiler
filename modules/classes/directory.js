@@ -40,6 +40,26 @@ class Directory {
 		}
 	}
 
+	getDir(dirPath) {
+		if (dirPath.startsWith(this.path) || dirPath.startsWith(this.path.substr(0, this.path.length - 1))) {
+			if (dirPath === this.path || dirPath === this.path.substr(0, this.path.length - 1)) {
+				// Exact match
+				return this;
+			} else {
+				// Partial match, recurse
+				let target;
+				_.keys(this.dirs).some((dir) => {
+					target = this.dirs[dir].getDir(dirPath);
+					if (target) return true;
+				});
+				return target;
+			}
+		} else {
+			// Subdir not in this path
+			return;
+		}
+	}
+
 	analyze(recursive = true) {
 		// Find index page and get title
 		_.forOwn(this.pages, (page) => {
