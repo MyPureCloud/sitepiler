@@ -105,7 +105,7 @@ class Renderer {
 			// Exclude index page
 			if (siblingPage.filename.startsWith('index.')) return;
 
-			siblingPage.isCurrentPage = siblingPage.filename === page.filename;
+			siblingPage.isCurrentPage = siblingPage.link === page.link;
 			context.siblings.push(siblingPage);
 		});
 		_.forOwn(sitemap.dirs, (dir, dirname) => {
