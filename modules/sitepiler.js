@@ -307,7 +307,8 @@ function loadSources(sourceDir, outputRoot, relativePath, directory) {
 
 	// Recurse each subdir
 	dirContents.dirs.forEach((dir) => {
-		directory.dirs[dir] = Directory.fromPath(path.join(directory.path, dir));
+		if (!directory.dirs[dir])
+			directory.dirs[dir] = Directory.fromPath(path.join(directory.path, dir));
 		loadSources(path.join(sourceDir, dir), outputRoot, path.join(relativePath, dir), directory.dirs[dir]);
 	});
 }
