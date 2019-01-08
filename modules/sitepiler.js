@@ -165,6 +165,11 @@ class Sitepiler {
 			startMs = Timer.start();
 			this.context.sitemap = Directory.fromPath('/');
 			this.config.settings.stages.compile.contentDirs.forEach((sourceDir) => {
+				if (!fs.existsSync(sourceDir.source)) {
+					log.warn(`Content dir does not exist: ${sourceDir.source}`);
+					return;
+				}
+
 				loadSources(
 					sourceDir.source, 
 					this.config.settings.stages.compile.outputDirs.content, 
