@@ -74,6 +74,12 @@ class ContextExtensions {
 		};
 		newContext.splitAndGet.bind(newContext);
 
+		// Get env variable
+		newContext.getEnv = function(name) {
+			return process.env[name] || '';
+		};
+		newContext.getEnv.bind(newContext);
+
 		/** Swagger Helpers **/
 		//TODO: Move this to the dev center project. It's project-specific.
 		// For some reason, bind isn't working to set the context of `this` in the functions. The 
