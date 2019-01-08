@@ -195,6 +195,11 @@ class Sitepiler {
 			// Process static content
 			startMs = Timer.start();
 			this.config.settings.stages.compile.staticDirs.forEach((sourceDir) => {
+				if (!fs.existsSync(sourceDir.source)) {
+					log.warn(`Static source dir does not exist: ${sourceDir.source}`);
+					return;
+				}
+				
 				const targetDir = path.join(this.config.settings.stages.compile.outputDirs.static, sourceDir.dest);
 				log.info(`Copying static files from ${sourceDir.source} to ${targetDir}`);
 				fs.copySync(sourceDir.source, targetDir);

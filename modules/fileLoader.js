@@ -49,6 +49,8 @@ class FileLoader {
 	}
 
 	loadFiles(dir, target, filters, recursive = false) {
+		if (!fs.existsSync(dir)) return;
+		
 		const files = fs.readdirSync(dir);
 
 		// Load files in dir
