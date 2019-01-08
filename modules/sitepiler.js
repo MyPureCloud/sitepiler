@@ -221,26 +221,6 @@ class Sitepiler {
 			Promise.all(stylePromises)
 				.then(() => {
 					log.verbose(`Styles loaded in ${styleStartMs.getMs()}ms`);
-
-					// Build manifest
-					//TODO: move this into a custom script. Should be possible now that the sitemap exists for all pages.
-					if (this.context.data.build && this.context.data.build.projectName) {
-						log.verbose('Building manifest...');
-						this.manifest = {
-							name: this.context.data.build.projectName,
-							version: this.context.data.build.buildNumber,
-							buildNumber: this.context.data.build.buildNumber,
-							indexFiles: []
-						};
-						buildManifest(this.manifest.indexFiles, this.config.settings.stages.compile.outputDirs.content, '/');
-						fs.writeFileSync(
-							path.join(this.config.settings.stages.compile.outputDirs.content, 'manifest.json'), 
-							JSON.stringify(this.manifest, null, 2), 
-							'utf-8'
-						);
-					} else {
-						log.verbose('Skipping manifest, build data not found');
-					}
 					
 					// Complete stage
 					log.verbose(`Compile stage completed in ${compileStartMs.getMs() }ms`);
