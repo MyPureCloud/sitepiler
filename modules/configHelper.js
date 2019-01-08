@@ -91,13 +91,10 @@ class ConfigHelper {
 		this.config.settings.stages.compile.outputDirs.static = this.normalizeDir(this.config.settings.stages.compile.outputDirs.static, this.config.settings.rootDir);
 
 		// Resolve script sources
-		this.config.settings.stages.data.scripts.forEach((scriptConfig) => {
-			if (scriptConfig.src) scriptConfig.src = this.normalizeDir(scriptConfig.src, this.config.settings.rootDir);
-			if (scriptConfig.cwd)
-				scriptConfig.cwd = this.normalizeDir(scriptConfig.cwd, this.config.settings.rootDir);
-			else
-				scriptConfig.cwd = this.config.settings.rootDir;
-		});
+		this.normalizeScriptConfigs(this.config.settings.stages.data.scripts);
+		this.normalizeScriptConfigs(this.config.settings.stages.compile.preCompileScripts);
+		this.normalizeScriptConfigs(this.config.settings.stages.compile.postCompileScripts);
+		this.normalizeScriptConfigs(this.config.settings.stages.publish.publishScripts);
 
 		// Normalize data dirs
 		for (var i = 0; i < this.config.settings.stages.data.dataDirs.length; i++) {
@@ -238,6 +235,19 @@ class ConfigHelper {
 
 		const newPath = path.resolve.apply(this, paths);
 		return newPath;
+	}
+
+	normalizeScriptConfigs(scriptConfigs) {
+		if(!scriptConfigs) return;
+		scriptConfigs.forEach((scriptConfig) => this.normalizeScriptConfig(scriptConfig));
+	}
+
+	normalizeScriptConfig(scriptConfig) {
+		if (scriptConfig.src) scriptConfig.src = this.normalizeDir(scriptConfig.src, this.config.settings.rootDir);
+		if (scriptConfig.cwd)
+			scriptConfig.cwd = this.normalizeDir(scriptConfig.cwd, this.config.settings.rootDir);
+		else
+			scriptConfig.cwd = this.config.settings.rootDir;
 	}
 }
 
