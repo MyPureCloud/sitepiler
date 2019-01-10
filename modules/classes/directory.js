@@ -60,6 +60,30 @@ class Directory {
 		}
 	}
 
+	getPage(link) {
+		if (!link || !link.startsWith(this.path)) return;
+		if (link.endsWith('/'))
+			link += 'index.html';
+
+		let targetPage;
+
+		_.some(this.pages, (page) => {
+			if (page.link.toLowerCase() === link.toLowerCase()) {
+				targetPage = page;
+				return true;
+			}
+		});
+
+		if (targetPage) return targetPage;
+
+		_.some(this.dirs, (dir) =>{
+			targetPage  = dir.getPage(link);
+			return targetPage !== undefined;
+		});
+
+		return targetPage;
+	}
+
 	analyze(recursive = true) {
 		// Find index page and get title
 		_.forOwn(this.pages, (page) => {

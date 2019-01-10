@@ -21,6 +21,7 @@ class ContextExtensions {
 		// Add extension modules
 		newContext.path = path;
 		newContext._ = _;
+		newContext.moment = require('moment-timezone');
 		// Renderer is used in the include function, not intended to be used in a page
 		// Can't require it globally outside the class due to circular dependency with renderer requiring this
 		newContext.renderer = require('./renderer');
