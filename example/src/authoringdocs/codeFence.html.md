@@ -17,7 +17,7 @@ Use three backticks to open and close a fence. The opening colons support either
 | autoCollapse | true | When `true`, the element will be displayed in its collapsed state initially. Default: `false` |
 | language | json | Syntax highlighting language. Default: `nohighlight`. See [Language names and aliases](https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases). Use the values in the right column. |
 | tabsToSpaces | 2 | When specified, replaces all tab characters in the content with the specified number of spaces. |
-| alert | primary | When specified, the code fence does not use code formatting and displays as a styled alert instead. Valid types: `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `light`, `dark`. |
+| alert | primary | When specified, the code fence does not use code formatting and displays as a styled alert instead. Valid types: `vanilla`, `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `light`, `dark`. |
 {: class="table-striped"}
 
 ## Examples
@@ -120,6 +120,10 @@ or `inline` code
 ```
 
 ### Alert Examples
+
+```{"title":"Vanilla","alert":"vanilla"}
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
+```
 
 ```{"title":"Primary","alert":"primary"}
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
