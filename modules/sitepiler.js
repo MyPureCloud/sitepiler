@@ -181,17 +181,6 @@ class Sitepiler {
 			// Process page sources
 			this.context.sitemap.analyze();
 
-			// Process styles
-			const styleStartMs = Timer.start();
-			const stylePromises = [];
-			this.config.settings.stages.compile.styleDirs.forEach((styleConfig) => {
-				stylePromises.push(processStyleConfig(
-					styleConfig.source, 
-					path.join(this.config.settings.stages.compile.outputDirs.styles, styleConfig.dest), 
-					styleConfig.recursive
-				));
-			});
-
 			// Process static content
 			startMs = Timer.start();
 			this.config.settings.stages.compile.staticDirs.forEach((sourceDir) => {
@@ -217,19 +206,30 @@ class Sitepiler {
 			this.context.sitemap.renderPages(this.context);
 			log.verbose(`Rendered content files in ${startMs.getMs()}ms`);
 
+			// Process styles
+			const styleStartMs = Timer.start();
+			const stylePromises = [];
+			this.config.settings.stages.compile.styleDirs.forEach((styleConfig) => {
+				stylePromises.push(processStyleConfig(
+					styleConfig.source, 
+					path.join(this.config.settings.stages.compile.outputDirs.styles, styleConfig.dest), 
+					styleConfig.recursive
+				));
+			});
+
 			// Wait for styles to complete
 			Promise.all(stylePromises)
 				.then(() => {
 					log.verbose(`Styles loaded in ${styleStartMs.getMs()}ms`);
+					
+					// Run scripts
+					scriptRunner.run(this.config.settings.stages.compile.postCompileScripts);
 					
 					// Complete stage
 					log.verbose(`Compile stage completed in ${compileStartMs.getMs() }ms`);
 					deferred.resolve();
 				})
 				.catch(deferred.reject);
-
-			// Run scripts
-			scriptRunner.run(this.config.settings.stages.compile.postCompileScripts);
 		} catch(err) {
 			deferred.reject(err);
 		}
