@@ -35,7 +35,7 @@ class Page {
 		// Read from disk
 		const content = fs.readFileSync(this.sourcePath, 'utf-8');
 
-		// Extract frontmatter, discard body
+		// Extract frontmatter and return body
 		const fmData = fm(content);
 		return fmData.body;
 	}
@@ -47,9 +47,10 @@ class Page {
 		// Read from disk
 		const content = fs.readFileSync(sourcePath, 'utf-8');
 
-		// Extract frontmatter, discard body
+		// Extract frontmatter
 		const fmData = fm(content);
 		_.assign(page, fmData.attributes);
+		page.frontmatterKeys = _.keys(fmData.attributes);
 
 		// Add computed page settings
 		page.filename = renderer.stripExtension(path.basename(sourcePath), '.md');
