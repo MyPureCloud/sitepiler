@@ -91,7 +91,7 @@ module.exports = function(md, name, options) {
 		let content = token.content;
 		let title = token.attrs.title || undefined;
 		let language = token.attrs.language || 'nohighlight';
-		let maxHeight = token.attrs.maxHeight;
+		let maxHeight = token.attrs.maxHeight || '550px';
 		let autoCollapse = token.attrs.autoCollapse;
 		let alertType = token.attrs.alert ? token.attrs.alert.toLowerCase() : undefined;
 		let alertIcon;
@@ -131,7 +131,7 @@ module.exports = function(md, name, options) {
 
 		const contentMarkup = alertType 
 			? `<div class="alert alert-${alertType}" role="alert">${_.escape(content)}</div>`
-			: `<pre${maxHeight ? ` style="max-height: ${token.attrs.maxHeight} !important"` : ''}><code class="lang-${language}">${_.escape(content)}</code></pre>` ;
+			: `<pre${maxHeight ? ` style="max-height: ${maxHeight} !important"` : ''}><code class="lang-${language}">${_.escape(content)}</code></pre>` ;
 
 		return `<p>
 	<div class="card fence">
