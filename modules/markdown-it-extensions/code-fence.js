@@ -131,7 +131,7 @@ module.exports = function(md, name, options) {
 
 		const contentMarkup = alertType 
 			? `<div class="alert alert-${alertType}" role="alert">${_.escape(content)}</div>`
-			: `<pre${maxHeight ? ` style="max-height: ${maxHeight} !important"` : ''}><code class="lang-${language}">${_.escape(content)}</code></pre>` ;
+			: `<pre><code class="lang-${language}" ${maxHeight ? ` style="max-height: ${maxHeight}"` : ''}>${_.escape(content)}</code></pre>` ;
 
 		return `<p>
 	<div class="card fence">
