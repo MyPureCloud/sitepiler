@@ -13,11 +13,6 @@
 
 // Code fences
 .fence {
-	pre, code {
-		margin: 0;
-		padding: 0;
-	}
-
 	.fence-body {
 		padding: 0;
 		overflow-y: auto;
@@ -29,12 +24,14 @@
 		}
 
 		pre {
+			margin: 0 !important;
 			overflow-x: auto;
-			overflow-y: none;
+			overflow-y: auto;
 		}
 
 		code {
-			padding: 3pt;
+			margin: 0 !important;
+			display: block !important;
 		}
 	}
 

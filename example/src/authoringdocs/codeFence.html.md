@@ -16,6 +16,7 @@ Use three backticks to open and close a fence. The opening colons support either
 | maxHeight | 100px | Sets the `max-height` CSS property, must include units. Create a CSS rule in the stylesheet for `.fence .fence-body pre { max-height: 500px; }` to set a global default. | 
 | autoCollapse | true | When `true`, the element will be displayed in its collapsed state initially. Default: `false` |
 | language | json | Syntax highlighting language. Default: `nohighlight`. See [Language names and aliases](https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases). Use the values in the right column. |
+| showLineNumbers | true | When `true`, line numbers will be displayed in the fence |
 | tabsToSpaces | 2 | When specified, replaces all tab characters in the content with the specified number of spaces. |
 | alert | primary | When specified, the code fence does not use code formatting and displays as a styled alert instead. Valid types: `vanilla`, `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `light`, `dark`. |
 {: class="table-striped"}
@@ -66,7 +67,7 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus 
 
 ### All config options specified
 
-``` { "title":"Test Heading", "maxHeight": "70px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2 }
+``` { "title":"Test Heading", "maxHeight": "70px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2, "showLineNumbers": true }
 {
   "key": "value",
 	"array": [
