@@ -132,11 +132,24 @@ class Renderer {
 
 		// Execute layout template
 		let template;
-		if (this.templates.layouts[page.layout]) {
+		if (this.templates.layouts[page.layout] && page.layout !== 'default') {
 			template = this.templates.layouts[page.layout];
 		} else {
-			log.warn(`Unknown template "${page.layout}", using default`);
-			template = this.templates.layouts.default;
+			// Use path default?
+			this.defaultTemplates.some((dt) => {
+				if (page.link.toLowerCase().startsWith(dt.webPath.toLowerCase()) && this.templates.layouts[dt.template]) {
+					template = this.templates.layouts[dt.template];
+					return true;
+				}
+			});
+
+			// Use "default"
+			if (!template) {
+				if (page.layout && page.layout !== 'default')
+					log.warn(`Unknown template "${page.layout}", using default`);
+
+				template = this.templates.layouts.default;
+			}
 		}
 		let output = template(context);
 

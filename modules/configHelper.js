@@ -43,6 +43,7 @@ class ConfigHelper {
 		this.setDefault(this.config, 'settings', {});
 		this.setDefault(this.config.settings, 'rootDir', process.cwd());
 		this.setDefault(this.config.settings, 'templateChangeRebuildQuietSeconds', 30);
+		this.setDefault(this.config.settings, 'defaultTemplates', []);
 		this.setDefault(this.config.settings, 'stages', {});
 		this.setDefault(this.config.settings.stages, 'data', {});
 		this.setDefault(this.config.settings.stages.data, 'scripts', []);
