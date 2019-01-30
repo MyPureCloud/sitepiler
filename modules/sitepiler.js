@@ -41,6 +41,7 @@ class Sitepiler {
 		// Set settings on renderer
 		renderer.siteSubdir = this.config.settings.siteSubdir;
 		renderer.defaultTemplates = this.config.settings.defaultTemplates;
+		renderer.setCdn(this.config.settings.cdnUriRegex, this.config.settings.cdnUri);
 
 		// Livereload
 		if (this.config.cliopts.livereload && this.config.cliopts.local) {

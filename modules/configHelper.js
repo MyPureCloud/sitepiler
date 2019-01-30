@@ -164,7 +164,7 @@ class ConfigHelper {
 		_.forOwn(config, (value, key) => {
 			if (typeof(value) == 'string') {
 				config[key] = value.replace(/\$\{(.+?)\}/gi, (match, p1, offset, string) => {
-					return this.getEnv(p1);
+					return this.getEnv(p1) || '';
 				});
 			} else {
 				this.resolveEnvVars(value);

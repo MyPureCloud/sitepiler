@@ -58,6 +58,13 @@ class Renderer {
 		md.use(require('./markdown-it-extensions/linkRenderer'), 'link renderer', internalLinkRegex);
 	}
 
+	setCdn(cdnUriRegex, cdnUri) {
+		log.info(`CDN URI: ${cdnUri}`);
+		log.info(`Using CDN regex: ${cdnUriRegex}`);
+		this.cdnUriRegex = new RegExp(cdnUriRegex, 'gi');
+		this.cdnUri = cdnUri;
+	}
+
 	compileTemplates(source, dest, originalContext) {
 		// Deep copy context
 		const context = ContextExtensions.fromContext(originalContext);
@@ -158,6 +165,13 @@ class Renderer {
 			output = output.replace(ABS_PATH_REGEX, (match, p1, p2, offset, string) => {
 				if (p2.startsWith('//')) return match;
 				return p1 + this.siteSubdir + p2;
+			});
+		}
+
+		// Use CDN
+		if (this.cdnUri && this.cdnUri !== '' && this.cdnUriRegex) {
+			output = output.replace(ABS_PATH_REGEX, (match, p1, p2, p3, offset, string) => {
+				return `${p1}${this.cdnUri}${p2}${p3}`;
 			});
 		}
 
