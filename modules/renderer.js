@@ -97,10 +97,29 @@ class Renderer {
 		paths = paths.filter((p) => p != '');
 		paths.forEach((dirname) => {
 			sitemap = sitemap.dirs[dirname];
-			context.breadcrumb.push({ 
+			let slice = { 
 				title: sitemap.title,
-				path: sitemap.path
+				path: sitemap.path,
+				crumbs: []
+			};
+			_.forOwn(sitemap.pages, (crumbPage) => {
+				if (crumbPage.filename.startsWith('index.') || crumbPage.notoc) return;
+				slice.crumbs.push({
+					title: crumbPage.title,
+					path: crumbPage.link,
+					order: crumbPage.order
+				});
 			});
+			_.forOwn(sitemap.dirs, (dir) => {
+				if (!dir.indexPage || dir.indexPage.notoc) return;
+				slice.crumbs.push({
+					title: dir.indexPage.title,
+					path: dir.indexPage.link,
+					order: dir.indexPage.order
+				});
+			});
+			slice.crumbs = _.sortBy(slice.crumbs, [ 'order', 'title']);
+			context.breadcrumb.push(slice);
 		});
 
 		// Remove last crumb if index page
