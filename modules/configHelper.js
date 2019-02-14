@@ -70,7 +70,12 @@ class ConfigHelper {
 			this.applyOverrides(this.config, configSources[i]);
 		}
 
-		// Set env vars
+		// Set env vars, skip ones with replacements on the first pass
+		_.forOwn(this.config.envVars, (value, key) => {
+			if (/\$\{\w+?\}/i.exec(value) === null)
+				this.setEnv(key, value);
+		});
+
 		_.forOwn(this.config.envVars, (value, key) => {
 			this.setEnv(key, value);
 		});
