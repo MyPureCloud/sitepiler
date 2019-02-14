@@ -228,7 +228,7 @@ class Sitepiler {
 					scriptRunner.run(this.config.settings.stages.compile.postCompileScripts);
 					
 					// Complete stage
-					log.verbose(`Compile stage completed in ${compileStartMs.getMs() }ms`);
+					log.verbose(`Compile stage completed in ${compileStartMs.getMs() }ms\x07\x07\x07`);
 					deferred.resolve();
 				})
 				.catch(deferred.reject);

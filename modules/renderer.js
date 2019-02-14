@@ -7,7 +7,7 @@ const ContextExtensions = require('./contextExtensions');
 
 const log = new (require('lognext'))('Renderer');
 
-const ABS_PATH_REGEX = /(<\s*(?:a|img|script|link)\s+.*(?:href|src)=['"])(\/.*?['"].*?>)/igm;
+const ABS_PATH_REGEX = /(<\s*(?:a|img|script|link)\s+.*?(?:href|src)=['"])(\/.*?['"].*?>)/igm;
 
 // Markdown renderer settings
 const md = new MarkdownIt({
@@ -163,7 +163,8 @@ class Renderer {
 		} else {
 			// Use path default?
 			this.defaultTemplates.some((dt) => {
-				if (page.link.toLowerCase().startsWith(dt.webPath.toLowerCase()) && this.templates.layouts[dt.template]) {
+				if ((dt.webPath && page.link.toLowerCase().startsWith(dt.webPath.toLowerCase()) && this.templates.layouts[dt.template]) ||
+				(dt.webPathRegex && (new RegExp(dt.webPathRegex, 'i')).exec(page.link))) {
 					template = this.templates.layouts[dt.template];
 					return true;
 				}
@@ -182,7 +183,7 @@ class Renderer {
 		// Add subdir
 		if (this.siteSubdir) {
 			output = output.replace(ABS_PATH_REGEX, (match, p1, p2, offset, string) => {
-				if (p2.startsWith('//')) return match;
+				if (p2.startsWith('//') || p2.toLowerCase().startsWith(this.siteSubdir)) return match;
 				return p1 + this.siteSubdir + p2;
 			});
 		}

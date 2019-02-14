@@ -185,9 +185,10 @@ function stageToInt(stage) {
 }
 
 function exit(msg) {
-	if (typeof msg === 'number')
+	if (typeof msg === 'number') {
+		log.error(`Exiting with code ${msg}`);
 		process.exit(msg);
-	else {
+	} else {
 		log.error('The application is exiting with an error!');
 		log.error(msg);
 		process.exit(msg);
