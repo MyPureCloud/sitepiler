@@ -92,7 +92,7 @@ class ContextExtensions {
 			if (!swaggerSource) swaggerSource = this.data.swagger;
 			
 			// If this is a reference, return the definition
-			if (schema['$ref']) {
+			if (schema['$ref'] && typeof(schema['$ref']) === 'string') {
 				const defName = schema['$ref'].split('/').pop();
 				// Stop resolving refs at: 
 				// 	- level 3 if the type has already been resolved
@@ -114,8 +114,9 @@ class ContextExtensions {
 					newSchema[key] = newContext.getDefinition(value, swaggerSource, truncate, resolvedTypes, value.items ? level : level + 1);
 
 					// Set model name
-					if (value['$ref'])
+					if (value['$ref'] && typeof(schema['$ref']) === 'string') {
 						newSchema[key].____modelName = value['$ref'].split('/').pop();
+					}
 				}
 			});
 			return newSchema;
