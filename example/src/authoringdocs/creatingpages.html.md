@@ -24,6 +24,7 @@ All properties specified in the frontmatter object will be available as part of 
 | title | the page's title |
 | layout | the name of the layout to use when rendering the page. Defaults to `default` if not specified. |
 | order | Override for order in siblings list. Value of 1 will be a the top of the list, bigger numbers lower. If not set, will appear sorted alphabetically below all prioritized pages. |
+| renderMarkdown | If `false`, skips rendering using markdown and only executes the template. Use for non-HTML files, like a JSON file. |
 
 ### Suggested Properties
 
