@@ -64,9 +64,6 @@ class ConfigHelper {
 		this.checkAndThrow(this.config.settings.stages.data, 'dataDirs');
 		this.checkAndThrow(this.config.settings.stages.compile, 'templateDirs');
 		this.checkAndThrow(this.config.settings.stages.compile, 'contentDirs');
-		if (!fs.existsSync(this.getEnv('WORKSPACE'))) {
-			throw new Error(`WORKSPACE "${this.getEnv('WORKSPACE')}" not found. Ensure the WORKSPACE env var is set to the path where the developer-center and sitepiler repos can be found.`);
-		}
 
 		// Apply other configs
 		for (let i = configSources.length - 1; i > 0; i--) {
@@ -85,6 +82,11 @@ class ConfigHelper {
 
 		// Resolve env vars
 		this.resolveEnvVars(this.config);
+
+		// Ensure WORKSPACE is set
+		if (!fs.existsSync(this.getEnv('WORKSPACE'))) {
+			throw new Error(`WORKSPACE "${this.getEnv('WORKSPACE')}" not found. Ensure the WORKSPACE env var is set to the path where the developer-center and sitepiler repos can be found.`);
+		}
 
 		// Normalize dirs
 		this.config.settings.stages.data.dataDirs = this.normalizeDirs(this.config.settings.stages.data.dataDirs, this.config.settings.rootDir);
