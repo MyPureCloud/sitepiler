@@ -114,7 +114,7 @@ class ContextExtensions {
 					newSchema[key] = newContext.getDefinition(value, swaggerSource, truncate, resolvedTypes, value.items ? level : level + 1);
 
 					// Set model name
-					if (value['$ref'] && typeof(schema['$ref']) === 'string') {
+					if (value['$ref'] && typeof(value['$ref']) === 'string') {
 						newSchema[key].____modelName = value['$ref'].split('/').pop();
 					}
 				}
