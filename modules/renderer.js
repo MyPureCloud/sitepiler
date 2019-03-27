@@ -25,6 +25,7 @@ md.use(require('./markdown-it-extensions/code-fence'));
 md.use(require('./markdown-it-extensions/toc'));
 md.use(require('./markdown-it-extensions/linkRenderer'), 'link renderer');
 md.use(require('./markdown-it-extensions/heading'));
+md.use(require('./markdown-it-extensions/alert'));
 
 // Set doT settings
 dot.templateSettings.varname = 'context';

@@ -94,33 +94,6 @@ module.exports = function(md, name, options) {
 		let maxHeight = token.attrs.maxHeight || '550px';
 		let autoCollapse = token.attrs.autoCollapse;
 		let showLineNumbers = token.attrs.showLineNumbers;
-		let alertType = token.attrs.alert ? token.attrs.alert.toLowerCase() : undefined;
-		let alertIcon;
-
-		if (alertType) {
-			switch(alertType.toLowerCase()) {
-				case 'primary':
-				case 'secondary':
-				case 'light':
-				case 'dark':
-				case 'info': {
-					alertIcon = 'info';
-					break;
-				}
-				case 'success': {
-					alertIcon = 'check';
-					break;
-				}
-				case 'danger': {
-					alertIcon = 'x';
-					break;
-				}
-				case 'warning': {
-					alertIcon = 'warning';
-					break;
-				}
-			}
-		}
 
 		if (token.attrs.tabsToSpaces) {
 			let spaces = '';
@@ -129,16 +102,12 @@ module.exports = function(md, name, options) {
 			}
 			content = content.replace(/\t/gi, spaces);
 		}
-
-		const contentMarkup = alertType 
-			? `<div class="alert alert-${alertType}" role="alert">${_.escape(content)}</div>`
-			: `<pre class="${showLineNumbers ? ' line-numbers' : ''}"><code class="language-${language}" ${maxHeight ? ` style="max-height: ${maxHeight}"` : ''}>${_.escape(content)}</code></pre>` ;
-
+		
 		return `<p>
 	<div class="card fence">
-		${title ? `<h5 class="card-header fence-header${alertType ? ` alert-type-${alertType}` : ''}">${alertIcon ? `<span class="oi" data-glyph="${alertIcon}"></span> ` : '' }${title}</h5>` : ''}
+		${title ? `<h5 class="card-header fence-header">${title}</h5>` : ''}
 	  <div class="card-body fence-body"${autoCollapse ? ' style="display: none"' : ''}>
-	    ${contentMarkup}
+	    <pre class="${showLineNumbers ? ' line-numbers' : ''}"><code class="language-${language}" ${maxHeight ? ` style="max-height: ${maxHeight}"` : ''}>${_.escape(content)}</code></pre>
 	  </div>
 	</div>
 </p>`;
