@@ -12,24 +12,24 @@
   "license": "MIT",
   "dependencies": {
     "clone": "^2.1.2",
-    "commander": "^2.17.1",
+    "commander": "^2.19.0",
     "dot": "^1.1.2",
     "front-matter": "^2.3.0",
-    "fs-extra": "^7.0.0",
+    "fs-extra": "^7.0.1",
     "json-schema-deref-sync": "^0.5.0",
-    "less": "^3.8.1",
-    "lodash": "^4.17.10",
+    "less": "^3.9.0",
+    "lodash": "^4.17.11",
     "lognext": "0.0.4",
     "markdown-it": "^8.4.2",
-    "moment": "^2.22.2",
+    "moment": "^2.24.0",
     "moment-timezone": "^0.5.23",
     "q": "^1.5.1",
-    "yaml": "^1.0.0-rc.8"
+    "yaml": "^1.4.0"
   },
   "devDependencies": {
     "body-parser": "^1.18.3",
-    "chokidar": "^2.0.4",
-    "express": "^4.16.3",
+    "chokidar": "^2.1.5",
+    "express": "^4.16.4",
     "livereload": "^0.7.0"
   }
 }
