@@ -1,0 +1,1 @@
+node sitepiler.js --build compile --local --livereload example/sitepiler.yml example/sitepiler-local.yml

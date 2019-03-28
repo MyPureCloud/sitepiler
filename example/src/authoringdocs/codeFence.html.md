@@ -1,5 +1,5 @@
 ---
-title: Code Fences and Alert Blocks
+title: Code Fences
 ---
 
 The extended fences plugin allows for fancy syntax-highlighted code blocks.
@@ -18,7 +18,6 @@ Use three backticks to open and close a fence. The opening colons support either
 | language | json | Syntax highlighting language. Default: `nohighlight`. See [Language names and aliases](https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases). Use the values in the right column. |
 | showLineNumbers | true | When `true`, line numbers will be displayed in the fence |
 | tabsToSpaces | 2 | When specified, replaces all tab characters in the content with the specified number of spaces. |
-| alert | primary | When specified, the code fence does not use code formatting and displays as a styled alert instead. Valid types: `vanilla`, `primary`, `secondary`, `success`, `danger`, `warning`, `info`, `light`, `dark`. |
 {: class="table-striped"}
 
 ## Examples
@@ -52,15 +51,6 @@ Specify configuration options as a JSON object.
 // Code goes here
 \```
 ```
-
-### Alerts
-
-Alerts don't use the `<pre>` or `<code>` tags and are styled based on [Bootstrap Alerts](https://getbootstrap.com/docs/4.0/components/alerts/). See [Alert Examples](#alertexamples) for all alert types. 
-
-```{"title":"Alert Title","alert":"primary"}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
-```
-
 
 
 ## More examples
@@ -118,42 +108,4 @@ let thisCode = "not highlighted";
 * Lists
 
 or `inline` code
-```
-
-### Alert Examples
-
-```{"title":"Vanilla","alert":"vanilla"}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
-```
-
-```{"title":"Primary","alert":"primary"}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
-```
-
-```{"title":"Secondary","alert":"secondary"}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
-```
-
-```{"title":"Success","alert":"success"}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
-```
-
-```{"title":"Danger","alert":"danger"}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
-```
-
-```{"title":"Warning","alert":"warning"}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
-```
-
-```{"title":"Info","alert":"info"}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
-```
-
-```{"title":"Light","alert":"light"}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
-```
-
-```{"title":"Dark","alert":"dark"}
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.
 ```

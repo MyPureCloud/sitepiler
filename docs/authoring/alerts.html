@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Alert Blocks</title>
+
+	<link rel="icon" type="image/png" sizes="32x32" href="/sitepiler/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/sitepiler/favicon-16x16.png">
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" href="/sitepiler/styles/sitepiler.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
+</head>
+<body>
+
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/sitepiler/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container layout-content">
+  <div class="row">
+    <div class="col-sm-3 layout-content-navigation">
+    	<h3>Navigation</h3>
+    	<ul class="page-list">
+    		<li class="pages-current"><a href="/sitepiler/authoring/alerts.html">Alert Blocks</a></li>
+    		<li class="pages-default"><a href="/sitepiler/authoring/markdown.html">Basic Formatting with Markdown</a></li>
+    		<li class="pages-default"><a href="/sitepiler/authoring/codeFence.html">Code Fences</a></li>
+    		<li class="pages-default"><a href="/sitepiler/authoring/creatingpages.html">Creating Pages</a></li>
+    		<li class="pages-default"><a href="/sitepiler/authoring/styles.html">Styling with LESS and CSS</a></li>
+    		<li class="pages-default"><a href="/sitepiler/authoring/table.html">Tables</a></li>
+    		<li class="pages-default"><a href="/sitepiler/authoring/templating.html">Templating</a></li>
+    	</ul>
+    </div>
+    <div class="col-sm-9 layout-content-body">
+<p class="devcenter-breadcrumb">
+	<a href="/sitepiler/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+		<a href="/sitepiler/authoring/">Authoring Content</a> > 
+	
+	Alert Blocks
+</p>
+				<h1>Alert Blocks</h1>
+
+<p>An alert block is a simple container to add some color to draw attention to its content. Alert blocks support both inline and block markdown formatting inside of it. Use three colons <code>:::</code> to open and close an alert block. Optionally, include one of the following alert types in the opener to choose the specific style of the block: <code>vanilla</code>, <code>primary</code>, <code>secondary</code>, <code>success</code>, <code>danger|error</code>, <code>warning</code>, <code>info</code>, <code>light</code>, <code>dark</code></p>
+<a href="#examples" name="examples" class="toc-link toc-link-h2"><h2>Examples<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#syntax" name="syntax" class="toc-link toc-link-h3"><h3>Syntax<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">:::primary
+This is a primary alert block
+:::
+</code></pre>
+	  </div>
+	</div>
+</p><a href="#styles" name="styles" class="toc-link toc-link-h3"><h3>Styles<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+	<div class="card fence">
+	  <div class="card-body fence-body">
+	    <div class="alert alert-vanilla" role="alert"><p><code>vanilla</code>, default style if none specified.</p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
+	    </div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+	  <div class="card-body fence-body">
+	    <div class="alert alert-primary" role="alert"><p><code>primary</code></p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
+	    </div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+	  <div class="card-body fence-body">
+	    <div class="alert alert-secondary" role="alert"><p><code>secondary</code></p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
+	    </div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+	  <div class="card-body fence-body">
+	    <div class="alert alert-success" role="alert"><p><code>success</code></p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
+	    </div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+	  <div class="card-body fence-body">
+	    <div class="alert alert-danger" role="alert"><p><code>danger</code> or <code>error</code></p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
+	    </div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+	  <div class="card-body fence-body">
+	    <div class="alert alert-warning" role="alert"><p><code>warning</code></p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
+	    </div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+	  <div class="card-body fence-body">
+	    <div class="alert alert-info" role="alert"><p><code>info</code></p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
+	    </div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+	  <div class="card-body fence-body">
+	    <div class="alert alert-light" role="alert"><p><code>light</code></p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
+	    </div>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+	  <div class="card-body fence-body">
+	    <div class="alert alert-dark" role="alert"><p><code>dark</code></p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
+	    </div>
+	  </div>
+	</div>
+</p>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

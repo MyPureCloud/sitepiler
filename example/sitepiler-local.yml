@@ -1,1 +1,7 @@
 ---
+envVars:
+  WORKSPACE: /git
+
+settings:
+  siteHost: localhost:4567
+  siteProtocol: http

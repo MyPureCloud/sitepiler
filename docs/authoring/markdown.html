@@ -51,8 +51,9 @@ $(document).ready(() => {
     <div class="col-sm-3 layout-content-navigation">
     	<h3>Navigation</h3>
     	<ul class="page-list">
+    		<li class="pages-default"><a href="/sitepiler/authoring/alerts.html">Alert Blocks</a></li>
     		<li class="pages-current"><a href="/sitepiler/authoring/markdown.html">Basic Formatting with Markdown</a></li>
-    		<li class="pages-default"><a href="/sitepiler/authoring/codeFence.html">Code Fences and Alert Blocks</a></li>
+    		<li class="pages-default"><a href="/sitepiler/authoring/codeFence.html">Code Fences</a></li>
     		<li class="pages-default"><a href="/sitepiler/authoring/creatingpages.html">Creating Pages</a></li>
     		<li class="pages-default"><a href="/sitepiler/authoring/styles.html">Styling with LESS and CSS</a></li>
     		<li class="pages-default"><a href="/sitepiler/authoring/table.html">Tables</a></li>
@@ -101,7 +102,7 @@ $(document).ready(() => {
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
-	    <pre><code class="lang-nohighlight">Here is some **bold text** inline.
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">Here is some **bold text** inline.
 </code></pre>
 	  </div>
 	</div>
@@ -110,7 +111,7 @@ $(document).ready(() => {
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
-	    <pre><code class="lang-nohighlight">Here is some _italic text_ inline.
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">Here is some _italic text_ inline.
 </code></pre>
 	  </div>
 	</div>
@@ -119,7 +120,7 @@ $(document).ready(() => {
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
-	    <pre><code class="lang-nohighlight">You can [Google](https://google.com) for answers.
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">You can [Google](https://google.com) for answers.
 </code></pre>
 	  </div>
 	</div>
@@ -131,7 +132,7 @@ is lumped together.</p>
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
-	    <pre><code class="lang-nohighlight">Text on lines without a blank line
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">Text on lines without a blank line
 is lumped together.
 
 One or more blank lines in between blocks of text
@@ -144,7 +145,7 @@ Makes it a new paragraph.
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
-	    <pre><code class="lang-nohighlight"># H1
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px"># H1
 ## H2
 ### H3
 #### H4
@@ -163,7 +164,7 @@ Makes it a new paragraph.
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
-	    <pre><code class="lang-nohighlight">![Alt text for accessibility](/img/dog-lion.png)
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">![Alt text for accessibility](/img/dog-lion.png)
 </code></pre>
 	  </div>
 	</div>
@@ -178,7 +179,7 @@ Any blockquotes can use <em>inline</em> <strong>styles</strong>.</p>
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
-	    <pre><code class="lang-nohighlight">&gt; Single line quoted text
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">&gt; Single line quoted text
 
 &gt; Linebreaks are removed in multi-line quoted text when there isn&#39;t a blank line in between.
 &gt; Any blockquotes can use _inline_ **styles**.
@@ -192,7 +193,7 @@ Any blockquotes can use <em>inline</em> <strong>styles</strong>.</p>
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
-	    <pre><code class="lang-nohighlight">Horizontal rules require a blank line preceding them.
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">Horizontal rules require a blank line preceding them.
 
 ---
 But a blank line is not required after.

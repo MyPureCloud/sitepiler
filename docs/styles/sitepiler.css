@@ -2,11 +2,6 @@
 @import url('https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css');
 @import url('https://cdnjs.cloudflare.com/ajax/libs/open-iconic/1.1.1/font/css/open-iconic.css');
 @import url('https://use.fontawesome.com/releases/v5.3.1/css/all.css');
-.fence pre,
-.fence code {
-  margin: 0;
-  padding: 0;
-}
 .fence .fence-body {
   padding: 0;
   overflow-y: auto;
@@ -16,12 +11,20 @@
   border-radius: 0;
   border: 0;
 }
-.fence .fence-body pre {
-  overflow-x: auto;
-  overflow-y: none;
+.fence .fence-body .alert code {
+  display: inline !important;
 }
-.fence .fence-body code {
-  padding: 3pt;
+.fence .fence-body .alert > p {
+  margin: 0;
+}
+.fence .fence-body pre {
+  margin: 0 !important;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+.fence .fence-body pre code {
+  margin: 0 !important;
+  display: block !important;
 }
 .fence .fence-header {
   font-style: normal;

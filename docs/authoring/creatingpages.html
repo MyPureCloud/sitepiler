@@ -51,8 +51,9 @@ $(document).ready(() => {
     <div class="col-sm-3 layout-content-navigation">
     	<h3>Navigation</h3>
     	<ul class="page-list">
+    		<li class="pages-default"><a href="/sitepiler/authoring/alerts.html">Alert Blocks</a></li>
     		<li class="pages-default"><a href="/sitepiler/authoring/markdown.html">Basic Formatting with Markdown</a></li>
-    		<li class="pages-default"><a href="/sitepiler/authoring/codeFence.html">Code Fences and Alert Blocks</a></li>
+    		<li class="pages-default"><a href="/sitepiler/authoring/codeFence.html">Code Fences</a></li>
     		<li class="pages-current"><a href="/sitepiler/authoring/creatingpages.html">Creating Pages</a></li>
     		<li class="pages-default"><a href="/sitepiler/authoring/styles.html">Styling with LESS and CSS</a></li>
     		<li class="pages-default"><a href="/sitepiler/authoring/table.html">Tables</a></li>
@@ -74,7 +75,7 @@ $(document).ready(() => {
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
-	    <pre><code class="lang-nohighlight">---
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">---
 title: A page title
 layout: layoutname
 customproperty: true
@@ -102,6 +103,10 @@ customproperty: true
 <tr>
 <td>order<br /></td>
 <td>Override for order in siblings list. Value of 1 will be a the top of the list, bigger numbers lower. If not set, will appear sorted alphabetically below all prioritized pages.<br /></td>
+</tr>
+<tr>
+<td>renderMarkdown<br /></td>
+<td>If <code>false</code>, skips rendering using markdown and only executes the template. Use for non-HTML files, like a JSON file.<br /></td>
 </tr>
 </tbody>
 </table>
