@@ -11,10 +11,6 @@ module.exports = function container_plugin(md, name, options) {
 				alertType = 'danger';
 				break;
 			}
-			case 'info': {
-				alertType = 'primary';
-				break;
-			}
 		}
 
 		return `<p>
