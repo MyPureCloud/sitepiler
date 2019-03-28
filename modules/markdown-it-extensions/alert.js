@@ -9,6 +9,11 @@ module.exports = function container_plugin(md, name, options) {
 		switch (alertType.toLowerCase()) {
 			case 'error': {
 				alertType = 'danger';
+				break;
+			}
+			case 'info': {
+				alertType = 'primary';
+				break;
 			}
 		}
 
