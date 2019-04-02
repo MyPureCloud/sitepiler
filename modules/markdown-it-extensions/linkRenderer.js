@@ -8,8 +8,9 @@ module.exports = function(md, name, options) {
 	function linkOpenRenderer(tokens, idx, _options, env, slf) {
 		const token = tokens[idx];
 		const href = getAttr(token.attrs, 'href');
+		const title = getAttr(token.attrs, 'title');
 		let isExternal = !href.match(INTERNAL_LINK_REGEX);
-		return `<a href="${href}"${isExternal ? ' target="_blank"' : ''}>`;
+		return `<a href="${href}"${isExternal ? ' target="_blank"' : ''}${title ? ` title="${title}"` : ''}>`;
 	}
 
 	function linkCloseRenderer(tokens, idx, _options, env, slf) {
