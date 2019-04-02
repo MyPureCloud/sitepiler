@@ -191,7 +191,7 @@ class Renderer {
 
 		// Use CDN
 		if (this.cdnUri && this.cdnUri !== '' && this.cdnUriRegex) {
-			output = output.replace(ABS_PATH_REGEX, (match, p1, p2, p3, offset, string) => {
+			output = output.replace(this.cdnUriRegex, (match, p1, p2, p3, offset, string) => {
 				return `${p1}${this.cdnUri}${p2}${p3}`;
 			});
 		}
