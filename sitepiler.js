@@ -191,7 +191,7 @@ function exit(msg) {
 	} else {
 		log.error('The application is exiting with an error!');
 		log.error(msg);
-		process.exit(msg);
+		process.exit(1);
 	}
 }
 
