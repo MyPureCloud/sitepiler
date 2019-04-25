@@ -62,9 +62,17 @@ class Page {
 		page.destDir = destPath.substr(0, destPath.length - path.basename(destPath).length);
 		page.destPath = path.join(page.destDir, page.filename);
 
-		// Validate page settings
+		// Set default layout
 		ConfigHelper.setDefault(page, 'layout', 'default');
-		ConfigHelper.setDefault(page, 'title', 'Default Page Title');
+
+		// Set default title
+		const firstLine = fmData.body ? fmData.body.split('\n')[0] : '';
+		if (firstLine.trim().startsWith('#')) {
+			ConfigHelper.setDefault(page, 'title', firstLine.trim().replace(/(^#*\s*)/i, ''));
+			page.hideTitle = true;
+		} else {
+			ConfigHelper.setDefault(page, 'title', 'Default Page Title');
+		}
 
 		return page;
 	}

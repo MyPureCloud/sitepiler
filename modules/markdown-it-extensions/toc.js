@@ -12,8 +12,9 @@ module.exports = function(md, name, options) {
 		var nextLine, token, lineText;
 
 		// Is TOC?
+		// Format: [toc] or :::toc:::
 		lineText = getLine(state, startLine);
-		if (lineText.trim().toLowerCase() !== ':::toc:::') return false;
+		if (!lineText.match(/^\s*(?::::|\[)toc(?::::|\])\s*$/i)) return false;
 
 		// Move past the :::TOC::: line
 		nextLine = startLine + 1;

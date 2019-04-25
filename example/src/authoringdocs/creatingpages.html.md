@@ -34,3 +34,11 @@ These properties aren't used by sitepiler directly, but are some suggested optio
 |---|---|
 | notoc | `true` to exclude from navigation |
 | ispreview | `true` to include a preview banner at the top of the site |
+| hideTitle | `true` to hide the page's title from the layout |
+
+
+## Special Behavior
+
+### Implied titles
+
+In the absense of a title in the frontmatter setting, if the first line in a page is a markdown heading, the text of the heading will be used as the page's title. The attribute `hideTitle` will also be set to `true`. The actual body of the page will remain unaffected. 

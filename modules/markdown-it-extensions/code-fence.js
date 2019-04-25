@@ -52,13 +52,34 @@ module.exports = function(md, name, options) {
 		token.attrs = attrs;
 		token.content = '';
 
+		// First line language marker --> #!java
+		if (lineText.startsWith('#!')) {
+			attrs.language = lineText.substring(2).trim();
+			startLine++;
+			nextLine++;
+			lineText = getLine(state, nextLine);
+		}
+
+		// Trim empty lines at beginning
+		while(lineText.trim() === '') {
+			startLine++;
+			nextLine++;
+			lineText = getLine(state, nextLine);
+		}
+
 		// Add content until end marker is reached
+		let emptyLines = '';
 		while(!lineText.startsWith(controlChars) && nextLine <= endLine) {
 			// Trim escaped control chars
 			if (lineText.startsWith(`\\${controlChars}`))
 				lineText = lineText.substr(1);
 
-			token.content += lineText + '\n';
+			if (lineText.trim() === '') {
+				emptyLines += '\n';
+			} else {
+				token.content += emptyLines + lineText + '\n';
+				emptyLines = '';
+			}
 
 			nextLine++;
 			lineText = getLine(state, nextLine);
