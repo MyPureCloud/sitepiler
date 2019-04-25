@@ -16,7 +16,7 @@
     "dot": "^1.1.2",
     "front-matter": "^2.3.0",
     "fs-extra": "^7.0.1",
-    "json-schema-deref-sync": "^0.5.0",
+    "json-schema-deref-sync": "^0.6.0",
     "less": "^3.9.0",
     "lodash": "^4.17.11",
     "lognext": "0.0.4",
