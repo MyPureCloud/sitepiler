@@ -94,11 +94,14 @@ class ContextExtensions {
 			// If this is a reference, return the definition
 			if (schema['$ref'] && typeof(schema['$ref']) === 'string') {
 				const defName = schema['$ref'].split('/').pop();
+
 				// Stop resolving refs at: 
 				// 	- level 3 if the type has already been resolved
 				// 	- level 6 if it's a previously unknown type
+				// 	- unknown definition
 				if ((resolvedTypes.includes(defName) && level > 3) ||
-					(!resolvedTypes.includes(defName) && truncate && level > 6)) {
+					(!resolvedTypes.includes(defName) && truncate && level > 6) || 
+					!swaggerSource.definitions[defName]) {
 					return { 'modelRef': defName };
 				} else {
 					resolvedTypes.push(defName);

@@ -48,7 +48,7 @@ class FileLoader {
 		return filters;
 	}
 
-	loadFiles(dir, target, filters, recursive = false) {
+	loadFiles(dir, target, filters, recursive = false, stripFilename = false) {
 		if (!fs.existsSync(dir)) return;
 		
 		const files = fs.readdirSync(dir);
@@ -59,7 +59,7 @@ class FileLoader {
 			if (fs.lstatSync(fullPath).isDirectory()) {
 				if (recursive) {
 					if (!target[file]) target[file] = {};
-					this.loadFiles(fullPath, target[file], filters, recursive);
+					this.loadFiles(fullPath, target[file], filters, recursive, stripFilename);
 				}
 				return;
 			}
@@ -69,7 +69,8 @@ class FileLoader {
 				// .exec() returns null if no match
 				if ((new RegExp(filter[0])).exec(file)) {
 					// Loads the file by invoking the second parameter with the full path of the file
-					target[file] = filter[1](fullPath);
+					const fileName = stripFilename ? file.substring(0, file.length - path.extname(file).length) : file;
+					target[fileName] = filter[1](fullPath);
 					return true;
 				}
 			});

@@ -114,12 +114,12 @@ class Sitepiler {
 			// Load data files
 			const tempData = {};
 			this.config.settings.stages.data.dataDirs.forEach((dataDir) => {
-				fileLoader.loadFiles(dataDir, tempData, [ fileLoader.filters.JSON, fileLoader.filters.YAML ]);
+				fileLoader.loadFiles(dataDir, tempData, [ fileLoader.filters.JSON, fileLoader.filters.YAML ], true, true);
 			});
 
 			// Copy data to context, strip extension from filename key
 			_.forOwn(tempData, (value, key) => {
-				this.context.data[key.substring(0, key.length - path.extname(key).length)] = value;
+				this.context.data[key] = value;
 			});
 
 			// Complete stage

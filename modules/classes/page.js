@@ -71,7 +71,7 @@ class Page {
 			ConfigHelper.setDefault(page, 'title', firstLine.trim().replace(/(^#*\s*)/i, ''));
 			page.hideTitle = true;
 		} else {
-			ConfigHelper.setDefault(page, 'title', 'Default Page Title');
+			ConfigHelper.setDefault(page, 'title', titleize(page.filename.replace(/\.html$/i, '')));
 		}
 
 		return page;
@@ -80,3 +80,23 @@ class Page {
 
 
 module.exports = Page;
+
+
+
+function titleize(title) {
+	const noCapWords = [ 'and', 'or', 'to', 'a', 'an' ];
+	title = title.replace(/[-_.]/gi, ' ');
+	const parts = title.split(' ');
+	title = '';
+	parts.forEach((part) => {
+		if (noCapWords.indexOf(part.toLowerCase()) >= 0) {
+			title += part;
+		} else {
+			title += part.substring(0, 1).toUpperCase();
+			if (part.length > 1)
+				title += part.substr(1);
+		}
+		title += ' ';
+	});
+	return title;
+}
