@@ -81,6 +81,18 @@ class ContextExtensions {
 		};
 		newContext.getEnv.bind(newContext);
 
+		// Get sitemap starting from current dir
+		newContext.getRelativeSitemap = function() {
+			let sitemap = newContext.sitemap;
+			let page = newContext.page;
+			let dirs = page.path.split('/').filter(val => val && val !== '');
+			dirs.forEach((dir) => {
+				sitemap = sitemap.dirs[dir];
+			});
+			return sitemap;
+		};
+		newContext.getEnv.bind(newContext);
+
 		/** Swagger Helpers **/
 		//TODO: Move this to the dev center project. It's project-specific.
 		// For some reason, bind isn't working to set the context of `this` in the functions. The 
