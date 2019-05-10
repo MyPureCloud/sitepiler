@@ -176,7 +176,8 @@ class Sitepiler {
 					sourceDir.source, 
 					this.config.settings.stages.compile.outputDirs.content, 
 					sourceDir.dest, 
-					this.context.sitemap);
+					this.context.sitemap,
+					this.config.settings.ignoreKeys);
 			});
 			log.verbose(`Content loaded in ${startMs.getMs()}ms`);
 
@@ -273,7 +274,7 @@ module.exports = Sitepiler;
 
 
 
-function loadSources(sourceDir, outputRoot, relativePath, directory) {
+function loadSources(sourceDir, outputRoot, relativePath, directory, ignoreKeys) {
 	const outputDir = path.join(outputRoot, relativePath);
 
 	// Load dir content
@@ -281,22 +282,37 @@ function loadSources(sourceDir, outputRoot, relativePath, directory) {
 
 	// Process each content page
 	dirContents.files.forEach((file) => {
-		const wasAdded = directory.addPage(
-			Page.load(
-				path.join(sourceDir, file), 
-				path.join(outputDir, file), 
-				relativePath
-			)
+		// Load page
+		const page = Page.load(
+			path.join(sourceDir, file), 
+			path.join(outputDir, file), 
+			relativePath
 		);
-		if (!wasAdded)
+
+		// Process ignore rules
+		const pageKeys = _.keys(page).map(v=>v.toLowerCase());
+		let doIgnore = false;
+		ignoreKeys.map(v=>v.toLowerCase()).forEach((key) => {
+			if (page[key] === true && pageKeys.includes(key)) doIgnore = true;
+		});
+		if (doIgnore) {
+			log.warn(`Page ignored: ${path.join(directory.path, file)}`);
+			return;
+		}
+		
+		// Add to sitemap
+		const wasAdded = directory.addPage(page);
+		if (!wasAdded) {
 			log.warn('Failed to add page to directory structure! Page path: ' + path.join(directory.path, file));
+			return;
+		}
 	});
 
 	// Recurse each subdir
 	dirContents.dirs.forEach((dir) => {
 		if (!directory.dirs[dir])
 			directory.dirs[dir] = Directory.fromPath(path.join(directory.path, dir));
-		loadSources(path.join(sourceDir, dir), outputRoot, path.join(relativePath, dir), directory.dirs[dir]);
+		loadSources(path.join(sourceDir, dir), outputRoot, path.join(relativePath, dir), directory.dirs[dir], ignoreKeys);
 	});
 }
 

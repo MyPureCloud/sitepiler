@@ -16,6 +16,11 @@ settings:
   # Causes the local server to serve files under this subdirectory and prepends the subdirectory 
   # to all absolute paths found in href and src attributes on a, img, script, and link tags
   siteSubdir: sitepiler
+
+  # Frontmatter tags that if true, will not load the page into the site
+  ignoreKeys:
+  - private
+  - hidden
   
   # Stage configuration
   stages:
