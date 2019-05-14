@@ -159,6 +159,8 @@ if (cli.build) {
 function runLocalServer() {
 	if (cli.local) {
 		// Run local server
+		sitepiler.enableLiveReload();
+		log.info('Starting local server');
 		const EditorServer = require('./modules/editor/server');
 		server = new EditorServer(sitepiler, cli.localPort);
 		server.start();

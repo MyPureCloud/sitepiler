@@ -43,8 +43,14 @@ class Sitepiler {
 		renderer.defaultTemplates = this.config.settings.defaultTemplates;
 		renderer.setCdn(this.config.settings.cdnUriRegex, this.config.settings.cdnUri);
 
+		// Configure script runner
+		scriptRunner.setIsLocal(this.config.cliopts.local);
+	}
+
+	enableLiveReload() {
 		// Livereload
 		if (this.config.cliopts.livereload && this.config.cliopts.local) {
+			log.info('Starting livereload servier...');
 			this.livereloadServer = livereload.createServer({
 				port: this.config.cliopts.livereloadPort	
 			}, 
@@ -55,6 +61,7 @@ class Sitepiler {
 			this.livereloadServer.watch(watchPaths);
 
 			// Monitor sources to trigger individual page rebuilds
+			log.info('Starting watches on source paths...');
 			watchPaths = [];
 			this.config.settings.stages.compile.contentDirs.forEach((contentDir) => watchPaths.push(contentDir.source));
 			this.sourceWatcher = chokidar.watch(watchPaths, {
@@ -64,6 +71,7 @@ class Sitepiler {
 			this.sourceWatcher.on('all', sourceWatcherEvent.bind(this));
 
 			// Monitor templates and styles to trigger full rebuild
+			log.info('Starting watches on template paths...');
 			watchPaths = [];
 			this.config.settings.stages.compile.templateDirs.layouts.forEach((templateDir) => watchPaths.push(templateDir));
 			this.config.settings.stages.compile.templateDirs.partials.forEach((templateDir) => watchPaths.push(templateDir));
@@ -73,10 +81,12 @@ class Sitepiler {
 				ignoreInitial: true
 			});
 			this.templateWatcher.on('all', templateWatcherEvent.bind(this));
-		}
 
-		// Configure script runner
-		scriptRunner.setIsLocal(this.config.cliopts.local);
+			log.info('Livereload initialization complete');
+			log.info('Large sites may cause an error "EMFILE: too many open files". This is a limitation of the OS and cannot be avoided. Remove the "--livereload" option from sitepiler\'s invocation to disable this feature.');
+		} else {
+			log.info('Livereload is not enabled');
+		}
 	}
 
 	// These props should be cleared when a full recompile is triggered
@@ -335,6 +345,7 @@ function processStyleConfig(sourceDir, outputDir, recursive) {
 	const deferred = Q.defer();
 
 	let styleSource = {};
+	log.debug(`sourceDir: ${sourceDir}`);
 	fileLoader.loadFiles(sourceDir, styleSource, [ fileLoader.filters.STYLES ], false);
 
 	const promises = [];
@@ -343,12 +354,14 @@ function processStyleConfig(sourceDir, outputDir, recursive) {
 			log.verbose(`Rendering LESS file ${key}`);
 			promises.push(less.render(value, { paths: [ sourceDir ] })
 				.then((output) => {
+					log.debug('Rendered file');
 					const outPath = path.join(outputDir, key.replace('.less', '.css'));
 					log.verbose('Writing less file: ', outPath);
 					fs.ensureDirSync(outputDir);
 					fs.writeFileSync(outPath, output.css, 'utf-8');
 				})
 				.catch((err) => {
+					log.debug('Error rendering file');
 					if (err.constructor.name === 'LessError') {
 						// The LESS renderer throws a custom object that is not a standard JS error
 						log.error(`${err.message} [${path.basename(err.filename)} (via ${key}) >> line: ${err.line}, column: ${err.column}, index: ${err.index}]`);
