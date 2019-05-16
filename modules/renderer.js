@@ -140,7 +140,8 @@ class Renderer {
 				title: dir.title,
 				link: dir.path,
 				isCurrentPage: false,
-				order: dir.indexPage ? dir.indexPage.order : undefined
+				order: dir.indexPage ? dir.indexPage.order : undefined,
+				notoc: dir.indexPage ? dir.indexPage.notoc : undefined
 			});
 		});
 
