@@ -79,9 +79,8 @@ $(document).ready(() => {
 <li class="toc-list-3"><a href="#configuration_object">Configuration Object</a></li>
 <li class="toc-list-2"><a href="#more_examples">More examples</a></li>
 <li class="toc-list-3"><a href="#all_config_options_specified">All config options specified</a></li>
-<li class="toc-list-3"><a href="#plain_ol__title">Plain ol' title</a></li>
 <li class="toc-list-3"><a href="#title_and_language">Title and language</a></li>
-<li class="toc-list-3"><a href="#no_title__highlighting_turned_off">No title, highlighting turned off</a></li>
+<li class="toc-list-3"><a href="#no_title_or_language__highlighting_turned_off">No title or language, highlighting turned off</a></li>
 </ul>
 <a href="#fence_options" name="fence_options" class="toc-link toc-link-h2"><h2>Fence Options<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><p>Use three backticks to open and close a fence. The opening backticks support either a <a href="https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases" target="_blank">language name</a> or a JSON configuration object on the same line directly following the backticks. The following options are supported:</p>
 <table class="table table-striped">
@@ -153,13 +152,21 @@ String str = &quot;my string&quot;;
 	<div class="card fence">
 		<h5 class="card-header fence-header">Test Heading</h5>
 	  <div class="card-body fence-body" style="display: none">
-	    <pre class=""><code class="language-json"  style="max-height: 30px">``` { &quot;title&quot;:&quot;Test Heading&quot;, &quot;maxHeight&quot;: &quot;30px&quot;, &quot;autoCollapse&quot;: true, &quot;language&quot;: &quot;json&quot;, &quot;tabsToSpaces&quot;: 2 }
+	    <pre class=""><code class="language-json"  style="max-height: 30px">```{ &quot;title&quot;:&quot;Test Heading&quot;, &quot;maxHeight&quot;: &quot;30px&quot;, &quot;autoCollapse&quot;: true, &quot;language&quot;: &quot;json&quot;, &quot;tabsToSpaces&quot;: 2 }
 // Code goes here
 ```
 </code></pre>
 	  </div>
 	</div>
 </p><a href="#more_examples" name="more_examples" class="toc-link toc-link-h2"><h2>More examples<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#all_config_options_specified" name="all_config_options_specified" class="toc-link toc-link-h3"><h3>All config options specified<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">```{ &quot;title&quot;:&quot;Test Heading&quot;, &quot;maxHeight&quot;: &quot;70px&quot;, &quot;autoCollapse&quot;: true, &quot;language&quot;: &quot;json&quot;, &quot;tabsToSpaces&quot;: 2, &quot;showLineNumbers&quot;: true }
+</code></pre>
+	  </div>
+	</div>
+</p><p>
 	<div class="card fence">
 		<h5 class="card-header fence-header">Test Heading</h5>
 	  <div class="card-body fence-body" style="display: none">
@@ -175,23 +182,15 @@ String str = &quot;my string&quot;;
 </code></pre>
 	  </div>
 	</div>
-</p><a href="#plain_ol__title" name="plain_ol__title" class="toc-link toc-link-h3"><h3>Plain ol' title<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+</p><a href="#title_and_language" name="title_and_language" class="toc-link toc-link-h3"><h3>Title and language<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
-	    <pre class=""><code class="language-Language unspecified"  style="max-height: 550px">const rp = require(&#39;request-promise&#39;);
-
-rp(&#39;http://www.google.com&#39;)
-  .then(function (htmlString) {
-    // Process html...
-  })
-  .catch(function (err) {
-    // Crawling failed...
-  });
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">```{ &quot;title&quot;: &quot;JavaScript&quot;, &quot;language&quot;: &quot;javascript&quot;}
 </code></pre>
 	  </div>
 	</div>
-</p><a href="#title_and_language" name="title_and_language" class="toc-link toc-link-h3"><h3>Title and language<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+</p><p>
 	<div class="card fence">
 		<h5 class="card-header fence-header">JavaScript</h5>
 	  <div class="card-body fence-body">
@@ -207,7 +206,15 @@ rp(&#39;http://www.google.com&#39;)
 </code></pre>
 	  </div>
 	</div>
-</p><a href="#no_title__highlighting_turned_off" name="no_title__highlighting_turned_off" class="toc-link toc-link-h3"><h3>No title, highlighting turned off<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+</p><a href="#no_title_or_language__highlighting_turned_off" name="no_title_or_language__highlighting_turned_off" class="toc-link toc-link-h3"><h3>No title or language, highlighting turned off<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">```{ &quot;language&quot;: &quot;nohighlight&quot; }
+</code></pre>
+	  </div>
+	</div>
+</p><p>
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">

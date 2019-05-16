@@ -47,8 +47,8 @@ String str = "my string";
 
 Specify configuration options as a JSON object.
 
-``` { "title":"Test Heading", "maxHeight": "30px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2 }
-\``` { "title":"Test Heading", "maxHeight": "30px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2 }
+```{ "title":"Test Heading", "maxHeight": "30px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2 }
+\```{ "title":"Test Heading", "maxHeight": "30px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2 }
 // Code goes here
 \```
 ```
@@ -58,7 +58,11 @@ Specify configuration options as a JSON object.
 
 ### All config options specified
 
-``` { "title":"Test Heading", "maxHeight": "70px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2, "showLineNumbers": true }
+```
+\```{ "title":"Test Heading", "maxHeight": "70px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2, "showLineNumbers": true }
+```
+
+```{ "title":"Test Heading", "maxHeight": "70px", "autoCollapse": true, "language": "json", "tabsToSpaces": 2, "showLineNumbers": true }
 {
   "key": "value",
 	"array": [
@@ -70,23 +74,13 @@ Specify configuration options as a JSON object.
 }
 ```
 
-### Plain ol' title
-
-``` Language unspecified
-const rp = require('request-promise');
-
-rp('http://www.google.com')
-  .then(function (htmlString) {
-    // Process html...
-  })
-  .catch(function (err) {
-    // Crawling failed...
-  });
-```
-
 ### Title and language
 
-``` { "title": "JavaScript", "language": "javascript"}
+```
+\```{ "title": "JavaScript", "language": "javascript"}
+```
+
+```{ "title": "JavaScript", "language": "javascript"}
 const rp = require('request-promise');
 
 rp('http://www.google.com')
@@ -98,9 +92,13 @@ rp('http://www.google.com')
   });
 ```
 
-### No title, highlighting turned off
+### No title or language, highlighting turned off
 
-``` { "language": "nohighlight" }
+```
+\```{ "language": "nohighlight" }
+```
+
+```{ "language": "nohighlight" }
 let thisCode = "not highlighted";
 
 ## Markdown just displays unrendered
