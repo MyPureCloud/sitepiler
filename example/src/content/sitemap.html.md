@@ -2,11 +2,29 @@
 title: Sitemap
 ---
 
-{{## def.printPages = (context, sitemap, output = '') => {
-	context._.forOwn(sitemap.pages, (page) => output += `* [${context.path.join(page.path, page.filename)}](${context.path.join(page.path, page.filename)} (${page.title}))\n`);
-	context._.forOwn(sitemap.dirs, (value, key) => output = context.printPages(context, value, output));
-	return output;
-}
-#}}
+Check out this page's [source code](https://github.com/purecloudlabs/sitepiler/blob/master/example/src/content/sitemap.html.md) to see how to generate this sitemap dynamically!
 
-{{= context.printPages(context, context.sitemap) }}
+{{ 
+function printPages(sitemap, levels, indent = 0) {
+	if (levels < 1) return;
+	context._.forOwn(sitemap.pages, (page) => { 
+		if (page.filename === 'index.html') return;
+		for (i=0; i<indent; i++) {
+			}}  {{
+		}
+		}}* [{{= page.title}}]({{= encodeURI(page.link) }})
+{{
+	});
+
+	context._.forOwn(sitemap.dirs, (dir) => {
+		for (i=0; i<indent; i++) {
+			}}  {{
+		}
+		}}* [{{= dir.indexPage.title}}]({{= encodeURI(dir.indexPage.link) }})
+{{
+		printPages(dir, levels - 1, indent + 1);
+	});
+}
+
+printPages(context.getRelativeSitemap(), 3);
+}}

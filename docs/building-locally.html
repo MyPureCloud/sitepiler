@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Building Locally</title>
+
+	<link rel="icon" type="image/png" sizes="32x32" href="/sitepiler/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/sitepiler/favicon-16x16.png">
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	
+	<link rel="stylesheet" href="/sitepiler/styles/sitepiler.css">
+
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+
+	<!-- Code fence style and collapser -->
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/styles/default.min.css">
+	<script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.13.1/build/highlight.min.js"></script>
+
+	<script type="text/javascript">
+/* globals hljs */
+
+hljs.initHighlightingOnLoad();
+
+$(document).ready(() => {
+	$('.fence > .fence-header').click(function(event) {
+		event.preventDefault();
+		$(this).parent().children('.fence-body').toggle({ easing: 'linear', duration: 300 });
+	});
+});
+	</script>
+	<!-- END Code fence style and collapser -->
+
+
+	<script>document.write('<script src="http://' + (location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1"></' + 'script>');</script>
+</head>
+<body>
+
+<div class="jumbotron layout-header">
+	<div class="container">
+	  <div class="row">
+	    <div class="col-sm">
+				<a href="/sitepiler/"><i class="fas fa-hand-lizard fa-3x fa-flip-horizontal"></i></a>
+				<span class="layout-header-title">Sitepiler</span>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="container layout-content">
+  <div class="row">
+    <div class="col-sm-3 layout-content-navigation">
+    	<h3>Navigation</h3>
+    	<ul class="page-list">
+    		<li class="pages-default"><a href="/sitepiler/authoring/">Authoring Content</a></li>
+    		<li class="pages-current"><a href="/sitepiler/building-locally.html">Building Locally</a></li>
+    		<li class="pages-default"><a href="/sitepiler/examples/">Example Pages</a></li>
+    		<li class="pages-default"><a href="/sitepiler/sitemap.html">Sitemap</a></li>
+    	</ul>
+    </div>
+    <div class="col-sm-9 layout-content-body">
+<p class="devcenter-breadcrumb">
+	<a href="/sitepiler/"><i class="fas fa-hand-lizard fa-flip-horizontal"></i></a> >
+	
+	Building Locally
+</p>
+				<h1>Building Locally</h1>
+
+<a href="#tl_dr" name="tl_dr" class="toc-link toc-link-h1"><h1>TL;DR<span class="oi toc-link-icon" data-glyph="link-intact"></span></h1></a><p>To build this example site and serve it locally, clone the <a href="" target="_blank">sitepiler</a> repo and run:</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre class=""><code class="language-sh"  style="max-height: 550px">npm i
+sh build-local.sh
+</code></pre>
+	  </div>
+	</div>
+</p><p>Then visit <a href="http://localhost:4567/sitepiler/" target="_blank">http://localhost:4567/sitepiler/</a> in your browser.</p>
+<a href="#command_line_options" name="command_line_options" class="toc-link toc-link-h1"><h1>Command Line Options<span class="oi toc-link-icon" data-glyph="link-intact"></span></h1></a><p>Invoking sitepiler without options will display the CLI options:</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">Usage: sitepiler [options] &lt;configFiles ...&gt;
+
+Options:
+  -b --build &lt;stage&gt;       Build to target (data|compile|publish)
+  -o --buildOnly &lt;stage&gt;   Build a single stage (data|compile|publish)
+  -l --local               Serve the page locally
+  -p --localPort &lt;n&gt;       Port for serving the page locally (default: 4567)
+  -r --livereload          Enable livereload server when serving locally
+  -r --livereloadPort &lt;n&gt;  Custom livereload server port (default: 35729)
+  -t --tracing &lt;level&gt;     Tracing level (error|warn|info|verbose|debug|silly) (default: &quot;debug&quot;)
+  -v, --version            output the version number
+  -h, --help               output usage information
+</code></pre>
+	  </div>
+	</div>
+</p><p>When developing locally, this would be a common invocation of sitepiler:</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre class=""><code class="language-sh"  style="max-height: 550px">node sitepiler.js --build compile --local --livereload example/sitepiler.yml example/sitepiler-local.yml
+</code></pre>
+	  </div>
+	</div>
+</p>
+
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
