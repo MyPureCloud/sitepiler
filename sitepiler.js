@@ -10,6 +10,7 @@ const TARGET_REGEX_STRING = 'data|compile|publish';
 const TARGET_REGEX = new RegExp('^(' + TARGET_REGEX_STRING + ')$', 'i');
 const LOG_LEVEL_REGEX_STRING = 'error|warn|info|verbose|debug|silly';
 const LOG_LEVEL_REGEX = new RegExp('^(' + LOG_LEVEL_REGEX_STRING + ')$', 'i');
+let log;
 
 
 
@@ -36,7 +37,7 @@ if (!process.argv.slice(2).length) {
 /*** App starts here ***/
 
 // Initialize logger first, then load local modules
-const log = new (require('lognext'))('cli');
+log = new (require('lognext'))('cli');
 global.logLevel = cli.tracing;
 log.setLogLevel(global.logLevel);
 
@@ -188,7 +189,8 @@ function stageToInt(stage) {
 
 function exit(msg) {
 	if (typeof msg === 'number') {
-		log.error(`Exiting with code ${msg}`);
+		if (log && msg !== 0)
+			log.error(`Exiting with code ${msg}`);
 		process.exit(msg);
 	} else {
 		log.error('The application is exiting with an error!');
