@@ -100,7 +100,7 @@ module.exports = function(md, name, options) {
 		if (text.startsWith('{')) {
 			attrs = JSON.parse(text);
 		} else {
-			attrs.title = text;
+			attrs.language = text;
 		}
 
 		return attrs;

@@ -8,7 +8,7 @@ The extended fences plugin allows for fancy syntax-highlighted code blocks.
 
 ## Fence Options
 
-Use three backticks to open and close a fence. The opening colons support either a title or a JSON configuration object on the same line directly following the colons. The following options are supported:
+Use three backticks to open and close a fence. The opening backticks support either a [language name](https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html#language-names-and-aliases) or a JSON configuration object on the same line directly following the backticks. The following options are supported:
 
 | Option | Example | Description |
 |--------|---------|-------------|
@@ -32,13 +32,14 @@ This is the standard markdown code fence. Code highlighting is disabled by defau
 \```
 ```
 
-### Title only
+### Language only
 
-Provide a title for the code block.
+Provide a language for the code block.
 
-``` Some Title Text
-\``` Some Title Text
+```
+\```java
 // Code goes here
+String str = "my string";
 \```
 ```
 
