@@ -62,15 +62,54 @@ class Bitbucket {
 		});
 	}
 
-	listFiles(owner, repo, target, path) {
+	listFiles(owner, repo, branch, path) {
 		return new Promise((resolve, reject) => {
 			this.axios
-				.get(`https://${this.host}/2.0/repositories/${owner}/${repo}/src/${target}/${path || ''}`, {
+				.get(`https://${this.host}/2.0/repositories/${owner}/${repo}/src/${branch}/${path || ''}`, {
 					params: {
 						pagelen: 100
 					}
 				})
 				.then((response) => {
+					resolve(response.data.values || response.data);
+				})
+				.catch((err) => this._handleApiError(err, reject));
+		});
+	}
+
+	commitFile(owner, repo, branch, path, content) {
+		return new Promise((resolve, reject) => {
+			const params = new URLSearchParams();
+			params.append('branch', branch);
+			params.append(path, content);
+			params.append('message', 'Committed with Yetitor');
+			this.axios
+				.post(`https://${this.host}/2.0/repositories/${owner}/${repo}/src`, params, {
+					headers: {
+						'content-type': 'application/x-www-form-urlencoded'
+					}
+				})
+				.then((response) => {
+					console.log(response);
+					resolve(response.data.values || response.data);
+				})
+				.catch((err) => this._handleApiError(err, reject));
+		});
+	}
+
+	createPullRequest(owner, repo, branch) {
+		return new Promise((resolve, reject) => {
+			this.axios
+				.post(`https://${this.host}/2.0/repositories/${owner}/${repo}/pullrequests`, {
+					title: 'PR created by Yetitor',
+					source: {
+						branch: {
+							name: branch
+						}
+					}
+				})
+				.then((response) => {
+					console.log(response);
 					resolve(response.data.values || response.data);
 				})
 				.catch((err) => this._handleApiError(err, reject));

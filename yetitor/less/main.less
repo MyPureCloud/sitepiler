@@ -13,6 +13,20 @@ body {
 	font-family: 'Roboto', sans-serif;
 }
 
+#yeti {
+	background-image: url(/images/yeti.png);
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-position: top;
+	background-position-y: 65px;
+	opacity: 0.1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
 .yetitor-header {
 	background-color: @charcoal;
 	color: @orange;
@@ -68,6 +82,7 @@ body {
 }
 
 .yetitor-subheader {
+	display: none;
 	font-size: 19px;
 	color: @black;
 	height: 60px;
@@ -75,7 +90,7 @@ body {
 
 	.subheader-text {
 		position: relative;
-		top: 16px;
+		top: 13px;
 
 		.title {
 		}
@@ -85,10 +100,42 @@ body {
 			font-size: 16px;
 			padding-left: 10px;
 		}
+		.editor-buttons {
+			background-color: #f0f0f0;
+			padding: 3px 7px;
+			border-radius: 5px;
+			display: inline-block;
+			margin: 0 30px;
+
+			i {
+				color: @orange;
+				cursor: pointer;
+				top: 2px;
+				position: relative;
+				font-size: 22px;
+				margin: 0 5px;
+			}
+
+			img {
+				height: 22px;
+				top: -1px;
+				position: relative;
+				margin: 0 5px;
+				cursor: pointer;
+			}
+		}
+
+		#subheader-alert {
+			display: none;
+			font-size: 15px;
+			margin: 0;
+			padding: 4px 12px;
+		}
 	}
 }
 
 .output-container {
+	display: none;
 	position: absolute;
 	top: 120px;
 	bottom: 0;
@@ -108,6 +155,7 @@ body {
 }
 
 #ace-editor {
+	display: none;
 	position: absolute;
 	top: 120px;
 	bottom: 0;
@@ -224,6 +272,18 @@ body {
 	#file-tree-root {
 		display: block;
 	}
+
+	#help-frame {
+		border: 0;
+		width: 400px;
+		height: 93%;
+		padding: 0;
+		position: absolute;
+		top: 7%;
+		bottom: 0;
+		right: 0;
+		left: 0;
+	}
 }
 
 #render-error {
@@ -233,6 +293,33 @@ body {
 
 .hidden {
 	display: none;
+}
+
+.search-container {
+	margin-top: 15px;
+	margin-bottom: 15px;
+
+	i {
+		border-radius: 20px 0 0px 20px;
+		background-color: @orange;
+		padding: 7px 9px;
+	}
+
+	input {
+		&,
+		&:focus,
+		&:active {
+			width: 100%;
+			padding: 4px 9px 3px 9px;
+			margin: 0;
+			font-size: 14px;
+			border-radius: 0 20px 20px 0;
+			border: 0;
+			height: auto;
+			outline: 0;
+			box-shadow: none;
+		}
+	}
 }
 
 @import 'spinner.less';

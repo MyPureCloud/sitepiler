@@ -63,11 +63,20 @@
 				axios
 					.get('/default.dot')
 					.then((template) => {
-						console.log(template);
+						// Render templates
 						const templates = {
 							'default.dot': template.data
 						};
 						RendererLib.renderer.compileTemplates(templates, RendererLib.renderer.templates.layouts, context);
+
+						return axios.get('/help.html.md');
+					})
+					.then((content) => {
+						// Render help file
+						console.log(content);
+						const page = RendererLib.Page.load(content.data, 'help.html.md', `output/help.html`, '/');
+						let output = RendererLib.renderer.renderContent(page, context);
+						document.getElementById('help-frame').src = `data:text/html;charset=utf-8,${escape(output)}`;
 					})
 					.catch(console.error);
 
@@ -90,6 +99,8 @@
 				$('#repo-list li').click((evt) => {
 					setRepo($(evt.target).text());
 				});
+				$('#save-button').click(commitFile);
+				$('#create-pr-button').click(createPullRequest);
 
 				$(document).on('click', '.file-tree .directory', (evt) => {
 					let directory = $(evt.target);
@@ -118,6 +129,8 @@
 							.addClass('fa-caret-down');
 					}
 				});
+
+				showSidebar('repos');
 			});
 
 			$(document).on('click', '.file-tree .file', (evt) => {
@@ -129,6 +142,10 @@
 					.listFiles('inindca', selectedRepo, selectedBranch, pathInfo.fullPath)
 					.then((contents) => {
 						showSidebar();
+						$('#ace-editor').show();
+						$('.output-container').show();
+						$('.yetitor-subheader').show();
+						$('#yeti').hide();
 						if (typeof contents === 'object') contents = JSON.stringify(contents, null, 2);
 						// Extract page title
 						const match = contents.match(/^---[\s\S]+title:(.+)[\s\S]+---/im);
@@ -137,6 +154,11 @@
 						$('.subheader-text .title').text(title.trim());
 						$('.subheader-text .filename').text(pathInfo.fullPath);
 						editor.session.setValue(contents);
+						if (!pathInfo.name.endsWith('.md')) {
+							showSubheaderAlert('Non-markdown content will not be rendered', 'warning');
+						} else {
+							showSubheaderAlert();
+						}
 					})
 					.catch(console.error);
 			});
@@ -249,12 +271,11 @@
 				try {
 					$('#render-error').hide();
 					const pathInfo = parsePath($('.subheader-text .filename').text());
-					// if (!pathInfo.fullPath.endsWith('.md')) {
-					// 	console.log("I ain't gonna render that!");
-					// 	// $('.output-container').empty();
-					// 	document.getElementById('output-frame').src = `data:text/html;charset=utf-8,`;
-					// 	return;
-					// }
+					// TODO: consider a better way to avoid attempting to render non-markdown files
+					if (!pathInfo.fullPath.endsWith('.md')) {
+						document.getElementById('output-frame').src = `data:text/html;charset=utf-8,`;
+						return;
+					}
 					const content = editor.getValue();
 					if (!content || content.trim() === '') {
 						document.getElementById('output-frame').src = `data:text/html;charset=utf-8,`;
@@ -262,8 +283,8 @@
 					}
 					const page = RendererLib.Page.load(content, pathInfo.fullPath, `output/${pathInfo.fullPath}`, '/');
 					let output = RendererLib.renderer.renderContent(page, context);
-					// $('.output-container').html(output);
 					document.getElementById('output-frame').src = `data:text/html;charset=utf-8,${escape(output)}`;
+					$('.subheader-text .title').text(page.title);
 				} catch (err) {
 					console.error(err);
 					$('#render-error').text(`Render error: ${err.message || err}`);
@@ -278,6 +299,22 @@
 					editor.renderer.layerConfig.maxHeight - editor.renderer.$size.scrollerHeight + editor.renderer.scrollMargin.bottom;
 				const outputTarget = (scrollTop / editorHeight) * outputHeight;
 				$('.output-container').scrollTop(outputTarget);
+			}
+
+			let subheaderAlertTimeout;
+			function showSubheaderAlert(message, type, timeout) {
+				if (message) {
+					$('#subheader-alert').html(message);
+					$('#subheader-alert').removeClass();
+					$('#subheader-alert').addClass(`alert alert-${type}`);
+					$('#subheader-alert').css('display', 'inline-block');
+					if (timeout) {
+						if (subheaderAlertTimeout) clearTimeout(subheaderAlertTimeout);
+						subheaderAlertTimeout = setTimeout(() => $('#subheader-alert').css('display', 'none'), timeout);
+					}
+				} else {
+					$('#subheader-alert').css('display', 'none');
+				}
 			}
 
 			/*** BITBUCKET STUFF ***/
@@ -356,10 +393,34 @@
 							.remove('.lds-spinner');
 					});
 			}
+
+			function commitFile() {
+				console.log('saving file');
+				bitbucket
+					.commitFile('inindca', selectedRepo, selectedBranch, $('.subheader-text .filename').text(), editor.getValue())
+					.then((response) => {
+						console.log(response);
+						showSubheaderAlert('File saved successfully', 'success', 3000);
+					})
+					.catch(console.error);
+			}
+
+			function createPullRequest() {
+				console.log('opening new PR');
+				bitbucket
+					.createPullRequest('inindca', selectedRepo, selectedBranch)
+					.then((response) => {
+						console.log(response);
+						const prLink = `https://bitbucket.org/inindca/api-central/pull-requests/${response.id}`;
+						showSubheaderAlert(`Pull request created: <a href="${prLink}" target="_blank">${prLink}</a>`, 'success', 30000);
+					})
+					.catch(console.error);
+			}
 		</script>
 	</head>
 
 	<body>
+		<div id="yeti"></div>
 		<div class="container-fluid">
 			<!-- [[ HEADER ]] -->
 			<div class="row yetitor-header">
@@ -391,7 +452,7 @@
 						</div>
 					</a>
 					<a href="#" id="choose-file">
-						<i class="far fa-file"></i>
+						<i class="fas fa-file"></i>
 						<span>File Browser</span>
 					</a>
 					<a href="#" id="show-help"><i class="fas fa-question-circle"></i></a>
@@ -402,6 +463,12 @@
 					<div class="subheader-text">
 						<span class="title"></span>
 						<span class="filename"></span>
+						<div class="editor-buttons">
+							<i id="save-button" title="Commit (save)" class="fas fa-save"></i>
+							<!-- <i id="create-pr-button" title="Create Pull Request" class="fas fa-upload"></i> -->
+							<img id="create-pr-button" title="Create Pull Request" src="/images/pull-request.svg" />
+						</div>
+						<div id="subheader-alert" class="alert alert-danger">this is a message</div>
 					</div>
 				</div>
 			</div>
@@ -421,7 +488,16 @@
 			<!-- [[ REPOS ]] -->
 			<div id="repo-list-container" class="panel">
 				<h1>Choose a Repository</h1>
-				search
+				<div class="container-flex">
+					<div class="row search-container">
+						<div class="col-sm-1">
+							<i class="fas fa-search"></i>
+						</div>
+						<div class="col-sm-11">
+							<input type="text" class="form-control" />
+						</div>
+					</div>
+				</div>
 				<ul id="repo-list" class="link-list">
 					<li>api-central</li>
 					<li>developer-center</li>
@@ -432,14 +508,33 @@
 			<!-- [[ BRANCHES ]] -->
 			<div id="branch-list-container" class="panel">
 				<h1>repo-name</h1>
-				search
 				<h2>Choose a branch</h2>
+				<div class="container-flex">
+					<div class="row search-container">
+						<div class="col-sm-1">
+							<i class="fas fa-search"></i>
+						</div>
+						<div class="col-sm-11">
+							<input type="text" class="form-control" />
+						</div>
+					</div>
+				</div>
 				<ul id="branch-list" class="link-list"></ul>
 			</div>
 
 			<!-- [[ FILES ]] -->
 			<div id="file-container" class="panel">
 				<h1>Files</h1>
+				<div class="container-flex">
+					<div class="row search-container">
+						<div class="col-sm-1">
+							<i class="fas fa-search"></i>
+						</div>
+						<div class="col-sm-11">
+							<input type="text" class="form-control" />
+						</div>
+					</div>
+				</div>
 				<div class="file-tree">
 					<ul id="file-tree-root">
 						<!-- <li>
@@ -466,7 +561,7 @@
 			<div id="help-container" class="panel">
 				<h1>Help</h1>
 
-				How to markdown
+				<iframe id="help-frame" sandbox="allow-same-origin allow-scripts"></iframe>
 			</div>
 
 			<i id="close-sidebar" class="fas fa-times-circle"></i>
