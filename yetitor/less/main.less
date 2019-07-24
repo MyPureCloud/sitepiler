@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap');
+
+@charcoal: #333333;
+@dark-gray: #6b7178;
+@medium-gray: #707070;
+@light-gray: #c3c4c5;
+@orange: #ff4f1f;
+@white: #ffffff;
+@black: #000000;
+
+html,
+body {
+	font-family: 'Roboto', sans-serif;
+}
+
+.yetitor-header {
+	background-color: @charcoal;
+	color: @orange;
+	font-size: 28px;
+	padding: 8px;
+	box-shadow: 0 5px 5px #00000030;
+	height: 60px;
+
+	.genesys-logo {
+		height: 31px;
+		position: relative;
+		top: -3px;
+	}
+
+	.header-text {
+		display: inline-block;
+		position: relative;
+		top: 2px;
+	}
+
+	.menu-nav {
+		text-align: right;
+		color: @light-gray;
+		font-size: 18px;
+		margin-top: 7px;
+
+		a {
+			padding: 0 15px;
+
+			.inline-icon {
+				padding: 0 4px;
+			}
+		}
+
+		a,
+		a:visited,
+		a:active,
+		a:hover {
+			color: @light-gray;
+			text-decoration: none;
+		}
+
+		a:hover {
+			color: @white;
+		}
+
+		// Initially hidden
+		#choose-branch,
+		#choose-file {
+			display: none;
+		}
+	}
+}
+
+.yetitor-subheader {
+	font-size: 19px;
+	color: @black;
+	height: 60px;
+	border-bottom: 1px solid @medium-gray;
+
+	.subheader-text {
+		position: relative;
+		top: 16px;
+
+		.title {
+		}
+
+		.filename {
+			color: @light-gray;
+			font-size: 16px;
+			padding-left: 10px;
+		}
+	}
+}
+
+.output-container {
+	position: absolute;
+	top: 120px;
+	bottom: 0;
+	left: 50vw;
+	right: 0;
+	width: 50vw;
+	overflow-x: auto;
+	padding: 0;
+
+	#output-frame {
+		border: 0;
+		width: 100%;
+		height: 100%;
+		margin: 0;
+		padding: 0;
+	}
+}
+
+#ace-editor {
+	position: absolute;
+	top: 120px;
+	bottom: 0;
+	left: 0;
+	right: 50vw;
+	width: 50vw;
+
+	.ace_gutter {
+		background-color: #303030;
+		color: @medium-gray;
+	}
+
+	.ace_scroller {
+		background-color: @charcoal;
+	}
+
+	.ace_strong {
+		color: #898df5 !important;
+		font-weight: bold;
+	}
+
+	.ace_emphasis {
+		font-style: italic;
+	}
+
+	.ace_list {
+		color: #89d5f5 !important;
+	}
+
+	.ace_heading {
+		color: #f1f589 !important;
+	}
+
+	.ace_function {
+		color: #f58989 !important;
+	}
+}
+
+.sidebar-container {
+	background-color: @dark-gray;
+	color: @white;
+	font-size: 14px;
+	padding: 25px;
+	position: absolute;
+	top: 60px;
+	right: 0;
+	bottom: 0;
+	width: 400px;
+	box-shadow: -5px 0px 5px #00000030;
+	overflow-x: auto;
+
+	#close-sidebar {
+		position: absolute;
+		top: 7px;
+		right: 7px;
+		font-size: 20px;
+		cursor: pointer;
+	}
+
+	.panel {
+		display: none;
+
+		h1 {
+			font-size: 32px;
+			color: @orange;
+			margin-bottom: 18px;
+		}
+
+		h2 {
+			font-size: 20px;
+			margin-bottom: 18px;
+		}
+
+		.link-list {
+			list-style-type: none;
+			margin: 0;
+			padding: 0;
+
+			li {
+				margin: 10px 0;
+				cursor: pointer;
+
+				&:hover {
+					text-decoration: underline;
+				}
+			}
+		}
+	}
+
+	.file-tree {
+		ul {
+			list-style-type: none;
+			margin: 0;
+			padding: 0 0 0 12px;
+			display: none;
+
+			li {
+				padding: 2px 0;
+				cursor: pointer;
+
+				i {
+					margin: 0 3px 0 0;
+				}
+
+				.directory,
+				.file {
+					display: inline-block;
+					width: 100%;
+				}
+			}
+		}
+	}
+
+	#file-tree-root {
+		display: block;
+	}
+}
+
+#render-error {
+	display: none;
+	margin: 7px;
+}
+
+.hidden {
+	display: none;
+}
+
+@import 'spinner.less';

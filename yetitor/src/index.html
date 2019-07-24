@@ -1,0 +1,475 @@
+<html>
+	<head>
+		<title>Yetitor</title>
+
+		<link
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
+		<link rel="stylesheet" href="styles/main.css" />
+
+		<!-- [[ EXTERNAL LIBS ]] -->
+		<script
+			src="https://code.jquery.com/jquery-3.4.1.min.js"
+			integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			crossorigin="anonymous"
+		></script>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/ace.js"
+			integrity="sha256-5Xkhn3k/1rbXB+Q/DX/2RuAtaB4dRRyQvMs83prFjpM="
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.5/mode-markdown.js"
+			integrity="sha256-y7CQ+vmcCTzRcZRodqknIaPkRg2nFIS91PMCbjofpAI="
+			crossorigin="anonymous"
+		></script>
+		<script
+			src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"
+			integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ="
+			crossorigin="anonymous"
+		></script>
+		<script src="https://kit.fontawesome.com/418a9b5cf8.js"></script>
+
+		<!-- [[ APP SCRIPTS ]] -->
+		<script src="scripts/webpack/renderer.js"></script>
+		<script src="scripts/bitbucket.js"></script>
+
+		<script>
+			/* globals bitbucket moment */
+			bitbucket.authorize();
+
+			var editor, selectedRepo, selectedBranch, renderTimer;
+			const context = {
+				sitemap: new RendererLib.Directory(),
+				origin: window.location.origin
+			};
+
+			$(document).ready(() => {
+				// Configure ACE editor
+				editor = ace.edit('ace-editor');
+				editor.setTheme('ace/theme/twilight');
+				editor.session.setMode('ace/mode/markdown');
+				editor.session.setUseWrapMode(true);
+				editor.setShowPrintMargin(false);
+				editor.session.on('change', editorChanged);
+				editor.session.on('changeScrollTop', syncScrollEditorToOutput);
+
+				// Configure renderer
+				RendererLib.renderer.defaultTemplates = [];
+				axios
+					.get('/default.dot')
+					.then((template) => {
+						console.log(template);
+						const templates = {
+							'default.dot': template.data
+						};
+						RendererLib.renderer.compileTemplates(templates, RendererLib.renderer.templates.layouts, context);
+					})
+					.catch(console.error);
+
+				// Handle UI events
+				$('#choose-repo').click(() => {
+					showSidebar('repos');
+				});
+				$('#choose-branch').click(() => {
+					showSidebar('branches');
+				});
+				$('#choose-file').click(() => {
+					showSidebar('files');
+				});
+				$('#show-help').click(() => {
+					showSidebar('help');
+				});
+				$('#close-sidebar').click(() => {
+					showSidebar();
+				});
+				$('#repo-list li').click((evt) => {
+					setRepo($(evt.target).text());
+				});
+
+				$(document).on('click', '.file-tree .directory', (evt) => {
+					let directory = $(evt.target);
+					if (directory[0].tagName !== 'SPAN' || directory[0].className !== 'directory') {
+						directory = directory.parent();
+					}
+					if (directory[0].tagName !== 'SPAN' || directory[0].className !== 'directory') {
+						// If the parent isn't a directory, ignore click
+						return;
+					}
+					evt.stopPropagation();
+					directory.children('ul').toggle();
+					if (directory.children('ul').children().length === 0) {
+						console.log(`Loading files for ${directory.data('path')}`);
+						loadFiles(directory.children('ul'), 'inindca', selectedRepo, selectedBranch, directory.data('path'));
+					}
+					if (directory.children('ul').css('display') === 'none') {
+						directory
+							.children('i')
+							.removeClass('fa-caret-down')
+							.addClass('fa-caret-right');
+					} else {
+						directory
+							.children('i')
+							.removeClass('fa-caret-right')
+							.addClass('fa-caret-down');
+					}
+				});
+			});
+
+			$(document).on('click', '.file-tree .file', (evt) => {
+				let file = $(evt.target);
+				console.log('Retrieving file');
+				editor.session.setValue('');
+				const pathInfo = parsePath(file.data('path'));
+				bitbucket
+					.listFiles('inindca', selectedRepo, selectedBranch, pathInfo.fullPath)
+					.then((contents) => {
+						showSidebar();
+						if (typeof contents === 'object') contents = JSON.stringify(contents, null, 2);
+						// Extract page title
+						const match = contents.match(/^---[\s\S]+title:(.+)[\s\S]+---/im);
+						console.log(match);
+						const title = match && match.length >= 2 ? match[1] : 'Untitled';
+						$('.subheader-text .title').text(title.trim());
+						$('.subheader-text .filename').text(pathInfo.fullPath);
+						editor.session.setValue(contents);
+					})
+					.catch(console.error);
+			});
+
+			function parsePath(path) {
+				const parts = path.split('/');
+				return {
+					name: parts.pop(),
+					fullPath: path,
+					path: parts.join('/')
+				};
+			}
+
+			function setRepo(repo) {
+				// Set repo
+				selectedRepo = repo;
+				$('#branch-list-container h1').text(repo);
+				$('#choose-repo span').text(repo);
+
+				// Stage branches
+				setBranch();
+				// selectedBranch = undefined;
+				// $('#choose-branch span').text('Choose Branch');
+				$('#choose-branch').show();
+				loadBranches('inindca', selectedRepo);
+				showSidebar('branches');
+			}
+
+			function setBranch(branch) {
+				selectedBranch = branch;
+				$('#choose-branch span').text(branch || 'Choose Branch');
+				if (branch) {
+					$('#choose-file').show();
+					loadFiles($('#file-tree-root'), 'inindca', selectedRepo, selectedBranch);
+					showSidebar('files');
+				} else {
+					$('#choose-file').hide();
+				}
+			}
+
+			function handleSetBranchClick(evt) {
+				setBranch($(evt.target).text());
+			}
+
+			function showSidebar(panel) {
+				switch (panel) {
+					case 'repos': {
+						const container = $('#repo-list-container');
+						if (container.css('display') === 'none') {
+							$('.sidebar-container .panel').hide();
+							container.show();
+							$('.sidebar-container').show();
+						} else {
+							container.hide();
+							$('.sidebar-container').hide();
+						}
+						break;
+					}
+					case 'branches': {
+						const container = $('#branch-list-container');
+						if (container.css('display') === 'none') {
+							$('.sidebar-container .panel').hide();
+							container.show();
+							$('.sidebar-container').show();
+						} else {
+							container.hide();
+							$('.sidebar-container').hide();
+						}
+						break;
+					}
+					case 'help': {
+						const container = $('#help-container');
+						if (container.css('display') === 'none') {
+							$('.sidebar-container .panel').hide();
+							container.show();
+							$('.sidebar-container').show();
+						} else {
+							container.hide();
+							$('.sidebar-container').hide();
+						}
+						break;
+					}
+					case 'files': {
+						const container = $('#file-container');
+						if (container.css('display') === 'none') {
+							$('.sidebar-container .panel').hide();
+							container.show();
+							$('.sidebar-container').show();
+						} else {
+							container.hide();
+							$('.sidebar-container').hide();
+						}
+						break;
+					}
+					default: {
+						$('.sidebar-container').hide();
+						$('.sidebar-container .panel').hide();
+					}
+				}
+			}
+
+			function editorChanged() {
+				if (renderTimer) {
+					clearTimeout(renderTimer);
+				}
+				renderTimer = setTimeout(renderOutput, 300);
+			}
+
+			function renderOutput() {
+				try {
+					$('#render-error').hide();
+					const pathInfo = parsePath($('.subheader-text .filename').text());
+					// if (!pathInfo.fullPath.endsWith('.md')) {
+					// 	console.log("I ain't gonna render that!");
+					// 	// $('.output-container').empty();
+					// 	document.getElementById('output-frame').src = `data:text/html;charset=utf-8,`;
+					// 	return;
+					// }
+					const content = editor.getValue();
+					if (!content || content.trim() === '') {
+						document.getElementById('output-frame').src = `data:text/html;charset=utf-8,`;
+						return;
+					}
+					const page = RendererLib.Page.load(content, pathInfo.fullPath, `output/${pathInfo.fullPath}`, '/');
+					let output = RendererLib.renderer.renderContent(page, context);
+					// $('.output-container').html(output);
+					document.getElementById('output-frame').src = `data:text/html;charset=utf-8,${escape(output)}`;
+				} catch (err) {
+					console.error(err);
+					$('#render-error').text(`Render error: ${err.message || err}`);
+					$('#render-error').show();
+				}
+			}
+
+			// Synchronizes the output window when the editor is scrolled
+			function syncScrollEditorToOutput(scrollTop) {
+				const outputHeight = $('.output-container').prop('scrollHeight') - $('.output-container').prop('offsetHeight');
+				const editorHeight =
+					editor.renderer.layerConfig.maxHeight - editor.renderer.$size.scrollerHeight + editor.renderer.scrollMargin.bottom;
+				const outputTarget = (scrollTop / editorHeight) * outputHeight;
+				$('.output-container').scrollTop(outputTarget);
+			}
+
+			/*** BITBUCKET STUFF ***/
+			function loadBranches(owner, repo) {
+				$('#choose-branch .lds-spinner').css('display', 'inline-block');
+				$('#branch-list').empty();
+				//TODO: Implement branch search and checkbox for "my branches" to check branch.target.author.user.account_id against logged in user
+				//TODO: Implement "show old branches" checkbox to bypass date filter
+				bitbucket
+					.listBranches(owner, repo)
+					.then((branches) => {
+						console.log('Got branches', branches);
+						branches.forEach((branch) => {
+							const d = moment(branch.target.date);
+							if (moment.duration(moment().diff(d)).asMonths() < 6)
+								$('#branch-list').append(
+									$('<li>')
+										.text(branch.name)
+										.click(handleSetBranchClick)
+								);
+						});
+						$('#choose-branch .lds-spinner').hide();
+					})
+					.catch((err) => {
+						console.error(err);
+						$('#choose-branch .lds-spinner').hide();
+					});
+			}
+
+			function loadFiles(element, owner, repo, target, path) {
+				element.empty();
+				element
+					.parent()
+					.children('span')
+					.after(
+						$(
+							'<div class="lds-spinner" style="display: inline-block"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>'
+						)
+					);
+				bitbucket
+					.listFiles(owner, repo, target, path)
+					.then((files) => {
+						console.log('Files: ', files);
+						files.forEach((file) => {
+							const pathInfo = parsePath(file.path);
+							if (file.type === 'commit_directory') {
+								element.append(
+									$('<li>').append(
+										$('<span class="directory">')
+											.data('path', pathInfo.fullPath)
+											.append($('<i class="fas fa-caret-right"></i>'))
+											.append($('<span>').text(pathInfo.name))
+											.append($('<ul>'))
+									)
+								);
+							} else {
+								element.append(
+									$('<li>').append(
+										$('<span class="file">')
+											.data('path', pathInfo.fullPath)
+											.text(pathInfo.name)
+									)
+								);
+							}
+						});
+						element
+							.parent()
+							.children()
+							.remove('.lds-spinner');
+					})
+					.catch((err) => {
+						console.error(err);
+						element
+							.parent()
+							.children()
+							.remove('.lds-spinner');
+					});
+			}
+		</script>
+	</head>
+
+	<body>
+		<div class="container-fluid">
+			<!-- [[ HEADER ]] -->
+			<div class="row yetitor-header">
+				<div class="col-sm-2">
+					<img src="images/genesys-icon.svg" class="genesys-logo" />
+					<span class="header-text">YETITOR</span>
+				</div>
+				<div class="col-sm-10 menu-nav">
+					<a href="#" id="choose-repo">
+						<i class="fas fa-database inline-icon"></i>
+						<span>Choose Repo</span>
+					</a>
+					<a href="#" id="choose-branch">
+						<i class="fas fa-code-branch inline-icon"></i>
+						<span>Choose Branch</span>
+						<div class="lds-spinner">
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+							<div></div>
+						</div>
+					</a>
+					<a href="#" id="choose-file">
+						<i class="far fa-file"></i>
+						<span>File Browser</span>
+					</a>
+					<a href="#" id="show-help"><i class="fas fa-question-circle"></i></a>
+				</div>
+			</div>
+			<div class="row yetitor-subheader">
+				<div class="col-sm">
+					<div class="subheader-text">
+						<span class="title"></span>
+						<span class="filename"></span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- [[ EDITOR ]] -->
+		<div id="ace-editor"></div>
+
+		<!-- [[ OUTPUT ]] -->
+		<div class="output-container">
+			<div id="render-error" class="alert alert-danger"></div>
+			<iframe id="output-frame" sandbox="allow-same-origin allow-scripts"></iframe>
+		</div>
+
+		<!-- [[ SIDEBAR ]] -->
+		<div class="sidebar-container hidden">
+			<!-- [[ REPOS ]] -->
+			<div id="repo-list-container" class="panel">
+				<h1>Choose a Repository</h1>
+				search
+				<ul id="repo-list" class="link-list">
+					<li>api-central</li>
+					<li>developer-center</li>
+					<li>public-api-v2</li>
+				</ul>
+			</div>
+
+			<!-- [[ BRANCHES ]] -->
+			<div id="branch-list-container" class="panel">
+				<h1>repo-name</h1>
+				search
+				<h2>Choose a branch</h2>
+				<ul id="branch-list" class="link-list"></ul>
+			</div>
+
+			<!-- [[ FILES ]] -->
+			<div id="file-container" class="panel">
+				<h1>Files</h1>
+				<div class="file-tree">
+					<ul id="file-tree-root">
+						<!-- <li>
+							<span class="directory"><i class="fas fa-caret-down"></i> src</span>
+							<ul>
+								<li>
+									<span class="directory"><i class="fas fa-caret-down"></i> directory</span>
+									<ul>
+										<li>2222222.html</li>
+										<li>33333333.html</li>
+									</ul>
+								</li>
+								<li>first.html</li>
+								<li>file.html</li>
+							</ul>
+						</li>
+						<li>index.html</li>
+						<li>other.html</li> -->
+					</ul>
+				</div>
+			</div>
+
+			<!-- [[ HELP ]] -->
+			<div id="help-container" class="panel">
+				<h1>Help</h1>
+
+				How to markdown
+			</div>
+
+			<i id="close-sidebar" class="fas fa-times-circle"></i>
+		</div>
+	</body>
+</html>

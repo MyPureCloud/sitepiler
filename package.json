@@ -30,6 +30,7 @@
     "body-parser": "^1.18.3",
     "chokidar": "^2.1.5",
     "express": "^4.16.4",
-    "livereload": "^0.7.0"
+    "livereload": "^0.7.0",
+    "path-webpack": "0.0.3"
   }
 }

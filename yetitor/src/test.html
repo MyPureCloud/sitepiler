@@ -1,0 +1,125 @@
+<html>
+	<head>
+		<title>Yetitor</title>
+		<script
+			src="https://code.jquery.com/jquery-3.4.1.min.js"
+			integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+			crossorigin="anonymous"
+		></script>
+
+		<script src="scripts/webpack/renderer.js"></script>
+		<script>
+			const clientId = '7PKyHCBGEuqZaCuJ5n';
+			const bbHost = 'api.bitbucket.org';
+		</script>
+		<script>
+			console.log(RendererLib);
+
+			const context = {
+				sitemap: new RendererLib.Directory()
+			};
+
+			RendererLib.renderer.defaultTemplates = [];
+			const templates = {
+				'default.dot': '{{= context.content }}'
+			};
+			RendererLib.renderer.compileTemplates(templates, RendererLib.renderer.templates.layouts, context);
+
+			console.log(RendererLib.renderer.templates);
+
+			const page = RendererLib.Page.load(
+				'---\ntitle: Test Page\n---\n# Title\nSome Text',
+				'src/content/index.html.md',
+				'output/index.html',
+				'/'
+			);
+			console.log(page);
+			let output = RendererLib.renderer.renderContent(page, context);
+			console.log(output);
+		</script>
+		<script>
+			let access_token = authorize();
+
+			$(document).ready(() => {
+				$('#auth-bitbucket').click(
+					() => (window.location.href = `https://bitbucket.org/site/oauth2/authorize?client_id=${clientId}&response_type=token`)
+				);
+
+				$('#test').click(() => {
+					$.ajax({
+						method: 'GET',
+						url: `https://${bbHost}/2.0/repositories/inindca/developer-center/refs?pagelen=100&q=${bbEncodeQuery([
+							{
+								operator: '=',
+								key: 'type',
+								value: 'branch'
+							},
+							{
+								operator: '!=',
+								key: 'name',
+								value: 'master'
+							}
+						])}`,
+						headers: {
+							Authorization: `Bearer ${access_token}`
+						}
+					})
+						.then((data) => {
+							console.log(data);
+						})
+						.catch(console.error);
+				});
+			});
+
+			function bbEncodeQuery(queryData) {
+				// https://developer.atlassian.com/bitbucket/api/2/reference/meta/filtering
+				let parts = [];
+				queryData.forEach((query) => {
+					parts.push(`${query.key} ${query.operator || '='} "${query.value}"`);
+				});
+				return encodeURI(parts.join(' AND '));
+			}
+
+			function authorize() {
+				// Get from hash
+				const hash = {};
+				window.location.hash
+					.substring(1)
+					.split('&')
+					.forEach((part) => {
+						if (part === '') return;
+						const parts = part.split('=');
+						hash[parts[0]] = parts[1];
+					});
+				if (hash.access_token) {
+					const ac = hash.access_token.replace('%3D', '=');
+					localStorage.setItem('bb_access_token', ac);
+					window.location.hash = '';
+					console.log('Got token from hash');
+					return ac;
+				}
+
+				// Get from storage
+				const bb_access_token = localStorage.getItem('bb_access_token');
+				if (bb_access_token) {
+					console.log('Got token from storage');
+					return bb_access_token;
+				}
+
+				// Get new token
+				window.location.href = `https://bitbucket.org/site/oauth2/authorize?client_id=${clientId}&response_type=token`;
+			}
+		</script>
+
+		<link
+			href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+			rel="stylesheet"
+			integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T"
+			crossorigin="anonymous"
+		/>
+	</head>
+
+	<button id="auth-bitbucket">Get new token</button>
+	<br />
+	<button id="test">test</button>
+</html>
