@@ -411,7 +411,7 @@
 					.createPullRequest('inindca', selectedRepo, selectedBranch)
 					.then((response) => {
 						console.log(response);
-						const prLink = `https://bitbucket.org/inindca/api-central/pull-requests/${response.id}`;
+						const prLink = `https://bitbucket.org/inindca/${selectedRepo}/pull-requests/${response.id}`;
 						showSubheaderAlert(`Pull request created: <a href="${prLink}" target="_blank">${prLink}</a>`, 'success', 30000);
 					})
 					.catch(console.error);
