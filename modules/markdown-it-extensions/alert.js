@@ -10,7 +10,7 @@ function getLine(state, line) {
 
 module.exports = function container_plugin(md, name, options) {
 	function renderOpen(tokens, idx, _options, env, self) {
-		let alertType = tokens[idx].attrs.alert;
+		let alertType = tokens[idx].attrs.alert || 'vanilla';
 		let title = tokens[idx].attrs.title || undefined;
 		let autoCollapse = tokens[idx].attrs.autoCollapse;
 
