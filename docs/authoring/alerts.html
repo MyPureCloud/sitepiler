@@ -71,7 +71,34 @@ $(document).ready(() => {
 				<h1>Alert Blocks</h1>
 
 <p>An alert block is a simple container to add some color to draw attention to its content. Alert blocks support both inline and block markdown formatting inside of it. Use three colons <code>:::</code> to open and close an alert block. Optionally, include one of the following alert types in the opener to choose the specific style of the block: <code>vanilla</code>, <code>primary</code>, <code>secondary</code>, <code>success</code>, <code>danger|error</code>, <code>warning</code>, <code>info</code>, <code>light</code>, <code>dark</code></p>
-<a href="#examples" name="examples" class="toc-link toc-link-h2"><h2>Examples<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#syntax" name="syntax" class="toc-link toc-link-h3"><h3>Syntax<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
+<a href="#alert_block_options" name="alert_block_options" class="toc-link toc-link-h2"><h2>Alert Block Options<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><p>Use three colons to open and close an alert. The opening colons support either an alert style name (See <a href="#styles" target="_blank">Styles</a> below) or a JSON configuration object on the same line directly following the colons. The following options are supported:</p>
+<table class="table table-striped">
+<thead>
+<tr>
+<th>Option</th>
+<th>Example</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>alert<br /></td>
+<td>primary<br /></td>
+<td>The style of the alert block. See <a href="#styles" target="_blank">Styles</a> for examples<br /></td>
+</tr>
+<tr>
+<td>title<br /></td>
+<td>Some Code<br /></td>
+<td>Displays a header before the alert with the given title<br /></td>
+</tr>
+<tr>
+<td>autoCollapse<br /></td>
+<td>true<br /></td>
+<td>When <code>true</code>, the element will be displayed in its collapsed state initially. Default: <code>false</code><br /></td>
+</tr>
+</tbody>
+</table>
+<a href="#examples" name="examples" class="toc-link toc-link-h2"><h2>Examples<span class="oi toc-link-icon" data-glyph="link-intact"></span></h2></a><a href="#basic_syntax" name="basic_syntax" class="toc-link toc-link-h3"><h3>Basic Syntax<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
 	<div class="card fence">
 		
 	  <div class="card-body fence-body">
@@ -81,8 +108,28 @@ This is a primary alert block
 </code></pre>
 	  </div>
 	</div>
+</p><a href="#advanced_syntax" name="advanced_syntax" class="toc-link toc-link-h3"><h3>Advanced Syntax<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>Use a JSON object to specify options:</p>
+<p>
+	<div class="card fence">
+		
+	  <div class="card-body fence-body">
+	    <pre class=""><code class="language-nohighlight"  style="max-height: 550px">:::{&quot;alert&quot;:&quot;danger&quot;,&quot;title&quot;:&quot;Dangerous Text&quot;}
+This text is **dangerous**.
+:::
+</code></pre>
+	  </div>
+	</div>
+</p><p>
+	<div class="card fence">
+		<h5 class="card-header fence-header">Dangerous Text</h5>
+	  <div class="card-body fence-body">
+	    <div class="alert alert-danger" role="alert"><p>This text is <strong>dangerous</strong>.</p>
+	    </div>
+	  </div>
+	</div>
 </p><a href="#styles" name="styles" class="toc-link toc-link-h3"><h3>Styles<span class="oi toc-link-icon" data-glyph="link-intact"></span></h3></a><p>
 	<div class="card fence">
+		
 	  <div class="card-body fence-body">
 	    <div class="alert alert-vanilla" role="alert"><p><code>vanilla</code>, default style if none specified.</p>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
@@ -91,6 +138,7 @@ This is a primary alert block
 	</div>
 </p><p>
 	<div class="card fence">
+		
 	  <div class="card-body fence-body">
 	    <div class="alert alert-primary" role="alert"><p><code>primary</code></p>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
@@ -99,6 +147,7 @@ This is a primary alert block
 	</div>
 </p><p>
 	<div class="card fence">
+		
 	  <div class="card-body fence-body">
 	    <div class="alert alert-secondary" role="alert"><p><code>secondary</code></p>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
@@ -107,6 +156,7 @@ This is a primary alert block
 	</div>
 </p><p>
 	<div class="card fence">
+		
 	  <div class="card-body fence-body">
 	    <div class="alert alert-success" role="alert"><p><code>success</code></p>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
@@ -115,6 +165,7 @@ This is a primary alert block
 	</div>
 </p><p>
 	<div class="card fence">
+		
 	  <div class="card-body fence-body">
 	    <div class="alert alert-danger" role="alert"><p><code>danger</code> or <code>error</code></p>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
@@ -123,6 +174,7 @@ This is a primary alert block
 	</div>
 </p><p>
 	<div class="card fence">
+		
 	  <div class="card-body fence-body">
 	    <div class="alert alert-warning" role="alert"><p><code>warning</code></p>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
@@ -131,6 +183,7 @@ This is a primary alert block
 	</div>
 </p><p>
 	<div class="card fence">
+		
 	  <div class="card-body fence-body">
 	    <div class="alert alert-info" role="alert"><p><code>info</code></p>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
@@ -139,6 +192,7 @@ This is a primary alert block
 	</div>
 </p><p>
 	<div class="card fence">
+		
 	  <div class="card-body fence-body">
 	    <div class="alert alert-light" role="alert"><p><code>light</code></p>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>
@@ -147,6 +201,7 @@ This is a primary alert block
 	</div>
 </p><p>
 	<div class="card fence">
+		
 	  <div class="card-body fence-body">
 	    <div class="alert alert-dark" role="alert"><p><code>dark</code></p>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec tincidunt tempus ultricies. Sed a purus nec tortor rutrum tincidunt vel at orci. Nulla eu nisi nibh. Cras dapibus non diam vel elementum. Vestibulum sollicitudin urna id viverra cursus. Ut eu sapien sapien. Donec aliquam quam lorem, sit amet gravida diam sodales eget.</p>

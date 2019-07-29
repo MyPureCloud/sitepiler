@@ -1,9 +1,18 @@
 // Based on markdown-it-container 2.0.0 https://github.com//markdown-it/markdown-it-container @license MIT
 // Retrieved date: 3/27/2019
 
+function getLine(state, line) {
+	var pos = state.bMarks[line] + state.blkIndent,
+		max = state.eMarks[line];
+
+	return state.src.substr(pos, max - pos);
+}
+
 module.exports = function container_plugin(md, name, options) {
 	function renderOpen(tokens, idx, _options, env, self) {
 		let alertType = tokens[idx].attrs.alert;
+		let title = tokens[idx].attrs.title || undefined;
+		let autoCollapse = tokens[idx].attrs.autoCollapse;
 
 		// Apply alert class aliases
 		switch (alertType.toLowerCase()) {
@@ -15,7 +24,8 @@ module.exports = function container_plugin(md, name, options) {
 
 		return `<p>
 	<div class="card fence">
-	  <div class="card-body fence-body">
+		${title ? `<h5 class="card-header fence-header">${title}</h5>` : ''}
+	  <div class="card-body fence-body"${autoCollapse ? ' style="display: none"' : ''}>
 	    <div class="alert alert-${alertType}" role="alert">`;
 	}
 
@@ -72,6 +82,10 @@ module.exports = function container_plugin(md, name, options) {
 		if (silent) {
 			return true;
 		}
+
+		// Parse control char attributes
+		let lineText = getLine(state, startLine);
+		const attrs = parseAttrs(lineText);
 
 		// Search for the end of the block
 		nextLine = startLine;
@@ -140,9 +154,7 @@ module.exports = function container_plugin(md, name, options) {
 		token.block = true;
 		token.info = params;
 		token.map = [startLine, nextLine];
-		token.attrs = {
-			alert: params.trim().toLowerCase()
-		};
+		token.attrs = attrs;
 
 		// This is the magic that makes the content render.
 		state.md.block.tokenize(state, startLine + 1, nextLine);
@@ -158,6 +170,20 @@ module.exports = function container_plugin(md, name, options) {
 		state.line = nextLine + (auto_closed ? 1 : 0);
 
 		return true;
+	}
+
+	function parseAttrs(lineText) {
+		if (!lineText || lineText.length < 5) return {};
+
+		let attrs = {};
+		let text = lineText.substr(3).trim();
+		if (text.startsWith('{')) {
+			attrs = JSON.parse(text);
+		} else {
+			attrs.alert = text;
+		}
+
+		return attrs;
 	}
 
 	// Register extension
