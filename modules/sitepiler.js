@@ -17,13 +17,10 @@ const renderer = require('./renderer');
 const scriptRunner = require('./scriptRunner');
 const Timer = require('./timer');
 
-
 const log = new lognext('Sitepiler');
 const watcherlog = new lognext('watcher');
 
-const BLOCKED_WATCHER_EVENTS = ['addDir','unlink','unlinkDir'];
-
-
+const BLOCKED_WATCHER_EVENTS = ['addDir', 'unlink', 'unlinkDir'];
 
 class Sitepiler {
 	constructor(config) {
@@ -35,8 +32,7 @@ class Sitepiler {
 		this.initCompileProps();
 
 		// Set internal link regex
-		if (this.config.settings.internalLinkRegex)
-			renderer.setInternalLinkRegex(new RegExp(this.config.settings.internalLinkRegex, 'i'));
+		if (this.config.settings.internalLinkRegex) renderer.setInternalLinkRegex(new RegExp(this.config.settings.internalLinkRegex, 'i'));
 
 		// Set settings on renderer
 		renderer.siteSubdir = this.config.settings.siteSubdir;
@@ -51,10 +47,12 @@ class Sitepiler {
 		// Livereload
 		if (this.config.cliopts.livereload && this.config.cliopts.local) {
 			log.info('Starting livereload servier...');
-			this.livereloadServer = livereload.createServer({
-				port: this.config.cliopts.livereloadPort	
-			}, 
-			() => log.info(`Livereload accepting connections on port ${this.config.cliopts.livereloadPort}`));
+			this.livereloadServer = livereload.createServer(
+				{
+					port: this.config.cliopts.livereloadPort
+				},
+				() => log.info(`Livereload accepting connections on port ${this.config.cliopts.livereloadPort}`)
+			);
 
 			let watchPaths = [];
 			watchPaths.push(path.resolve(this.config.settings.stages.compile.outputDirs.content));
@@ -83,7 +81,9 @@ class Sitepiler {
 			this.templateWatcher.on('all', templateWatcherEvent.bind(this));
 
 			log.info('Livereload initialization complete');
-			log.info('Large sites may cause an error "EMFILE: too many open files". This is a limitation of the OS and cannot be avoided. Remove the "--livereload" option from sitepiler\'s invocation to disable this feature.');
+			log.info(
+				'Large sites may cause an error "EMFILE: too many open files". This is a limitation of the OS and cannot be avoided. Remove the "--livereload" option from sitepiler\'s invocation to disable this feature.'
+			);
 		} else {
 			log.info('Livereload is not enabled');
 		}
@@ -124,7 +124,7 @@ class Sitepiler {
 			// Load data files
 			const tempData = {};
 			this.config.settings.stages.data.dataDirs.forEach((dataDir) => {
-				fileLoader.loadFiles(dataDir, tempData, [ fileLoader.filters.JSON, fileLoader.filters.YAML ], true, true);
+				fileLoader.loadFiles(dataDir, tempData, [fileLoader.filters.JSON, fileLoader.filters.YAML], true, true);
 			});
 
 			// Copy data to context, strip extension from filename key
@@ -134,7 +134,7 @@ class Sitepiler {
 
 			// Complete stage
 			deferred.resolve();
-		} catch(err) {
+		} catch (err) {
 			deferred.reject(err);
 		}
 
@@ -166,10 +166,10 @@ class Sitepiler {
 			// Load templates
 			let startMs = Timer.start();
 			this.config.settings.stages.compile.templateDirs.layouts.forEach((dataDir) => {
-				fileLoader.loadFiles(dataDir, this.templateSource.layouts, [ fileLoader.filters.DOT ], true);
+				fileLoader.loadFiles(dataDir, this.templateSource.layouts, [fileLoader.filters.DOT], true);
 			});
 			this.config.settings.stages.compile.templateDirs.partials.forEach((dataDir) => {
-				fileLoader.loadFiles(dataDir, this.templateSource.partials, [ fileLoader.filters.DOT ], true);
+				fileLoader.loadFiles(dataDir, this.templateSource.partials, [fileLoader.filters.DOT], true);
 			});
 			log.verbose(`Templates loaded in ${startMs.getMs()}ms`);
 
@@ -183,11 +183,12 @@ class Sitepiler {
 				}
 
 				loadSources(
-					sourceDir.source, 
-					this.config.settings.stages.compile.outputDirs.content, 
-					sourceDir.dest, 
+					sourceDir.source,
+					this.config.settings.stages.compile.outputDirs.content,
+					sourceDir.dest,
 					this.context.sitemap,
-					this.config.settings.ignoreKeys);
+					this.config.settings.ignoreKeys
+				);
 			});
 			log.verbose(`Content loaded in ${startMs.getMs()}ms`);
 
@@ -201,7 +202,7 @@ class Sitepiler {
 					log.warn(`Static source dir does not exist: ${sourceDir.source}`);
 					return;
 				}
-				
+
 				const targetDir = path.join(this.config.settings.stages.compile.outputDirs.static, sourceDir.dest);
 				log.info(`Copying static files from ${sourceDir.source} to ${targetDir}`);
 				fs.copySync(sourceDir.source, targetDir);
@@ -223,27 +224,29 @@ class Sitepiler {
 			const styleStartMs = Timer.start();
 			const stylePromises = [];
 			this.config.settings.stages.compile.styleDirs.forEach((styleConfig) => {
-				stylePromises.push(processStyleConfig(
-					styleConfig.source, 
-					path.join(this.config.settings.stages.compile.outputDirs.styles, styleConfig.dest), 
-					styleConfig.recursive
-				));
+				stylePromises.push(
+					processStyleConfig(
+						styleConfig.source,
+						path.join(this.config.settings.stages.compile.outputDirs.styles, styleConfig.dest),
+						styleConfig.recursive
+					)
+				);
 			});
 
 			// Wait for styles to complete
 			Promise.all(stylePromises)
 				.then(() => {
 					log.verbose(`Styles loaded in ${styleStartMs.getMs()}ms`);
-					
+
 					// Run scripts
 					scriptRunner.run(this.config.settings.stages.compile.postCompileScripts);
-					
+
 					// Complete stage
-					log.verbose(`Compile stage completed in ${compileStartMs.getMs() }ms\x07\x07\x07`);
+					log.verbose(`Compile stage completed in ${compileStartMs.getMs()}ms\x07\x07\x07`);
 					deferred.resolve();
 				})
 				.catch(deferred.reject);
-		} catch(err) {
+		} catch (err) {
 			deferred.reject(err);
 		}
 
@@ -260,7 +263,7 @@ class Sitepiler {
 			scriptRunner.run(this.config.settings.stages.publish.publishScripts);
 
 			deferred.resolve();
-		} catch(err) {
+		} catch (err) {
 			deferred.reject(err);
 		}
 
@@ -278,11 +281,7 @@ class Sitepiler {
 	}
 }
 
-
-
 module.exports = Sitepiler;
-
-
 
 function loadSources(sourceDir, outputRoot, relativePath, directory, ignoreKeys) {
 	const outputDir = path.join(outputRoot, relativePath);
@@ -293,23 +292,21 @@ function loadSources(sourceDir, outputRoot, relativePath, directory, ignoreKeys)
 	// Process each content page
 	dirContents.files.forEach((file) => {
 		// Load page
-		const page = Page.load(
-			path.join(sourceDir, file), 
-			path.join(outputDir, file), 
-			relativePath
-		);
+		const page = Page.load(path.join(sourceDir, file), path.join(outputDir, file), relativePath);
 
 		// Process ignore rules
-		const pageKeys = _.keys(page).map(v=>v.toLowerCase());
+		const pageKeys = _.keys(page).map((v) => v.toLowerCase());
 		let doIgnore = false;
-		ignoreKeys.map(v=>v.toLowerCase()).forEach((key) => {
-			if (page[key] === true && pageKeys.includes(key)) doIgnore = true;
-		});
+		ignoreKeys
+			.map((v) => v.toLowerCase())
+			.forEach((key) => {
+				if (page[key] === true && pageKeys.includes(key)) doIgnore = true;
+			});
 		if (doIgnore) {
 			log.warn(`Page ignored: ${path.join(directory.path, file)}`);
 			return;
 		}
-		
+
 		// Add to sitemap
 		const wasAdded = directory.addPage(page);
 		if (!wasAdded) {
@@ -320,8 +317,7 @@ function loadSources(sourceDir, outputRoot, relativePath, directory, ignoreKeys)
 
 	// Recurse each subdir
 	dirContents.dirs.forEach((dir) => {
-		if (!directory.dirs[dir])
-			directory.dirs[dir] = Directory.fromPath(path.join(directory.path, dir));
+		if (!directory.dirs[dir]) directory.dirs[dir] = Directory.fromPath(path.join(directory.path, dir));
 		loadSources(path.join(sourceDir, dir), outputRoot, path.join(relativePath, dir), directory.dirs[dir], ignoreKeys);
 	});
 }
@@ -332,10 +328,8 @@ function buildManifest(manifest, sourcePath, relativePath) {
 	files.forEach((file) => {
 		const newSourcePath = path.join(sourcePath, file);
 		const newRelativePath = path.join(relativePath, file);
-		if (fs.lstatSync(newSourcePath).isDirectory())
-			dirs.push(file);
-		else 
-			manifest.push({ file: newRelativePath });
+		if (fs.lstatSync(newSourcePath).isDirectory()) dirs.push(file);
+		else manifest.push({ file: newRelativePath });
 	});
 
 	dirs.forEach((dir) => buildManifest(manifest, path.join(sourcePath, dir), path.join(relativePath, dir)));
@@ -346,41 +340,46 @@ function processStyleConfig(sourceDir, outputDir, recursive) {
 
 	let styleSource = {};
 	log.debug(`sourceDir: ${sourceDir}`);
-	fileLoader.loadFiles(sourceDir, styleSource, [ fileLoader.filters.STYLES ], false);
+	fileLoader.loadFiles(sourceDir, styleSource, [fileLoader.filters.STYLES], false);
 
 	const promises = [];
 	_.forOwn(styleSource, (value, key) => {
 		if (key.toLowerCase().endsWith('less')) {
 			log.verbose(`Rendering LESS file ${key}`);
-			promises.push(less.render(value, { paths: [ sourceDir ] })
-				.then((output) => {
-					log.debug('Rendered file');
-					const outPath = path.join(outputDir, key.replace('.less', '.css'));
-					log.verbose('Writing less file: ', outPath);
-					fs.ensureDirSync(outputDir);
-					fs.writeFileSync(outPath, output.css, 'utf-8');
-				})
-				.catch((err) => {
-					log.debug('Error rendering file');
-					if (err.constructor.name === 'LessError') {
-						// The LESS renderer throws a custom object that is not a standard JS error
-						log.error(`${err.message} [${path.basename(err.filename)} (via ${key}) >> line: ${err.line}, column: ${err.column}, index: ${err.index}]`);
-						err = Error(err.message);
-					} else if (!err) {
-						// This 
-						const msg = `Unspecified error rendering ${key}`;
-						log.warn(msg);
-						err = Error(msg);
-					}
-					throw err;
-				})
+			promises.push(
+				less
+					.render(value, { paths: [sourceDir] })
+					.then((output) => {
+						log.debug('Rendered file');
+						const outPath = path.join(outputDir, key.replace('.less', '.css'));
+						log.verbose('Writing less file: ', outPath);
+						fs.ensureDirSync(outputDir);
+						fs.writeFileSync(outPath, output.css, 'utf-8');
+					})
+					.catch((err) => {
+						log.debug('Error rendering file');
+						if (err.constructor.name === 'LessError') {
+							// The LESS renderer throws a custom object that is not a standard JS error
+							log.error(
+								`${err.message} [${path.basename(err.filename)} (via ${key}) >> line: ${err.line}, column: ${err.column}, index: ${
+									err.index
+								}]`
+							);
+							err = Error(err.message);
+						} else if (!err) {
+							// This
+							const msg = `Unspecified error rendering ${key}`;
+							log.warn(msg);
+							err = Error(msg);
+						}
+						throw err;
+					})
 			);
 		} else {
 			log.verbose('Writing file: ', path.join(outputDir, key));
 			fs.ensureDirSync(outputDir);
 			fs.writeFileSync(path.join(outputDir, key), value, 'utf-8');
 		}
-
 	});
 
 	// Recurse?
@@ -413,7 +412,7 @@ function templateWatcherEvent(evt, filePath) {
 		// Set new timer
 		watcherlog.info(`Triggering recompile in ${this.config.settings.templateChangeRebuildQuietSeconds} seconds...`);
 		this.templateWatcherRebuiltTimeout = setTimeout(this.compile.bind(this), this.config.settings.templateChangeRebuildQuietSeconds * 1000);
-	} catch(ex) {
+	} catch (ex) {
 		log.error(ex);
 	}
 }
@@ -432,8 +431,7 @@ function sourceWatcherEvent(evt, filePath) {
 				return true;
 			}
 		});
-		if (!contentDir)
-			return watcherlog.error(`Failed to find content dir for source ${filePath}`);
+		if (!contentDir) return watcherlog.error(`Failed to find content dir for source ${filePath}`);
 
 		// Determine paths
 		const subdir = filePath.substring(contentDir.source.length + 1, filePath.length - path.basename(filePath).length);
@@ -443,14 +441,10 @@ function sourceWatcherEvent(evt, filePath) {
 		const destPath = path.join(this.config.settings.stages.compile.outputDirs.content, relativePath, path.basename(filePath));
 
 		// Generate content
-		const page = Page.load(
-			filePath, 
-			destPath, 
-			relativePath
-		);
+		const page = Page.load(filePath, destPath, relativePath);
 		this.context.sitemap.addPage(page);
 		page.render(this.context);
-	} catch(ex) {
+	} catch (ex) {
 		log.error(ex);
 	}
 }

@@ -37,7 +37,9 @@ module.exports = function(md, name, options) {
 		}
 
 		// Should have at least two lines
-		if (startLine + 2 > endLine) { return false; }
+		if (startLine + 2 > endLine) {
+			return false;
+		}
 		if (silent) return true;
 
 		// Parse control char attributes
@@ -61,7 +63,7 @@ module.exports = function(md, name, options) {
 		}
 
 		// Trim empty lines at beginning
-		while(lineText.trim() === '') {
+		while (lineText.trim() === '') {
 			startLine++;
 			nextLine++;
 			lineText = getLine(state, nextLine);
@@ -69,10 +71,9 @@ module.exports = function(md, name, options) {
 
 		// Add content until end marker is reached
 		let emptyLines = '';
-		while(!lineText.startsWith(controlChars) && nextLine <= endLine) {
+		while (!lineText.startsWith(controlChars) && nextLine <= endLine) {
 			// Trim escaped control chars
-			if (lineText.startsWith(`\\${controlChars}`))
-				lineText = lineText.substr(1);
+			if (lineText.startsWith(`\\${controlChars}`)) lineText = lineText.substr(1);
 
 			if (lineText.trim() === '') {
 				emptyLines += '\n';
@@ -87,7 +88,7 @@ module.exports = function(md, name, options) {
 
 		// Set next line in the state
 		state.line = nextLine + 1;
-		token.map = [ startLine, state.line ];
+		token.map = [startLine, state.line];
 
 		return true;
 	}
@@ -118,17 +119,19 @@ module.exports = function(md, name, options) {
 
 		if (token.attrs.tabsToSpaces) {
 			let spaces = '';
-			for (let i=0; i < token.attrs.tabsToSpaces; i++ ) {
+			for (let i = 0; i < token.attrs.tabsToSpaces; i++) {
 				spaces += ' ';
 			}
 			content = content.replace(/\t/gi, spaces);
 		}
-		
+
 		return `<p>
 	<div class="card fence">
 		${title ? `<h5 class="card-header fence-header">${title}</h5>` : ''}
 	  <div class="card-body fence-body"${autoCollapse ? ' style="display: none"' : ''}>
-	    <pre class="${showLineNumbers ? ' line-numbers' : ''}"><code class="language-${language}" ${maxHeight ? ` style="max-height: ${maxHeight}"` : ''}>${_.escape(content)}</code></pre>
+	    <pre class="${showLineNumbers ? ' line-numbers' : ''}"><code class="language-${language}" ${
+			maxHeight ? ` style="max-height: ${maxHeight}"` : ''
+		}>${_.escape(content)}</code></pre>
 	  </div>
 	</div>
 </p>`;
@@ -136,7 +139,7 @@ module.exports = function(md, name, options) {
 
 	// Overwrite fence rule
 	md.block.ruler.at('fence', fence, {
-		alt: [ 'paragraph', 'reference', 'blockquote', 'list' ]
+		alt: ['paragraph', 'reference', 'blockquote', 'list']
 	});
 
 	// Set renderer

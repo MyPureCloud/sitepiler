@@ -4,17 +4,15 @@ const YAML = require('yaml').default;
 
 const log = new (require('lognext'))('FileLoader');
 
-
-
 class FileLoader {
 	constructor() {
 		this.filters = {
-			ALL: [ '(.+)$', (f) => fs.readFileSync(f, 'utf-8') ],
-			JSON: [ '(json)$', require ],
-			DOT: [ '(dot)$', (f) => fs.readFileSync(f, 'utf-8') ],
-			MARKDOWN: [ '(md)$', (f) => fs.readFileSync(f, 'utf-8') ],
-			STYLES: [ '(css|less)$', (f) => fs.readFileSync(f, 'utf-8') ],
-			YAML: [ '(yml|yaml)$', (f) => YAML.parse(fs.readFileSync(f, 'utf-8')) ],
+			ALL: ['(.+)$', (f) => fs.readFileSync(f, 'utf-8')],
+			JSON: ['(json)$', require],
+			DOT: ['(dot)$', (f) => fs.readFileSync(f, 'utf-8')],
+			MARKDOWN: ['(md)$', (f) => fs.readFileSync(f, 'utf-8')],
+			STYLES: ['(css|less)$', (f) => fs.readFileSync(f, 'utf-8')],
+			YAML: ['(yml|yaml)$', (f) => YAML.parse(fs.readFileSync(f, 'utf-8'))]
 		};
 	}
 
@@ -40,7 +38,7 @@ class FileLoader {
 					break;
 				default:
 					log.warn(`Unknown filter: ${name}`);
-					filters.push([ `(${name})$]`, (f) => fs.readFileSync(f, 'utf-8') ]);
+					filters.push([`(${name})$]`, (f) => fs.readFileSync(f, 'utf-8')]);
 					break;
 			}
 		});
@@ -50,7 +48,7 @@ class FileLoader {
 
 	loadFiles(dir, target, filters, recursive = false, stripFilename = false) {
 		if (!fs.existsSync(dir)) return;
-		
+
 		const files = fs.readdirSync(dir);
 
 		// Load files in dir
@@ -67,7 +65,7 @@ class FileLoader {
 			// Apply filter
 			filters.some((filter) => {
 				// .exec() returns null if no match
-				if ((new RegExp(filter[0])).exec(file)) {
+				if (new RegExp(filter[0]).exec(file)) {
 					// Loads the file by invoking the second parameter with the full path of the file
 					const fileName = stripFilename ? file.substring(0, file.length - path.extname(file).length) : file;
 					target[fileName] = filter[1](fullPath);
@@ -81,7 +79,7 @@ class FileLoader {
 		let filterMatch;
 		filters.some((filter) => {
 			// .exec() returns null if no match
-			if ((new RegExp(filter[0])).exec(fileName)) {
+			if (new RegExp(filter[0]).exec(fileName)) {
 				filterMatch = filter;
 				return true;
 			}
@@ -103,8 +101,7 @@ class FileLoader {
 			if (fs.lstatSync(fullPath).isDirectory()) {
 				dirs.push(file);
 			} else {
-				if (!fileFilters || this.testFilters(fileFilters, file))
-					files.push(file);
+				if (!fileFilters || this.testFilters(fileFilters, file)) files.push(file);
 			}
 		});
 		return {
@@ -113,7 +110,5 @@ class FileLoader {
 		};
 	}
 }
-
-
 
 module.exports = new FileLoader();

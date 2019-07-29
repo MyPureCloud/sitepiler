@@ -6,8 +6,6 @@ const Timer = require('./timer');
 
 const log = new (require('lognext'))('ScriptRunner');
 
-
-
 class ScriptRunner {
 	constructor() {
 		this.isLocal = false;
@@ -31,7 +29,11 @@ class ScriptRunner {
 		}
 
 		if (this.isLocal && scriptConfig.runLocally === false) {
-			log.warn(`Building locally, skipping ${scriptConfig.type} script: ${scriptConfig.src || scriptConfig.command} ${scriptConfig.args ? scriptConfig.args.join(' ') : ''}`);
+			log.warn(
+				`Building locally, skipping ${scriptConfig.type} script: ${scriptConfig.src || scriptConfig.command} ${
+					scriptConfig.args ? scriptConfig.args.join(' ') : ''
+				}`
+			);
 			return 0;
 		} else {
 			exitCode = this._runImpl(scriptConfig);
@@ -53,7 +55,7 @@ class ScriptRunner {
 		let exitCode = -100;
 		try {
 			const args = scriptConfig.args ? scriptConfig.args.slice() : [];
-			const options = {stdio:'inherit'};
+			const options = { stdio: 'inherit' };
 			if (scriptConfig.cwd) {
 				log.verbose('cwd: ' + scriptConfig.cwd);
 				options['cwd'] = path.resolve(scriptConfig.cwd);
@@ -84,23 +86,17 @@ class ScriptRunner {
 				}
 			}
 
-			if (!exitCode || exitCode === null)
-				exitCode = 0;
+			if (!exitCode || exitCode === null) exitCode = 0;
 		} catch (err) {
-			if (err.message)
-				log.error(err.message);
+			if (err.message) log.error(err.message);
 
-			if (err.error)
-				log.error(err.error);
+			if (err.error) log.error(err.error);
 
-			if (err.status)
-				exitCode = err.status;
+			if (err.status) exitCode = err.status;
 		}
 
 		return exitCode;
 	}
 }
-
-
 
 module.exports = new ScriptRunner();

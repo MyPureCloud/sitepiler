@@ -4,10 +4,9 @@ const MarkdownIt = require('markdown-it');
 
 const ContextExtensions = require('./contextExtensions');
 
-
 const log = new (require('lognext'))('Renderer');
 
-const ABS_PATH_REGEX = /(<\s*(?:a|img|script|link)\s+.*?(?:href|src)=['"])(\/.*?['"].*?>)/igm;
+const ABS_PATH_REGEX = /(<\s*(?:a|img|script|link)\s+.*?(?:href|src)=['"])(\/.*?['"].*?>)/gim;
 
 // Markdown renderer settings
 const md = new MarkdownIt({
@@ -16,8 +15,8 @@ const md = new MarkdownIt({
 	xhtmlOut: true
 });
 
-// Disable Indented code - this setting breaks rendering formatted/intented HTML if it has blank lines in it 
-md.disable(['code']); 
+// Disable Indented code - this setting breaks rendering formatted/intented HTML if it has blank lines in it
+md.disable(['code']);
 
 // Add extensions
 md.block.ruler.before('table', 'mytable', require('./markdown-it-extensions/table'), { alt: ['paragraph', 'reference'] });
@@ -30,21 +29,19 @@ md.use(require('./markdown-it-extensions/alert'));
 // Set doT settings
 dot.templateSettings.varname = 'context';
 dot.templateSettings.strip = false;
-/* 
+/*
  * Original regexes: https://github.com/olado/doT/blob/master/doT.js
  * Requires node 9.11.2 or higher for lookbehind assertions
  * Added (?<!`) to escape templating that is used at the beginning of an inline code block
  * Does not escape if {{ not immediately preceded by a backtick
  */
-dot.templateSettings.evaluate =     /(?<!`)\{\{([\s\S]+?(\}?)+)\}\}/g;
-dot.templateSettings.interpolate =  /(?<!`)\{\{=([\s\S]+?)\}\}/g;
-dot.templateSettings.encode =       /(?<!`)\{\{!([\s\S]+?)\}\}/g;
-dot.templateSettings.use =          /(?<!`)\{\{#([\s\S]+?)\}\}/g;
-dot.templateSettings.define =       /(?<!`)\{\{##\s*([\w.$]+)\s*(:|=)([\s\S]+?)#\}\}/g;
-dot.templateSettings.conditional =  /(?<!`)\{\{\?(\?)?\s*([\s\S]*?)\s*\}\}/g;
-dot.templateSettings.iterate =      /(?<!`)\{\{~\s*(?:\}\}|([\s\S]+?)\s*:\s*([\w$]+)\s*(?::\s*([\w$]+))?\s*\}\})/g;
-
-
+dot.templateSettings.evaluate = /(?<!`)\{\{([\s\S]+?(\}?)+)\}\}/g;
+dot.templateSettings.interpolate = /(?<!`)\{\{=([\s\S]+?)\}\}/g;
+dot.templateSettings.encode = /(?<!`)\{\{!([\s\S]+?)\}\}/g;
+dot.templateSettings.use = /(?<!`)\{\{#([\s\S]+?)\}\}/g;
+dot.templateSettings.define = /(?<!`)\{\{##\s*([\w.$]+)\s*(:|=)([\s\S]+?)#\}\}/g;
+dot.templateSettings.conditional = /(?<!`)\{\{\?(\?)?\s*([\s\S]*?)\s*\}\}/g;
+dot.templateSettings.iterate = /(?<!`)\{\{~\s*(?:\}\}|([\s\S]+?)\s*:\s*([\w$]+)\s*(?::\s*([\w$]+))?\s*\}\})/g;
 
 class Renderer {
 	constructor() {
@@ -71,7 +68,7 @@ class Renderer {
 		const context = ContextExtensions.fromContext(originalContext);
 
 		_.forOwn(source, (value, key) => {
-			if (typeof(value) === 'object') {
+			if (typeof value === 'object') {
 				if (!dest[key]) dest[key] = {};
 				this.compileTemplates(value, dest[key], originalContext);
 			} else {
@@ -98,7 +95,7 @@ class Renderer {
 		paths = paths.filter((p) => p != '');
 		paths.forEach((dirname) => {
 			sitemap = sitemap.dirs[dirname];
-			let slice = { 
+			let slice = {
 				title: sitemap.title,
 				path: sitemap.path,
 				crumbs: []
@@ -119,7 +116,7 @@ class Renderer {
 					order: dir.indexPage.order
 				});
 			});
-			slice.crumbs = _.sortBy(slice.crumbs, [ 'order', 'title']);
+			slice.crumbs = _.sortBy(slice.crumbs, ['order', 'title']);
 			context.breadcrumb.push(slice);
 		});
 
@@ -146,17 +143,15 @@ class Renderer {
 		});
 
 		// Sort siblings
-		context.siblings = _.sortBy(context.siblings, [ 'order', 'title']);
+		context.siblings = _.sortBy(context.siblings, ['order', 'title']);
 
 		// Compile page and execute page template
 		context.page = page;
 		const markdownContent = dot.template(page.getBody(), undefined, context)(context);
 
 		// Compile markdown
-		if (page.renderMarkdown !== false)
-			context.content = md.render(markdownContent);
-		else
-			context.content = markdownContent;
+		if (page.renderMarkdown !== false) context.content = md.render(markdownContent);
+		else context.content = markdownContent;
 
 		// Execute layout template
 		let template;
@@ -165,8 +160,10 @@ class Renderer {
 		} else {
 			// Use path default?
 			this.defaultTemplates.some((dt) => {
-				if ((dt.webPath && page.link.toLowerCase().startsWith(dt.webPath.toLowerCase()) && this.templates.layouts[dt.template]) ||
-				(dt.webPathRegex && (new RegExp(dt.webPathRegex, 'i')).exec(page.link))) {
+				if (
+					(dt.webPath && page.link.toLowerCase().startsWith(dt.webPath.toLowerCase()) && this.templates.layouts[dt.template]) ||
+					(dt.webPathRegex && new RegExp(dt.webPathRegex, 'i').exec(page.link))
+				) {
 					template = this.templates.layouts[dt.template];
 					return true;
 				}
@@ -174,8 +171,7 @@ class Renderer {
 
 			// Use "default"
 			if (!template) {
-				if (page.layout && page.layout !== 'default')
-					log.warn(`Unknown template "${page.layout}", using default`);
+				if (page.layout && page.layout !== 'default') log.warn(`Unknown template "${page.layout}", using default`);
 
 				template = this.templates.layouts.default;
 			}
@@ -199,10 +195,8 @@ class Renderer {
 
 		// Log completion
 		const duration = Date.now() - startMs;
-		if (duration > 1000)
-			log.warn(`Page build time of ${duration} exceeded 1000ms: ${page.link}`);
-		else
-			log.verbose(`Page build completed in ${duration}ms`);
+		if (duration > 1000) log.warn(`Page build time of ${duration} exceeded 1000ms: ${page.link}`);
+		else log.verbose(`Page build completed in ${duration}ms`);
 
 		return output;
 	}

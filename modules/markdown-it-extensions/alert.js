@@ -29,21 +29,28 @@ module.exports = function container_plugin(md, name, options) {
 	options = options || {};
 
 	var min_markers = 3,
-		marker_str  = options.marker || ':',
+		marker_str = options.marker || ':',
 		marker_char = marker_str.charCodeAt(0),
-		marker_len  = marker_str.length;
+		marker_len = marker_str.length;
 
 	function container(state, startLine, endLine, silent) {
-
-		var pos, nextLine, marker_count, markup, params, token,
-			old_parent, old_line_max,
+		var pos,
+			nextLine,
+			marker_count,
+			markup,
+			params,
+			token,
+			old_parent,
+			old_line_max,
 			auto_closed = false,
 			start = state.bMarks[startLine] + state.tShift[startLine],
 			max = state.eMarks[startLine];
 
 		// Check out the first character quickly,
 		// this should filter out most of non-containers
-		if (marker_char !== state.src.charCodeAt(start)) { return false; }
+		if (marker_char !== state.src.charCodeAt(start)) {
+			return false;
+		}
 
 		// Check out the rest of the marker string
 		for (pos = start + 1; pos <= max; pos++) {
@@ -53,14 +60,18 @@ module.exports = function container_plugin(md, name, options) {
 		}
 
 		marker_count = Math.floor((pos - start) / marker_len);
-		if (marker_count < min_markers) { return false; }
+		if (marker_count < min_markers) {
+			return false;
+		}
 		pos -= (pos - start) % marker_len;
 
 		markup = state.src.slice(start, pos);
 		params = state.src.slice(pos, max);
 
 		// Since start is found, we can report success here in validation mode
-		if (silent) { return true; }
+		if (silent) {
+			return true;
+		}
 
 		// Search for the end of the block
 		nextLine = startLine;
@@ -83,7 +94,9 @@ module.exports = function container_plugin(md, name, options) {
 				break;
 			}
 
-			if (marker_char !== state.src.charCodeAt(start)) { continue; }
+			if (marker_char !== state.src.charCodeAt(start)) {
+				continue;
+			}
 
 			if (state.sCount[nextLine] - state.blkIndent >= 4) {
 				// closing fence should be indented less than 4 spaces
@@ -97,13 +110,17 @@ module.exports = function container_plugin(md, name, options) {
 			}
 
 			// closing code fence must be at least as long as the opening one
-			if (Math.floor((pos - start) / marker_len) < marker_count) { continue; }
+			if (Math.floor((pos - start) / marker_len) < marker_count) {
+				continue;
+			}
 
 			// make sure tail has spaces only
 			pos -= (pos - start) % marker_len;
 			pos = state.skipSpaces(pos);
 
-			if (pos < max) { continue; }
+			if (pos < max) {
+				continue;
+			}
 
 			// found!
 			auto_closed = true;
@@ -118,22 +135,22 @@ module.exports = function container_plugin(md, name, options) {
 		state.lineMax = nextLine;
 
 		// Add open token
-		token        = state.push('alert_open', 'div', 1);
+		token = state.push('alert_open', 'div', 1);
 		token.markup = markup;
-		token.block  = true;
-		token.info   = params;
-		token.map    = [ startLine, nextLine ];
+		token.block = true;
+		token.info = params;
+		token.map = [startLine, nextLine];
 		token.attrs = {
 			alert: params.trim().toLowerCase()
 		};
 
-		// This is the magic that makes the content render. 
+		// This is the magic that makes the content render.
 		state.md.block.tokenize(state, startLine + 1, nextLine);
 
 		// Add close token
-		token        = state.push('alert_close', 'div', -1);
+		token = state.push('alert_close', 'div', -1);
 		token.markup = state.src.slice(start, pos);
-		token.block  = true;
+		token.block = true;
 
 		// Update state
 		state.parentType = old_parent;
@@ -145,7 +162,7 @@ module.exports = function container_plugin(md, name, options) {
 
 	// Register extension
 	md.block.ruler.before('fence', 'container_' + name, container, {
-		alt: [ 'paragraph', 'reference', 'blockquote', 'list' ]
+		alt: ['paragraph', 'reference', 'blockquote', 'list']
 	});
 	md.renderer.rules['alert_open'] = renderOpen;
 	md.renderer.rules['alert_close'] = renderClose;

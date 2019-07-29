@@ -3,8 +3,6 @@ const path = require('path');
 
 const log = new (require('lognext'))('Directory');
 
-
-
 class Directory {
 	constructor() {
 		this.dirs = {};
@@ -62,8 +60,7 @@ class Directory {
 
 	getPage(link) {
 		if (!link || !link.startsWith(this.path)) return;
-		if (link.endsWith('/'))
-			link += 'index.html';
+		if (link.endsWith('/')) link += 'index.html';
 
 		let targetPage;
 
@@ -76,8 +73,8 @@ class Directory {
 
 		if (targetPage) return targetPage;
 
-		_.some(this.dirs, (dir) =>{
-			targetPage  = dir.getPage(link);
+		_.some(this.dirs, (dir) => {
+			targetPage = dir.getPage(link);
 			return targetPage !== undefined;
 		});
 
@@ -100,8 +97,7 @@ class Directory {
 		if (!this.title) this.title = 'No Title';
 
 		// Recurse
-		if (recursive)
-			_.forOwn(this.dirs, (dir) => dir.analyze(recursive));
+		if (recursive) _.forOwn(this.dirs, (dir) => dir.analyze(recursive));
 	}
 
 	renderPages(context, recursive = true) {
@@ -109,8 +105,7 @@ class Directory {
 		_.forOwn(this.pages, (page) => page.render(context));
 
 		// Recurse dirs
-		if (recursive) 
-			_.forOwn(this.dirs, (dir) => dir.renderPages(context, recursive));
+		if (recursive) _.forOwn(this.dirs, (dir) => dir.renderPages(context, recursive));
 	}
 
 	static fromPath(webPath) {
@@ -119,15 +114,11 @@ class Directory {
 		directory.path = webPath;
 
 		// Add slashes
-		if (!directory.path.startsWith('/')) 
-			directory.path = '/' + directory.path;
-		if (!directory.path.endsWith('/')) 
-			directory.path = directory.path + '/';
+		if (!directory.path.startsWith('/')) directory.path = '/' + directory.path;
+		if (!directory.path.endsWith('/')) directory.path = directory.path + '/';
 
 		return directory;
 	}
 }
-
-
 
 module.exports = Directory;

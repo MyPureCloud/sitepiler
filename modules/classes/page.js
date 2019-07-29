@@ -8,12 +8,8 @@ const renderer = require('./../renderer');
 
 const log = new (require('lognext'))('Page');
 
-
-
 class Page {
-	constructor() {
-
-	}
+	constructor() {}
 
 	render(context) {
 		// Mutate self
@@ -27,9 +23,7 @@ class Page {
 		return this;
 	}
 
-	analyze() {
-		
-	}
+	analyze() {}
 
 	getBody() {
 		// Read from disk
@@ -78,13 +72,10 @@ class Page {
 	}
 }
 
-
 module.exports = Page;
 
-
-
 function titleize(title) {
-	const noCapWords = [ 'and', 'or', 'to', 'a', 'an' ];
+	const noCapWords = ['and', 'or', 'to', 'a', 'an'];
 	title = title.replace(/[-_.]/gi, ' ');
 	const parts = title.split(' ');
 	title = '';
@@ -93,8 +84,7 @@ function titleize(title) {
 			title += part;
 		} else {
 			title += part.substring(0, 1).toUpperCase();
-			if (part.length > 1)
-				title += part.substr(1);
+			if (part.length > 1) title += part.substr(1);
 		}
 		title += ' ';
 	});

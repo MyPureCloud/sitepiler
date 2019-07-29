@@ -4,7 +4,6 @@ const fs = require('fs-extra');
 const log = new (require('lognext'))('editor');
 const path = require('path');
 
-
 class EditorServer {
 	constructor(sitepiler, port) {
 		this.sitepiler = sitepiler;
@@ -34,15 +33,11 @@ class EditorServer {
 
 		// Retrieve a source file
 		router.get('/localapi/sources/:contentDirId/*', (req, res) => {
-			if (req.originalUrl.includes('../'))
-				return res.status(400).send('No cheating in the path!');
+			if (req.originalUrl.includes('../')) return res.status(400).send('No cheating in the path!');
 
 			// Join content dir path and requested path (just the * portion)
 			const requestedPath = req.path.substring(19 + req.params.contentDirId.toString().length);
-			const sourcePath = path.join(
-				sitepiler.config.settings.stages.compile.contentDirs[req.params.contentDirId], 
-				requestedPath
-			);
+			const sourcePath = path.join(sitepiler.config.settings.stages.compile.contentDirs[req.params.contentDirId], requestedPath);
 
 			if (fs.existsSync(sourcePath)) {
 				log.debug(`Serving source: ${sourcePath}`);
@@ -55,15 +50,11 @@ class EditorServer {
 
 		// Save a source file
 		router.post('/localapi/sources/:contentDirId/*', textPlainBodyParser, (req, res) => {
-			if (req.originalUrl.includes('../'))
-				return res.status(400).send('No cheating in the path!');
+			if (req.originalUrl.includes('../')) return res.status(400).send('No cheating in the path!');
 
 			// Join content dir path and requested path (just the * portion)
 			const requestedPath = req.path.substring(19 + req.params.contentDirId.toString().length);
-			const sourcePath = path.join(
-				sitepiler.config.settings.stages.compile.contentDirs[req.params.contentDirId], 
-				requestedPath
-			);
+			const sourcePath = path.join(sitepiler.config.settings.stages.compile.contentDirs[req.params.contentDirId], requestedPath);
 
 			// Save source to disk
 			log.info(`Writing source file: ${sourcePath}`);
@@ -73,13 +64,10 @@ class EditorServer {
 			// Render and save
 			//TODO: don't think this code is necessary due to file system watchers in sitepiler
 			const output = sitepiler.render(req.body);
-			let destPath = path.join(
-				sitepiler.config.settings.stages.compile.outputDirs.content,
-				requestedPath
-			);
-			log.debug('destPath=',destPath);
+			let destPath = path.join(sitepiler.config.settings.stages.compile.outputDirs.content, requestedPath);
+			log.debug('destPath=', destPath);
 			destPath = sitepiler.prepareOutputFileName(destPath);
-			log.debug('destPath=',destPath);
+			log.debug('destPath=', destPath);
 			log.info(`Writing output file: ${destPath}`);
 			fs.ensureDirSync(path.dirname(destPath));
 			fs.writeFileSync(destPath, output);
@@ -91,8 +79,7 @@ class EditorServer {
 		// Error page
 		router.use('*', (req, res) => {
 			let errorPage = path.join(sitepiler.config.settings.stages.compile.outputDirs.content, 'error.html');
-			if (fs.existsSync(errorPage))
-				res.sendFile(errorPage);
+			if (fs.existsSync(errorPage)) res.sendFile(errorPage);
 
 			// Do nothing if the site doesn't have the page. Use default.
 		});
@@ -119,8 +106,6 @@ class EditorServer {
 
 module.exports = EditorServer;
 
-
-
 // Parses text/plain content into req.body
 function textPlainBodyParser(req, res, next) {
 	req.setEncoding('utf8');
@@ -128,7 +113,7 @@ function textPlainBodyParser(req, res, next) {
 	req.on('data', function(chunk) {
 		req.body += chunk;
 	});
-	req.on('end', function(){
+	req.on('end', function() {
 		next();
 	});
 }

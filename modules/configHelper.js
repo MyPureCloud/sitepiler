@@ -5,8 +5,6 @@ const fs = require('fs-extra');
 const path = require('path');
 const YAML = require('yaml').default;
 
-
-
 class ConfigHelper {
 	constructor() {
 		log.setLogLevel(global.logLevel);
@@ -17,19 +15,15 @@ class ConfigHelper {
 
 		// Load config files from disk
 		configFiles.forEach((configSource) => {
-			if (!fs.existsSync(configSource))
-				throw new Error(`Config file not found: ${configSource}`);
-			else
-				log.info(`Loading config: ${configSource}`);
+			if (!fs.existsSync(configSource)) throw new Error(`Config file not found: ${configSource}`);
+			else log.info(`Loading config: ${configSource}`);
 
 			// Read file
 			const extension = path.extname(configSource).substring(1);
 			if (extension.toLowerCase() === 'yml' || extension.toLowerCase() === 'yaml')
 				configSources.push(YAML.parse(fs.readFileSync(configSource, 'utf-8')));
-			else if (extension.toLowerCase() === 'json')
-				configSources.push(fs.readFileSync(configSource, 'utf-8'));
-			else
-				throw new Error(`Unknown file extension ${extension}`);
+			else if (extension.toLowerCase() === 'json') configSources.push(fs.readFileSync(configSource, 'utf-8'));
+			else throw new Error(`Unknown file extension ${extension}`);
 
 			// Dereference
 			configSources[configSources.length - 1] = this.dereference(configSources[configSources.length - 1]);
@@ -73,8 +67,7 @@ class ConfigHelper {
 
 		// Set env vars, skip ones with replacements on the first pass
 		_.forOwn(this.config.envVars, (value, key) => {
-			if (/\$\{\w+?\}/i.exec(value) === null)
-				this.setEnv(key, value);
+			if (/\$\{\w+?\}/i.exec(value) === null) this.setEnv(key, value);
 		});
 
 		_.forOwn(this.config.envVars, (value, key) => {
@@ -86,21 +79,49 @@ class ConfigHelper {
 
 		// Ensure WORKSPACE is set
 		if (!fs.existsSync(this.getEnv('WORKSPACE'))) {
-			throw new Error(`WORKSPACE "${this.getEnv('WORKSPACE')}" not found. Ensure the WORKSPACE env var is set to the path where the developer-center and sitepiler repos can be found.`);
+			throw new Error(
+				`WORKSPACE "${this.getEnv(
+					'WORKSPACE'
+				)}" not found. Ensure the WORKSPACE env var is set to the path where the developer-center and sitepiler repos can be found.`
+			);
 		}
 
 		// Normalize dirs
 		this.config.settings.stages.data.dataDirs = this.normalizeDirs(this.config.settings.stages.data.dataDirs, this.config.settings.rootDir);
-		this.config.settings.stages.compile.templateDirs.layouts = this.normalizeDirs(this.config.settings.stages.compile.templateDirs.layouts, this.config.settings.rootDir);
-		this.config.settings.stages.compile.templateDirs.partials = this.normalizeDirs(this.config.settings.stages.compile.templateDirs.partials, this.config.settings.rootDir);
-		this.config.settings.stages.compile.contentDirs = this.normalizeDirObjects(this.config.settings.stages.compile.contentDirs, this.config.settings.rootDir);
-		this.config.settings.stages.compile.styleDirs = this.normalizeDirObjects(this.config.settings.stages.compile.styleDirs, this.config.settings.rootDir);
-		this.config.settings.stages.compile.staticDirs = this.normalizeDirObjects(this.config.settings.stages.compile.staticDirs, this.config.settings.rootDir);
+		this.config.settings.stages.compile.templateDirs.layouts = this.normalizeDirs(
+			this.config.settings.stages.compile.templateDirs.layouts,
+			this.config.settings.rootDir
+		);
+		this.config.settings.stages.compile.templateDirs.partials = this.normalizeDirs(
+			this.config.settings.stages.compile.templateDirs.partials,
+			this.config.settings.rootDir
+		);
+		this.config.settings.stages.compile.contentDirs = this.normalizeDirObjects(
+			this.config.settings.stages.compile.contentDirs,
+			this.config.settings.rootDir
+		);
+		this.config.settings.stages.compile.styleDirs = this.normalizeDirObjects(
+			this.config.settings.stages.compile.styleDirs,
+			this.config.settings.rootDir
+		);
+		this.config.settings.stages.compile.staticDirs = this.normalizeDirObjects(
+			this.config.settings.stages.compile.staticDirs,
+			this.config.settings.rootDir
+		);
 
 		// Resolve output dirs
-		this.config.settings.stages.compile.outputDirs.content = this.normalizeDir(this.config.settings.stages.compile.outputDirs.content, this.config.settings.rootDir);
-		this.config.settings.stages.compile.outputDirs.styles = this.normalizeDir(this.config.settings.stages.compile.outputDirs.styles, this.config.settings.rootDir);
-		this.config.settings.stages.compile.outputDirs.static = this.normalizeDir(this.config.settings.stages.compile.outputDirs.static, this.config.settings.rootDir);
+		this.config.settings.stages.compile.outputDirs.content = this.normalizeDir(
+			this.config.settings.stages.compile.outputDirs.content,
+			this.config.settings.rootDir
+		);
+		this.config.settings.stages.compile.outputDirs.styles = this.normalizeDir(
+			this.config.settings.stages.compile.outputDirs.styles,
+			this.config.settings.rootDir
+		);
+		this.config.settings.stages.compile.outputDirs.static = this.normalizeDir(
+			this.config.settings.stages.compile.outputDirs.static,
+			this.config.settings.rootDir
+		);
 
 		// Resolve script sources
 		this.normalizeScriptConfigs(this.config.settings.stages.data.scripts);
@@ -115,10 +136,8 @@ class ConfigHelper {
 
 		// Normalize siteSubdir to "/path/to/folder"
 		if (this.config.settings.siteSubdir) {
-			if (!this.config.settings.siteSubdir.startsWith('/'))
-				this.config.settings.siteSubdir = '/' + this.config.settings.siteSubdir;
-			if (this.config.settings.siteSubdir.endsWith('/'))
-				this.config.settings.siteSubdir = this.config.settings.siteSubdir.substring(1);
+			if (!this.config.settings.siteSubdir.startsWith('/')) this.config.settings.siteSubdir = '/' + this.config.settings.siteSubdir;
+			if (this.config.settings.siteSubdir.endsWith('/')) this.config.settings.siteSubdir = this.config.settings.siteSubdir.substring(1);
 		}
 	}
 
@@ -128,16 +147,14 @@ class ConfigHelper {
 			return;
 		}
 		if (!haystack[needle] && haystack[needle] !== false) {
-			if (warning) 
-				log.warn(warning);
+			if (warning) log.warn(warning);
 
 			haystack[needle] = defaultValue;
 		}
 	}
 
 	checkAndThrow(haystack, needle, message) {
-		if (!haystack[needle] || haystack[needle] === '')
-			throw new Error(message ? message : `${needle} must be set!`);
+		if (!haystack[needle] || haystack[needle] === '') throw new Error(message ? message : `${needle} must be set!`);
 	}
 
 	getEnv(varname, defaultValue, isDefaultValue) {
@@ -146,25 +163,20 @@ class ConfigHelper {
 		log.silly(`ENV: ${varname}->${envVar}`);
 		if (!envVar && defaultValue) {
 			envVar = defaultValue;
-			if (isDefaultValue === true)
-				log.info(`Using default value for ${varname}: ${envVar}`);
-			else
-				log.warn(`Using override for ${varname}: ${envVar}`);
+			if (isDefaultValue === true) log.info(`Using default value for ${varname}: ${envVar}`);
+			else log.warn(`Using override for ${varname}: ${envVar}`);
 		}
 		if (envVar) {
-			if (envVar.toLowerCase() === 'true')
-				return true;
-			else if (envVar.toLowerCase() === 'true')
-				return false;
-			else 
-				return envVar;
+			if (envVar.toLowerCase() === 'true') return true;
+			else if (envVar.toLowerCase() === 'true') return false;
+			else return envVar;
 		}
 
 		return defaultValue;
 	}
 
 	setEnv(varname, value) {
-		var values = [ value ];
+		var values = [value];
 		this.resolveEnvVars(values);
 		varname = varname.trim();
 		log.silly(`ENV: ${varname}=${values[0]}`);
@@ -173,7 +185,7 @@ class ConfigHelper {
 
 	resolveEnvVars(config) {
 		_.forOwn(config, (value, key) => {
-			if (typeof(value) == 'string') {
+			if (typeof value == 'string') {
 				config[key] = value.replace(/\$\{(.+?)\}/gi, (match, p1, offset, string) => {
 					return this.getEnv(p1) || '';
 				});
@@ -184,22 +196,18 @@ class ConfigHelper {
 	}
 
 	applyOverrides(original, overrides) {
-		if (!original || !overrides)
-			return;
+		if (!original || !overrides) return;
 
 		_.forOwn(overrides, (value, key) => {
 			if (Array.isArray(value)) {
 				log.verbose(`Overriding array ${key}. Length old/new => ${original[key].length}/${value.length}`);
 				original[key] = value;
-			}
-			else if (typeof(value) == 'object') {
+			} else if (typeof value == 'object') {
 				// Initialize original to ensure the full path to the override values
-				if (!original[key])
-					original[key] = {};
+				if (!original[key]) original[key] = {};
 				this.applyOverrides(original[key], value);
 			} else {
-				if (original[key])
-					log.verbose(`Overriding ${key}. Values old/new => ${original[key]}/${value}`);
+				if (original[key]) log.verbose(`Overriding ${key}. Values old/new => ${original[key]}/${value}`);
 				original[key] = value;
 			}
 		});
@@ -222,7 +230,7 @@ class ConfigHelper {
 		dirs.forEach((d) => {
 			let newDir = {};
 
-			if (typeof(d) === 'string') {
+			if (typeof d === 'string') {
 				newDir.source = d;
 			} else {
 				newDir = d;
@@ -240,8 +248,7 @@ class ConfigHelper {
 	normalizeDir(dir, cwd) {
 		const paths = [];
 
-		if (!path.isAbsolute(dir))
-			paths.push(cwd);
+		if (!path.isAbsolute(dir)) paths.push(cwd);
 
 		paths.push(dir);
 
@@ -250,19 +257,15 @@ class ConfigHelper {
 	}
 
 	normalizeScriptConfigs(scriptConfigs) {
-		if(!scriptConfigs) return;
+		if (!scriptConfigs) return;
 		scriptConfigs.forEach((scriptConfig) => this.normalizeScriptConfig(scriptConfig));
 	}
 
 	normalizeScriptConfig(scriptConfig) {
 		if (scriptConfig.src) scriptConfig.src = this.normalizeDir(scriptConfig.src, this.config.settings.rootDir);
-		if (scriptConfig.cwd)
-			scriptConfig.cwd = this.normalizeDir(scriptConfig.cwd, this.config.settings.rootDir);
-		else
-			scriptConfig.cwd = this.config.settings.rootDir;
+		if (scriptConfig.cwd) scriptConfig.cwd = this.normalizeDir(scriptConfig.cwd, this.config.settings.rootDir);
+		else scriptConfig.cwd = this.config.settings.rootDir;
 	}
 }
-
-
 
 module.exports = new ConfigHelper();

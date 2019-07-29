@@ -4,9 +4,9 @@ class PageData {
 		this.body = '';
 	}
 
-	static is(d) { return d instanceof PageData; }
+	static is(d) {
+		return d instanceof PageData;
+	}
 }
-
-
 
 module.exports = PageData;

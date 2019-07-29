@@ -12,21 +12,28 @@ function isSpace(code) {
 
 module.exports = function(md, name, options) {
 	function heading(state, startLine, endLine, silent) {
-		var ch, level, tmp, token,
+		var ch,
+			level,
+			tmp,
+			token,
 			pos = state.bMarks[startLine] + state.tShift[startLine],
 			max = state.eMarks[startLine];
 
 		// if it's indented more than 3 spaces, it should be a code block
-		if (state.sCount[startLine] - state.blkIndent >= 4) { return false; }
+		if (state.sCount[startLine] - state.blkIndent >= 4) {
+			return false;
+		}
 
-		ch  = state.src.charCodeAt(pos);
+		ch = state.src.charCodeAt(pos);
 
-		if (ch !== 0x23/* # */ || pos >= max) { return false; }
+		if (ch !== 0x23 /* # */ || pos >= max) {
+			return false;
+		}
 
 		// count heading level
 		level = 1;
 		ch = state.src.charCodeAt(++pos);
-		while (ch === 0x23/* # */ && pos < max && level <= 6) {
+		while (ch === 0x23 /* # */ && pos < max && level <= 6) {
 			level++;
 			ch = state.src.charCodeAt(++pos);
 		}
@@ -34,9 +41,13 @@ module.exports = function(md, name, options) {
 		// Original logic
 		// if (level > 6 || (pos < max && !isSpace(ch))) { return false; }
 		// Add support for no spaces between octothorpes and text
-		if (level > 6) { return false; }
+		if (level > 6) {
+			return false;
+		}
 
-		if (silent) { return true; }
+		if (silent) {
+			return true;
+		}
 
 		// Let's cut tails like '    ###  ' from the end of string
 
@@ -48,16 +59,16 @@ module.exports = function(md, name, options) {
 
 		state.line = startLine + 1;
 
-		token        = state.push('heading_open', 'h' + String(level), 1);
+		token = state.push('heading_open', 'h' + String(level), 1);
 		token.markup = '########'.slice(0, level);
-		token.map    = [ startLine, state.line ];
+		token.map = [startLine, state.line];
 
-		token          = state.push('inline', '', 0);
-		token.content  = state.src.slice(pos, max).trim();
-		token.map      = [ startLine, state.line ];
+		token = state.push('inline', '', 0);
+		token.content = state.src.slice(pos, max).trim();
+		token.map = [startLine, state.line];
 		token.children = [];
 
-		token        = state.push('heading_close', 'h' + String(level), -1);
+		token = state.push('heading_close', 'h' + String(level), -1);
 		token.markup = '########'.slice(0, level);
 
 		return true;
@@ -65,8 +76,11 @@ module.exports = function(md, name, options) {
 
 	function headingOpenRenderer(tokens, idx, _options, env, slf) {
 		const token = tokens[idx];
-		let anchorName = tokens[idx+1].content || '';
-		anchorName = anchorName.toLowerCase().trim().replace(/[^a-z0-9]/gi, '_');
+		let anchorName = tokens[idx + 1].content || '';
+		anchorName = anchorName
+			.toLowerCase()
+			.trim()
+			.replace(/[^a-z0-9]/gi, '_');
 		return `<a href="#${anchorName}" name="${anchorName}" class="toc-link toc-link-${token.tag}"><${token.tag}>`;
 	}
 
@@ -77,7 +91,7 @@ module.exports = function(md, name, options) {
 
 	// Overwrite heading rule
 	md.block.ruler.at('heading', heading, {
-		alt: [ 'paragraph', 'reference', 'blockquote' ]
+		alt: ['paragraph', 'reference', 'blockquote']
 	});
 
 	md.renderer.rules['heading_open'] = headingOpenRenderer;
