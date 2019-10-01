@@ -7,6 +7,15 @@ function getLine(state, line) {
 	return state.src.substr(pos, max - pos);
 }
 
+function isSpace(code) {
+	switch (code) {
+		case 0x09:
+		case 0x20:
+			return true;
+	}
+	return false;
+}
+
 module.exports = function(md, name, options) {
 	function toc(state, startLine, endLine /*, silent*/) {
 		var nextLine, token, lineText;
@@ -41,12 +50,18 @@ module.exports = function(md, name, options) {
 						token = state.push('list_item_open', 'li', 1);
 						token.attrs = [['class', `toc-list-${headingMatch[1].length}`]];
 
+						// Trim heading text
+						let headingText = headingMatch[2];
+						while (isSpace(headingText.charCodeAt(headingText.length - 1)) || headingText.charCodeAt(headingText.length - 1) === 0x23) {
+							headingText = headingText.substr(0, headingText.length - 1);
+						}
+
 						// Add content
 						token = state.push('inline', '', 0);
-						token.content = `<a href="#${headingMatch[2]
+						token.content = `<a href="#${headingText
 							.toLowerCase()
 							.trim()
-							.replace(/[^a-z0-9]/gi, '_')}">${headingMatch[2]}</a>`;
+							.replace(/[^a-z0-9]/gi, '_')}">${headingText}</a>`;
 						token.children = [];
 
 						// Close list item
