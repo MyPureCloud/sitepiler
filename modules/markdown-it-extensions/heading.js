@@ -50,11 +50,8 @@ module.exports = function(md, name, options) {
 		}
 
 		// Let's cut tails like '    ###  ' from the end of string
-
-		max = state.skipSpacesBack(max, pos);
-		tmp = state.skipCharsBack(max, 0x23, pos); // #
-		if (tmp > pos && isSpace(state.src.charCodeAt(tmp - 1))) {
-			max = tmp;
+		while (isSpace(state.src.charCodeAt(max - 1)) || state.src.charCodeAt(max - 1) === 0x23) {
+			max--;
 		}
 
 		state.line = startLine + 1;
