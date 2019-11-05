@@ -10,6 +10,7 @@ class EditorServer {
 		this.port = port;
 
 		this.app = express();
+		this.app.use(require('cors')());
 		const router = express.Router();
 
 		// this.app.use(bodyParser.json());
