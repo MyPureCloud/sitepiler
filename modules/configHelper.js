@@ -3,7 +3,7 @@ const log = new (require('lognext'))('ConfigHelper');
 const deref = require('json-schema-deref-sync');
 const fs = require('fs-extra');
 const path = require('path');
-const YAML = require('yaml').default;
+const YAML = require('yaml');
 
 class ConfigHelper {
 	constructor() {
