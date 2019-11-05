@@ -1,6 +1,6 @@
 const fs = require('fs-extra');
 const path = require('path');
-const YAML = require('yaml').default;
+const YAML = require('yaml');
 
 const log = new (require('lognext'))('FileLoader');
 
