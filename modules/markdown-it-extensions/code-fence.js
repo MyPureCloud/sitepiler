@@ -128,10 +128,8 @@ module.exports = function(md, name, options) {
 		return `<p>
 	<div class="card fence">
 		${title ? `<h5 class="card-header fence-header">${title}</h5>` : ''}
-	  <div class="card-body fence-body"${autoCollapse ? ' style="display: none"' : ''}>
-	    <pre class="${showLineNumbers ? ' line-numbers' : ''}"><code class="language-${language}" ${
-			maxHeight ? ` style="max-height: ${maxHeight}"` : ''
-		}>${_.escape(content)}</code></pre>
+	  <div class="card-body fence-body" style="${autoCollapse ? ' display: none;' : ''} ${maxHeight ? ` max-height: ${maxHeight}` : ''}"${maxHeight ? ` data-maxHeight="${maxHeight}"` : ''}>
+	    <pre class="${showLineNumbers ? ' line-numbers' : ''}"><code class="language-${language}">${_.escape(content)}</code></pre>
 	  </div>
 	</div>
 </p>`;
