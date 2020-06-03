@@ -128,7 +128,9 @@ class ContextExtensions {
 			_.forOwn(newSchema, (value, key) => {
 				if (typeof value === 'object') {
 					// Value is a reference, replace it with a definition
+					const description = newSchema[key].description;
 					newSchema[key] = newContext.getDefinition(value, swaggerSource, truncate, resolvedTypes, value.items ? level : level + 1);
+					if (typeof description === 'string') newSchema[key].description = description;
 
 					// Set model name
 					if (value['$ref'] && typeof value['$ref'] === 'string') {
