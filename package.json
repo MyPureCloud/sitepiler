@@ -19,7 +19,7 @@
     "fs-extra": "^7.0.1",
     "json-schema-deref-sync": "^0.6.0",
     "less": "^3.9.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.21",
     "lognext": "0.0.4",
     "markdown-it": "^8.4.2",
     "moment": "^2.24.0",
